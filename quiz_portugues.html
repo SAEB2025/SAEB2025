@@ -1150,6 +1150,19 @@
             "https://i.ibb.co/Wp7smTf/IMG-4283.png"
         ];
 
+        // Heurística para detectar questões que dependem de texto/trecho para compreensão
+        function isTextDependent(questionText) {
+            if (!questionText || typeof questionText !== 'string') return false;
+            const text = questionText.toLowerCase();
+            const keywords = [
+                'texto', 'trecho', 'tirinha', 'charge', 'poema', 'crônica', 'artigo', 'campanha',
+                'manual', 'narrativa', 'resenha', 'anúncio', 'enciclopédia', 'rádio', 'aedes', 'detran'
+            ];
+            const mentionsKeyword = keywords.some(k => text.includes(k));
+            const hasQuotedSnippet = /['"“”‘’]/.test(questionText);
+            return mentionsKeyword || hasQuotedSnippet;
+        }
+
         // Variáveis do jogo
         let currentQuestionIndex = 0;
         let selectedQuestions = [];
@@ -1186,6 +1199,11 @@
             stats.overallTotal = (stats.overallTotal || 0) + totalQuestions;
             stats.portCorrect = (stats.portCorrect || 0) + finalCorrect;
             stats.portTotal = (stats.portTotal || 0) + totalQuestions;
+            // XP: 50 por acerto
+            stats.totalXP = (stats.totalXP || 0) + (finalCorrect * 50);
+            // Compatibilidade: espelhar XP em totalScore e acumular total de questões
+            stats.totalScore = (stats.totalScore || 0) + (finalCorrect * 50);
+            stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
 
             const passed = finalCorrect >= Math.ceil(totalQuestions * 0.7);
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
@@ -1276,10 +1294,13 @@
             const availableQuestions = questions.filter((_, index) => 
                 !usedQuestionIndices.includes(index)
             );
+            // Manter apenas questões que dependem de texto/trecho
+            const textPool = availableQuestions.filter(q => isTextDependent(q.question));
+            const pool = textPool.length > 0 ? textPool : availableQuestions;
             
-            // Selecionar 10 questões aleatórias das disponíveis
-            const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
-            selectedQuestions = shuffled.slice(0, 10);
+            // Selecionar aleatoriamente até 10 questões do pool
+            const shuffled = [...pool].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, Math.min(10, shuffled.length));
             
             // Rastrear índices das questões selecionadas
             selectedIndices = selectedQuestions.map(q => {
@@ -1332,7 +1353,7 @@
             answered = false;
             
             // Atualizar header
-            document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/10`;
+            document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/${selectedQuestions.length}`;
             document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
             
@@ -1407,6 +1428,7 @@
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
+                    <div class="correct-answer">Você ganhou <strong>+50 XP</strong>!</div>
                     <div class="correct-answer">Resposta correta!</div>
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
@@ -1435,7 +1457,7 @@
         function nextQuestion() {
             document.getElementById('feedbackModal').classList.remove('active');
             currentQuestionIndex++;
-            if (currentQuestionIndex < 10) {
+            if (currentQuestionIndex < selectedQuestions.length) {
                 setTimeout(() => {
                     document.querySelectorAll('.alternative').forEach(alt => {
                         alt.classList.remove('correct', 'incorrect', 'selected');
@@ -1466,15 +1488,16 @@
             document.getElementById('resultsScreen').classList.remove('hidden');
             
             const finalTime = Math.floor((Date.now() - startTime) / 60000);
-            const percentage = Math.round((score / 10) * 100);
+            const totalQ = selectedQuestions.length;
+            const percentage = Math.round((score / Math.max(1, totalQ)) * 100);
             
-            document.getElementById('finalScore').textContent = `${score}/10`;
+            document.getElementById('finalScore').textContent = `${score}/${totalQ}`;
             document.getElementById('percentageScore').textContent = `${percentage}%`;
             document.getElementById('correctAnswers').textContent = score;
-            document.getElementById('incorrectAnswers').textContent = 10 - score;
+            document.getElementById('incorrectAnswers').textContent = Math.max(0, totalQ - score);
             
             // Persistir resultados gerais
-            updateStatsAfterQuiz(score, 10, finalTime);
+            updateStatsAfterQuiz(score, totalQ, finalTime);
 
             // Limpar progresso concluído
             clearProgress();

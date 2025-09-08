@@ -2458,45 +2458,28 @@
             }
         }
 
-        // CALCULATE LEVEL AND XP
-        function calculateLevel(totalScore) {
-            const levels = [
-                { min: 0, max: 99, name: 'Iniciante', color: '#888888' },
-                { min: 100, max: 299, name: 'Aprendiz', color: '#00FF88' },
-                { min: 300, max: 599, name: 'Estudante', color: '#00BFFF' },
-                { min: 600, max: 999, name: 'Competente', color: '#FFFF00' },
-                { min: 1000, max: 1499, name: 'Avançado', color: '#FF6B35' },
-                { min: 1500, max: 2499, name: 'Expert', color: '#FF0080' },
-                { min: 2500, max: 3999, name: 'Mestre', color: '#9400D3' },
-                { min: 4000, max: 5999, name: 'Grão-Mestre', color: '#FFD700' },
-                { min: 6000, max: 9999, name: 'Lendário', color: '#FF1493' },
-                { min: 10000, max: Infinity, name: 'Mítico', color: '#00FFFF' }
+        // FREE FIRE RANK CALCULATION (100 XP por patente)
+        function getFreeFireRank(totalXP) {
+            const tiers = [
+                { name: 'Bronze', color: '#CD7F32' },
+                { name: 'Prata', color: '#C0C0C0' },
+                { name: 'Ouro', color: '#FFD700' },
+                { name: 'Platina', color: '#00CED1' },
+                { name: 'Diamante', color: '#1E90FF' },
+                { name: 'Mestre', color: '#FF4500' },
+                { name: 'Desafiante', color: '#9400D3' }
             ];
-            
-            for (let level of levels) {
-                if (totalScore >= level.min && totalScore <= level.max) {
-                    const xpInLevel = totalScore - level.min;
-                    const xpNeeded = level.max - level.min + 1;
-                    const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
-                    
-                    return {
-                        name: level.name,
-                        color: level.color,
-                        xp: xpInLevel,
-                        xpNeeded: xpNeeded,
-                        progress: progress,
-                        totalScore: totalScore
-                    };
-                }
-            }
-            
+            const safeXP = Math.max(0, Math.floor(Number(totalXP) || 0));
+            const tierIndex = Math.min(Math.floor(safeXP / 100), tiers.length - 1);
+            const xpInTier = safeXP % 100;
+            const progress = Math.min(100, xpInTier);
+            const tier = tiers[tierIndex];
             return {
-                name: 'Iniciante',
-                color: '#888888',
-                xp: 0,
-                xpNeeded: 100,
-                progress: 0,
-                totalScore: 0
+                name: tier.name,
+                color: tier.color,
+                xpInTier,
+                progress,
+                displayName: tier.name
             };
         }
 
@@ -2591,21 +2574,21 @@
                     noData.style.display = hasData ? 'none' : 'block';
                 }
 
-                // Update Level and XP
-                const levelInfo = calculateLevel(data.totalScore || 0);
+                // Update Rank (Free Fire) e XP
+                const totalXP = (data.totalXP != null) ? data.totalXP : (data.totalScore || 0);
+                const rankInfo = getFreeFireRank(totalXP);
                 const levelBadge = document.getElementById('levelBadge');
                 const xpFill = document.getElementById('xpFill');
                 const xpText = document.getElementById('xpText');
-                
                 if (levelBadge) {
-                    levelBadge.textContent = levelInfo.name;
-                    levelBadge.style.background = `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}88)`;
+                    levelBadge.textContent = rankInfo.displayName;
+                    levelBadge.style.background = `linear-gradient(135deg, ${rankInfo.color}, ${rankInfo.color}88)`;
                 }
                 if (xpFill) {
-                    xpFill.style.width = `${levelInfo.progress}%`;
+                    xpFill.style.width = `${rankInfo.progress}%`;
                 }
                 if (xpText) {
-                    xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP`;
+                    xpText.textContent = `${rankInfo.xpInTier} / 100 XP`;
                 }
 
                 // Overall Performance

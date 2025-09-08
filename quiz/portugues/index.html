@@ -236,6 +236,19 @@
             "https://i.ibb.co/Wp7smTf/IMG-4283.png"
         ];
 
+        // Heurística simples para identificar questões dependentes de texto/trecho
+        function isTextDependent(questionText) {
+            if (!questionText || typeof questionText !== 'string') return false;
+            const text = questionText.toLowerCase();
+            const keywords = [
+                'texto', 'trecho', 'tirinha', 'charge', 'poema', 'crônica', 'artigo', 'campanha',
+                'manual', 'narrativa', 'resenha', 'anúncio', 'enciclopédia', 'rádio', 'aedes', 'detran'
+            ];
+            const mentions = keywords.some(k => text.includes(k));
+            const hasQuotes = /['"“”‘’]/.test(questionText);
+            return mentions || hasQuotes;
+        }
+
         // Estado
         let currentQuestionIndex = 0;
         let selectedQuestions = [];
@@ -258,6 +271,12 @@
             stats.portCorrect = (stats.portCorrect || 0) + finalCorrect;
             stats.portTotal = (stats.portTotal || 0) + totalQuestions;
 
+            // XP: 50 por acerto
+            stats.totalXP = (stats.totalXP || 0) + (finalCorrect * 50);
+            // Compatibilidade com lobby atual
+            stats.totalScore = (stats.totalScore || 0) + (finalCorrect * 50);
+            stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
+
             const passed = finalCorrect >= Math.ceil(totalQuestions * 0.7);
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
             stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
@@ -274,7 +293,10 @@
         function goToLobby() { window.location.href = '/index.html#lobby'; }
 
         function initQuiz() {
-            selectedQuestions = getRandomQuestions(questions, 10);
+            // Manter apenas questões dependentes de texto; fallback p/ todas
+            const textQuestions = questions.filter(q => isTextDependent(q.question));
+            const pool = textQuestions.length > 0 ? textQuestions : questions;
+            selectedQuestions = getRandomQuestions(pool, Math.min(10, pool.length));
             currentQuestionIndex = 0; score = 0; selectedAnswer = null; startTime = Date.now(); answered = false;
             createParticles();
             showQuestion();
@@ -299,7 +321,7 @@
             if (currentQuestionIndex >= selectedQuestions.length) { showResults(); return; }
             const q = selectedQuestions[currentQuestionIndex];
             answered = false;
-            document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/10`;
+            document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/${selectedQuestions.length}`;
             document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
             document.getElementById('questionText').textContent = q.question;
@@ -350,6 +372,7 @@
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size:4rem;margin:1rem 0;">🎉</div>
+                    <div class="correct-answer">Você ganhou <strong>+50 XP</strong>!</div>
                     <div class="correct-answer">Resposta correta!</div>
                     <div class="explanation">${q.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
@@ -388,14 +411,15 @@
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             const elapsed = Math.floor((Date.now() - startTime) / 60000);
-            const pct = Math.round((score / selectedQuestions.length) * 100);
-            document.getElementById('finalScore').textContent = `${score}/${selectedQuestions.length}`;
+            const totalQ = selectedQuestions.length;
+            const pct = Math.round((score / Math.max(1, totalQ)) * 100);
+            document.getElementById('finalScore').textContent = `${score}/${totalQ}`;
             document.getElementById('percentageScore').textContent = `${pct}%`;
             document.getElementById('correctAnswers').textContent = score;
-            document.getElementById('incorrectAnswers').textContent = selectedQuestions.length - score;
+            document.getElementById('incorrectAnswers').textContent = Math.max(0, totalQ - score);
 
             // Persistir resultados compatíveis com homepage
-            updateStatsAfterQuiz(score, selectedQuestions.length, elapsed);
+            updateStatsAfterQuiz(score, totalQ, elapsed);
 
             const list = document.getElementById('improvementList');
             list.innerHTML = '';
