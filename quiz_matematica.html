@@ -810,7 +810,7 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <div class="logo">🔥 QUIZ MATEMÁTICA</div>
+            <div class="logo" onclick="goToLobby()">🔥 QUIZ MATEMÁTICA</div>
             <div class="quiz-info">
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
@@ -899,7 +899,7 @@
             },
             {
                 question: "Um rapaz comprou: 2 calças de R$94, 3 camisas de R$65, 1 tênis R$125, 1 boné e 1 sandália de R$49. Pagou R$156 à vista, o resto em 3 vezes. Valor de cada parcela:",
-                alternatives: ["112", "150", "161", "202", "254"],
+                alternatives: ["134", "150", "161", "202", "254"],
                 correct: 0,
                 explanation: "Total: 2×94 + 3×65 + 125 + 49 = 188 + 195 + 125 + 49 = R$557. Resta: 557 - 156 = 401. Parcela: 401 ÷ 3 = R$133,67 ≈ R$134."
             },
@@ -918,8 +918,8 @@
             {
                 question: "Uma vela de 10 cm, após 36 min restaram 4 cm. Tempo total até acabar:",
                 alternatives: ["60", "90", "134", "144", "360"],
-                correct: 1,
-                explanation: "Queimou 6 cm em 36 min. Taxa: 6÷36 = 1/6 cm/min. Para queimar 10 cm: 10 ÷ (1/6) = 60 min. Resposta: 90 min."
+                correct: 0,
+                explanation: "Queimou 6 cm em 36 min. Taxa: 6÷36 = 1/6 cm/min. Para queimar 10 cm: 10 ÷ (1/6) = 60 min. Resposta: 60 min."
             },
             {
                 question: "Bala segue a parábola y = −5x² + 90x. Altura máxima:",
@@ -1046,6 +1046,52 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+
+        // Persistência local de estatísticas
+        function loadStats() {
+            try {
+                const raw = localStorage.getItem('saebStats');
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveStats(stats) {
+            try {
+                localStorage.setItem('saebStats', JSON.stringify(stats));
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        function updateStatsAfterQuiz(finalCorrect, totalQuestions, elapsedMinutes) {
+            const stats = loadStats();
+            stats.quizzesCompleted = (stats.quizzesCompleted || 0) + 1;
+            stats.totalMinutes = (stats.totalMinutes || 0) + (elapsedMinutes || 0);
+            stats.overallCorrect = (stats.overallCorrect || 0) + finalCorrect;
+            stats.overallTotal = (stats.overallTotal || 0) + totalQuestions;
+            stats.mathCorrect = (stats.mathCorrect || 0) + finalCorrect;
+            stats.mathTotal = (stats.mathTotal || 0) + totalQuestions;
+
+            // streak simplificada: se >=7 acertos, incrementa; senão zera
+            const passed = finalCorrect >= Math.ceil(totalQuestions * 0.7);
+            stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
+            stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
+
+            // ranking simples
+            const overallPct = Math.round((stats.overallCorrect || 0) / Math.max(1, (stats.overallTotal || 0)) * 100);
+            if (overallPct >= 90) stats.ranking = 'Lendário';
+            else if (overallPct >= 75) stats.ranking = 'Pro';
+            else if (overallPct >= 50) stats.ranking = 'Intermediário';
+            else stats.ranking = 'Iniciante';
+
+            saveStats(stats);
+        }
+
+        function goToLobby() {
+            window.location.href = 'index.html#lobby';
+        }
 
         // Inicializar o quiz
         function initQuiz() {
@@ -1245,6 +1291,9 @@
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
             
+            // Persistir resultados
+            updateStatsAfterQuiz(score, 10, finalTime);
+
             // Sugestões de melhoria baseadas na performance
             const improvementList = document.getElementById('improvementList');
             improvementList.innerHTML = '';
@@ -1284,8 +1333,8 @@
                 document.getElementById('resultsScreen').classList.add('hidden');
                 document.getElementById('questionScreen').classList.remove('hidden');
                 
-                // Reinicializar o quiz
-                initQuiz();
+                // Redirecionar para lobby
+                goToLobby();
             }
         }
 

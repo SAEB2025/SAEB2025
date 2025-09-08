@@ -1354,7 +1354,7 @@
                     
                     <div class="quiz-options">
                         <!-- Matemática Quiz Card -->
-                        <div class="quiz-card matematica" onclick="iniciarQuiz('matematica')">
+                        <div class="quiz-card matematica" onclick="iniciarQuiz('matematica', event)">
                             <span class="quiz-icon">🔢</span>
                             <h2 class="quiz-title">MATEMÁTICA</h2>
                             <p class="quiz-description">
@@ -1370,7 +1370,7 @@
                         </div>
 
                         <!-- Português Quiz Card -->
-                        <div class="quiz-card portugues" onclick="iniciarQuiz('portugues')">
+                        <div class="quiz-card portugues" onclick="iniciarQuiz('portugues', event)">
                             <span class="quiz-icon">📝</span>
                             <h2 class="quiz-title">PORTUGUÊS</h2>
                             <p class="quiz-description">
@@ -1399,25 +1399,25 @@
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">📈 DESEMPENHO GERAL</div>
-                            <div class="diagnostic-value">0%</div>
+                            <div class="diagnostic-value" id="overallPerformanceValue">0%</div>
                             <div class="diagnostic-bar">
-                                <div class="diagnostic-fill" style="width: 0%"></div>
+                                <div class="diagnostic-fill" id="overallPerformanceFill" style="width: 0%"></div>
                             </div>
                         </div>
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">🎯 ACERTOS MATEMÁTICA</div>
-                            <div class="diagnostic-value">--</div>
+                            <div class="diagnostic-value" id="mathPerformanceValue">--</div>
                             <div class="diagnostic-bar">
-                                <div class="diagnostic-fill" style="width: 0%"></div>
+                                <div class="diagnostic-fill" id="mathPerformanceFill" style="width: 0%"></div>
                             </div>
                         </div>
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">📝 ACERTOS PORTUGUÊS</div>
-                            <div class="diagnostic-value">--</div>
+                            <div class="diagnostic-value" id="portuguesePerformanceValue">--</div>
                             <div class="diagnostic-bar">
-                                <div class="diagnostic-fill" style="width: 0%"></div>
+                                <div class="diagnostic-fill" id="portuguesePerformanceFill" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -1425,19 +1425,19 @@
                             <h4 style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-bottom: 1rem;">⚡ ESTATÍSTICAS</h4>
                             <div class="stat-row">
                                 <span class="stat-label">Quizzes Concluídos:</span>
-                                <span class="stat-value">0</span>
+                                <span class="stat-value" id="statQuizzesCompleted">0</span>
                             </div>
                             <div class="stat-row">
                                 <span class="stat-label">Tempo Total Jogado:</span>
-                                <span class="stat-value">0min</span>
+                                <span class="stat-value" id="statTotalTime">0min</span>
                             </div>
                             <div class="stat-row">
                                 <span class="stat-label">Melhor Streak:</span>
-                                <span class="stat-value">0</span>
+                                <span class="stat-value" id="statBestStreak">0</span>
                             </div>
                             <div class="stat-row">
                                 <span class="stat-label">Ranking:</span>
-                                <span class="stat-value">Iniciante</span>
+                                <span class="stat-value" id="statRanking">Iniciante</span>
                             </div>
                         </div>
                     </div>
@@ -1488,8 +1488,9 @@
         }
 
         // FUNÇÃO PARA INICIAR QUIZ COM EFEITO ESPECIAL
-        function iniciarQuiz(materia = null) {
-            const button = event.target.closest('.cta-main, .quiz-card');
+        function iniciarQuiz(materia = null, ev = null) {
+            const evt = ev || window.event;
+            const button = evt && evt.target ? evt.target.closest('.cta-main, .quiz-card') : null;
             
             if (button) {
                 // Efeito de glitch no botão
@@ -1508,10 +1509,12 @@
                     createExplosion(button);
                     
                     setTimeout(() => {
-                        if (materia) {
-                            alert(`🔥 PREPARANDO ${materia.toUpperCase()}!\n\nO quiz de ${materia} está sendo finalizado pelos desenvolvedores.\n\nEm breve você poderá testar seus conhecimentos e dominar essa matéria!\n\nAguarde as próximas atualizações! 🚀`);
+                        if (materia === 'matematica') {
+                            window.location.href = 'quiz_matematica.html#from=lobby';
+                        } else if (materia === 'portugues') {
+                            alert('🔥 Português em desenvolvimento. Em breve disponível!');
                         } else {
-                            alert('🔥 ATENÇÃO CRIAS!\n\nO quiz tá sendo preparado com muito amor e carinho. Em breve vocês vão poder testar os conhecimentos e mostrar que são os melhores!\n\nFiquem ligados que vem coisa boa por aí! 💯');
+                            showPage('lobby');
                         }
                     }, 500);
                 }, 150);
@@ -1904,9 +1907,15 @@
                 optimizeForMobile();
             }, 250));
             
+            // Abrir lobby via hash, se presente
+            if (location.hash.includes('lobby')) {
+                showPage('lobby');
+            }
+
             // Trigger inicial
             setTimeout(() => {
                 revealOnScroll();
+                loadUserData();
             }, 500);
 
             // Adicionar classe para dispositivos touch
@@ -1938,10 +1947,54 @@
         // INICIALIZAR PERFORMANCE MONITORING
         monitorPerformance();
 
-        // SIMULAÇÃO DE DADOS DO USUÁRIO (para futuro backend)
+        // CARREGAR DADOS DO LOCALSTORAGE E ATUALIZAR DIAGNÓSTICO
         function loadUserData() {
-            // Esta função será implementada quando houver backend real
-            console.log('Dados do usuário carregados');
+            try {
+                const raw = localStorage.getItem('saebStats');
+                if (!raw) return;
+                const data = JSON.parse(raw);
+
+                const hasData = (data.quizzesCompleted || 0) > 0;
+                const noData = document.querySelector('#stats-container .no-data');
+                if (noData && hasData) noData.style.display = 'none';
+
+                // Overall
+                const overall = Math.round((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100);
+                const overallValue = document.getElementById('overallPerformanceValue');
+                const overallFill = document.getElementById('overallPerformanceFill');
+                if (overallValue) overallValue.textContent = `${isFinite(overall) ? overall : 0}%`;
+                if (overallFill) overallFill.style.width = `${isFinite(overall) ? overall : 0}%`;
+
+                // Matemática
+                if (typeof data.mathCorrect === 'number' && typeof data.mathTotal === 'number') {
+                    const mathPct = Math.round((data.mathCorrect || 0) / Math.max(1, (data.mathTotal || 0)) * 100);
+                    const mathValue = document.getElementById('mathPerformanceValue');
+                    const mathFill = document.getElementById('mathPerformanceFill');
+                    if (mathValue) mathValue.textContent = `${isFinite(mathPct) ? mathPct : 0}%`;
+                    if (mathFill) mathFill.style.width = `${isFinite(mathPct) ? mathPct : 0}%`;
+                }
+
+                // Português (placeholder)
+                if (typeof data.portCorrect === 'number' && typeof data.portTotal === 'number') {
+                    const portPct = Math.round((data.portCorrect || 0) / Math.max(1, (data.portTotal || 0)) * 100);
+                    const portValue = document.getElementById('portuguesePerformanceValue');
+                    const portFill = document.getElementById('portuguesePerformanceFill');
+                    if (portValue) portValue.textContent = `${isFinite(portPct) ? portPct : 0}%`;
+                    if (portFill) portFill.style.width = `${isFinite(portPct) ? portPct : 0}%`;
+                }
+
+                // Estatísticas
+                const quizzesCompleted = document.getElementById('statQuizzesCompleted');
+                const totalTime = document.getElementById('statTotalTime');
+                const bestStreak = document.getElementById('statBestStreak');
+                const ranking = document.getElementById('statRanking');
+                if (quizzesCompleted) quizzesCompleted.textContent = data.quizzesCompleted || 0;
+                if (totalTime) totalTime.textContent = `${data.totalMinutes || 0}min`;
+                if (bestStreak) bestStreak.textContent = data.bestStreak || 0;
+                if (ranking) ranking.textContent = data.ranking || 'Iniciante';
+            } catch (e) {
+                console.warn('Falha ao carregar dados locais:', e);
+            }
         }
 
         // CARREGAR DADOS INICIAIS
