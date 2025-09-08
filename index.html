@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>SAEB 2025 - QUIZ SAEB 2025 🔥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="prefetch" href="quiz_matematica.html">
+    <link rel="prefetch" href="quiz_portugues.html">
     <style>
         * {
             margin: 0;
@@ -36,6 +39,30 @@
             line-height: 1.4;
             overflow-x: hidden;
             min-height: 100vh;
+        }
+
+        /* ACCESSIBILITY: focus styles and skip link */
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            background: var(--neon-yellow);
+            color: var(--dark-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            z-index: 30000;
+        }
+
+        .skip-link:focus {
+            left: 1rem;
+            top: 1rem;
+            outline: 3px solid var(--neon-green);
+            outline-offset: 2px;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--neon-yellow);
+            outline-offset: 3px;
         }
 
         /* BACKGROUND EFFECTS */
@@ -1216,11 +1243,12 @@
     </style>
 </head>
 <body class="loading">
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
     <!-- Background Effects -->
-    <div class="bg-grid"></div>
-    <div class="neon-particles" id="particles"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="neon-particles" id="particles" aria-hidden="true"></div>
     <!-- Route Loader -->
-    <div class="route-overlay" id="routeOverlay">
+    <div class="route-overlay" id="routeOverlay" role="dialog" aria-modal="true" aria-live="polite" aria-label="Carregando rota">
         <div class="spinner"></div>
         <div class="loading-text" id="routeOverlayText">Carregando...</div>
     </div>
@@ -1228,7 +1256,7 @@
     <!-- Header -->
     <header id="header">
         <div class="header-content">
-            <div class="logo" onclick="showPage('home')">🔥 SAEB 2025</div>
+            <div class="logo" onclick="showPage('home')" role="link" tabindex="0" aria-label="Ir para a página inicial" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showPage('home');}">🔥 SAEB 2025</div>
             <div class="nav-controls">
                 <div class="prototype-tag">BETA 2025</div>
                 <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
@@ -1236,7 +1264,7 @@
         </div>
     </header>
 
-    <div class="main-container">
+    <main id="main" class="main-container" role="main">
         <!-- HOME PAGE -->
         <div id="homePage" class="page active">
             <!-- Hero Section -->
@@ -1292,12 +1320,12 @@
                     <h3 style="color: var(--neon-green); font-family: 'Oswald', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); margin: 3rem 0 2rem; text-transform: uppercase;">🔥 AS MATÉRIAS QUE FAZEM A DIFERENÇA</h3>
                     <div class="cards-grid">
                         <div class="card">
-                            <span class="card-icon">📖</span>
+                            <span class="card-icon" aria-hidden="true">📖</span>
                             <h3 class="card-title">PORTUGUÊS</h3>
                             <p class="card-text">É aqui que tu mostra se manja dos textos, se sabe interpretar e se tem o dom da escrita. Literatura, gramática, interpretação - tudo que precisa pra mandar bem na vida.</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">🔢</span>
+                            <span class="card-icon" aria-hidden="true">🔢</span>
                             <h3 class="card-title">MATEMÁTICA</h3>
                             <p class="card-text">Os números não mentem, parceiro. Álgebra, geometria, estatística - é onde tu prova que tem o raciocínio afiado e sabe resolver os problemas da vida real.</p>
                         </div>
@@ -1308,32 +1336,32 @@
                     <h2 class="section-title">💯 POR QUE NOSSOS SIMULADOS SÃO DIFERENTES</h2>
                     <div class="cards-grid">
                         <div class="card">
-                            <span class="card-icon">🎮</span>
+                            <span class="card-icon" aria-hidden="true">🎮</span>
                             <h3 class="card-title">VIBE GAMER</h3>
                             <p class="card-text">Estudar não precisa ser chato, mano. Transformamos o aprendizado numa experiência épica, com elementos de jogo que te mantém motivado.</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">📊</span>
+                            <span class="card-icon" aria-hidden="true">📊</span>
                             <h3 class="card-title">DIAGNÓSTICO CERTEIRO</h3>
                             <p class="card-text">Sistema inteligente que mostra exatamente onde tu tá mandando bem e onde precisa dar aquela força extra. É tipo um raio-x do teu conhecimento.</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">⚡</span>
+                            <span class="card-icon" aria-hidden="true">⚡</span>
                             <h3 class="card-title">FEEDBACK INSTANTÂNEO</h3>
                             <p class="card-text">Errou? Recebe a explicação na hora. Acertou? Já parte pro próximo nível. Sem enrolação, direto ao ponto.</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">🎯</span>
+                            <span class="card-icon" aria-hidden="true">🎯</span>
                             <h3 class="card-title">FOCO NO QUE IMPORTA</h3>
                             <p class="card-text">Zero perda de tempo. Só o que realmente cai no SAEB, otimizado pro máximo de resultados com o mínimo de esforço.</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">📈</span>
+                            <span class="card-icon" aria-hidden="true">📈</span>
                             <h3 class="card-title">EVOLUÇÃO VISÍVEL</h3>
                             <p class="card-text">Gráficos e estatísticas que mostram tua evolução em tempo real. É viciante ver o próprio crescimento!</p>
                         </div>
                         <div class="card">
-                            <span class="card-icon">👑</span>
+                            <span class="card-icon" aria-hidden="true">👑</span>
                             <h3 class="card-title">CONFIANÇA TOTAL</h3>
                             <p class="card-text">Quando chegar na prova oficial, tu vai estar preparado e confiante. Sem nervosismo, só resultados.</p>
                         </div>
@@ -1402,33 +1430,33 @@
                     
                     <div class="quiz-options">
                         <!-- Matemática Quiz Card -->
-                        <div class="quiz-card matematica" onclick="iniciarQuiz('matematica', event)">
-                            <span class="quiz-icon">🔢</span>
+                        <div class="quiz-card matematica" onclick="iniciarQuiz('matematica', event)" role="button" tabindex="0" aria-label="Abrir quiz de Matemática" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();iniciarQuiz('matematica', event);}">
+                            <span class="quiz-icon" aria-hidden="true">🔢</span>
                             <h2 class="quiz-title">MATEMÁTICA</h2>
                             <p class="quiz-description">
                                 Números, fórmulas e problemas que vão testar se tu realmente manja dos cálculos. Mostre que é fera nos números!
                             </p>
                             <div class="quiz-difficulty">
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
                             </div>
                             <button class="start-quiz-btn">🚀 VAMO QUE VAMO</button>
                         </div>
 
                         <!-- Português Quiz Card -->
-                        <div class="quiz-card portugues" onclick="iniciarQuiz('portugues', event)">
-                            <span class="quiz-icon">📝</span>
+                        <div class="quiz-card portugues" onclick="iniciarQuiz('portugues', event)" role="button" tabindex="0" aria-label="Abrir quiz de Português" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();iniciarQuiz('portugues', event);}">
+                            <span class="quiz-icon" aria-hidden="true">📝</span>
                             <h2 class="quiz-title">PORTUGUÊS</h2>
                             <p class="quiz-description">
                                 Textos, interpretação e gramática para mostrar que você manda bem em português. Vamo ver se sabe das palavras!
                             </p>
                             <div class="quiz-difficulty">
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
-                                <span class="difficulty-star">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
+                                <span class="difficulty-star" aria-hidden="true">⭐</span>
                             </div>
                             <button class="start-quiz-btn">🎯 PARTIR PRO JOGO</button>
                         </div>
@@ -1447,7 +1475,7 @@
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">📈 DESEMPENHO GERAL</div>
-                            <div class="diagnostic-value" id="overallPerformanceValue">0%</div>
+                            <div class="diagnostic-value" id="overallPerformanceValue" role="status" aria-live="polite">0%</div>
                             <div class="diagnostic-bar">
                                 <div class="diagnostic-fill" id="overallPerformanceFill" style="width: 0%"></div>
                             </div>
@@ -1455,7 +1483,7 @@
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">🎯 ACERTOS MATEMÁTICA</div>
-                            <div class="diagnostic-value" id="mathPerformanceValue">--</div>
+                            <div class="diagnostic-value" id="mathPerformanceValue" role="status" aria-live="polite">--</div>
                             <div class="diagnostic-bar">
                                 <div class="diagnostic-fill" id="mathPerformanceFill" style="width: 0%"></div>
                             </div>
@@ -1463,7 +1491,7 @@
 
                         <div class="diagnostic-card">
                             <div class="diagnostic-label">📝 ACERTOS PORTUGUÊS</div>
-                            <div class="diagnostic-value" id="portuguesePerformanceValue">--</div>
+                            <div class="diagnostic-value" id="portuguesePerformanceValue" role="status" aria-live="polite">--</div>
                             <div class="diagnostic-bar">
                                 <div class="diagnostic-fill" id="portuguesePerformanceFill" style="width: 0%"></div>
                             </div>
@@ -1492,10 +1520,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Scroll to Top Button -->
-    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">⬆️</button>
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()" aria-label="Voltar ao topo">⬆️</button>
 
     <script>
         // CONTROLE DE PÁGINAS
@@ -1958,7 +1986,7 @@
             }
             
             // Event listeners
-            window.addEventListener('scroll', optimizedScrollHandler);
+            window.addEventListener('scroll', optimizedScrollHandler, { passive: true });
             window.addEventListener('resize', throttle(() => {
                 createNeonParticles();
                 optimizeForMobile();

@@ -243,6 +243,31 @@
             </div>
         </div>
         
+        <!-- TESTES DE USABILIDADE -->
+        <div class="test-section">
+            <h2>🧭 Usabilidade (Fluxos e Edge Cases)</h2>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="ux1">
+                <label for="ux1" class="test-label">Fluxo completo: Home → Lobby → Quiz → Resultado → Lobby</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="ux2">
+                <label for="ux2" class="test-label">Voltar do quiz com progresso salvo e retomar</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="ux3">
+                <label for="ux3" class="test-label">Clique em card e botão dentro do card (ambos funcionam)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="ux4">
+                <label for="ux4" class="test-label">Interrupção do fluxo (refresh na questão) mantém estado</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
         <!-- TESTES DE ANIMAÇÃO -->
         <div class="test-section">
             <h2>✨ Animações e Efeitos Visuais</h2>
@@ -329,6 +354,16 @@
                 <label for="quiz7" class="test-label">Cálculo de pontuação está correto</label>
                 <span class="status pending">PENDENTE</span>
             </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz8">
+                <label for="quiz8" class="test-label">Retomar jogo salvo (matemática e português)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz9">
+                <label for="quiz9" class="test-label">Estatísticas no lobby atualizam (overall, math, port)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
         </div>
         
         <!-- TESTES DE RESPONSIVIDADE -->
@@ -362,6 +397,86 @@
             <div class="test-item">
                 <input type="checkbox" class="checkbox" id="resp5">
                 <label for="resp5" class="test-label">Orientação landscape funciona</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+
+        <!-- PERSISTÊNCIA DE DADOS -->
+        <div class="test-section">
+            <h2>💾 Persistência de Dados (localStorage)</h2>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="data1">
+                <label for="data1" class="test-label">Salvar progresso do quiz ao sair (math/port)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="data2">
+                <label for="data2" class="test-label">Salvar estatísticas globais (quizzes, tempo, streak, ranking)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="data3">
+                <label for="data3" class="test-label">Limpar progresso ao finalizar quiz</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+
+        <!-- TRATAMENTO DE ERROS -->
+        <div class="test-section">
+            <h2>🛡️ Tratamento de Erros</h2>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="err1">
+                <label for="err1" class="test-label">Modal carrega sem imagem (fallback sem quebrar layout)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="err2">
+                <label for="err2" class="test-label">Sem seleção de alternativa não confirma (botão desabilitado)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="err3">
+                <label for="err3" class="test-label">Console sem erros após fluxo completo</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+
+        <!-- ACESSIBILIDADE -->
+        <div class="test-section">
+            <h2>♿ Acessibilidade</h2>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="a11y1">
+                <label for="a11y1" class="test-label">Navegação por teclado (Tab/Shift+Tab, Enter/Espaço)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="a11y2">
+                <label for="a11y2" class="test-label">Roles e ARIA corretos (dialog, radiogroup, status)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="a11y3">
+                <label for="a11y3" class="test-label">Skip link funciona (pular para conteúdo)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="a11y4">
+                <label for="a11y4" class="test-label">Foco visível e ordem lógica</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+
+        <!-- CONEXÃO E REDE -->
+        <div class="test-section">
+            <h2>🌐 Conectividade e Rede</h2>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="net1">
+                <label for="net1" class="test-label">Prefetch das páginas de quiz disparado (devtools network)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="net2">
+                <label for="net2" class="test-label">Carrega em 3G rápido (Simular throttling)</label>
                 <span class="status pending">PENDENTE</span>
             </div>
         </div>

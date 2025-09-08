@@ -33,17 +33,26 @@ Sistema de quiz interativo desenvolvido para preparação do SAEB 2025, focado e
 - Contém Home Page e Lobby de seleção de quizzes
 - Sistema de animações e efeitos visuais
 - Painel de diagnóstico (preparado para futuro backend)
+- Acessibilidade: skip link, roles ARIA, estados vivos e teclado nos cards
+- Performance: listeners passive, prefetch de páginas de quiz
 
 #### 2. **quiz_matematica.html** (48KB)
 - Quiz funcional com 23 questões do SAEB
 - Sistema de feedback instantâneo
 - Tela de resultados com estatísticas
 - Personagens animados para feedback de erro
+- Acessibilidade: radiogroup por ARIA, navegação por setas/Enter/Espaço, modal com foco
 
 #### 3. **test_checklist.html** (12KB)
 - Interface para validação de funcionalidades
 - Checklist interativo de testes
 - Exportação de relatório de testes
+- Cobertura ampliada: usabilidade, persistência, erros, acessibilidade e rede
+
+#### 4. **quiz_portugues.html** (48KB)
+- Quiz de Português com 25 questões
+- Mesmo padrão de UX do quiz de Matemática
+- Acessibilidade: radiogroup por ARIA, navegação por teclado, modal acessível
 
 ---
 
@@ -168,6 +177,16 @@ console.log(performance.timing.loadEventEnd - performance.timing.navigationStart
 // Resultado esperado: < 3000ms
 ```
 
+### 6. Testes de Acessibilidade
+```
+Teclado:
+- Navegar entre cards/alternativas com Tab/Shift+Tab, setas; selecionar com Enter/Espaço
+ARIA:
+- Dialog (overlay), radiogroup, status nas métricas do lobby
+Skip Link:
+- Pressione Tab na Home e ative “Pular para o conteúdo”
+```
+
 ### 4. Teste de Responsividade
 ```
 Chrome DevTools (F12):
@@ -267,9 +286,10 @@ animateCounters()     // Contadores animados
 
 ### Acessibilidade
 1. **Semantic HTML** - Estrutura semântica correta
-2. **ARIA labels** - (Preparado para implementação)
-3. **Keyboard navigation** - Suporte a teclado
-4. **Color contrast** - Alto contraste para legibilidade
+2. **ARIA labels e roles** - Dialogs, radiogroup, status implementados
+3. **Keyboard navigation** - Suporte a Tab/Shift+Tab e setas nas alternativas
+4. **Skip link** - Pular direto ao conteúdo principal
+5. **Color contrast** - Alto contraste para legibilidade
 
 ---
 
@@ -354,16 +374,16 @@ animateCounters()     // Contadores animados
 ### Bug 2: Animações podem travar em dispositivos antigos
 **Solução:** Media query `prefers-reduced-motion` implementada
 
-### Bug 3: Quiz de Português não implementado
-**Solução:** Alert informativo ao clicar
+### Bug 3: Quiz de Português
+**Status:** Implementado e com acessibilidade
 
 ---
 
 ## 📊 MÉTRICAS DE QUALIDADE
 
 ### Lighthouse Score (Estimado)
-- **Performance:** 85/100
-- **Accessibility:** 75/100
+- **Performance:** 88/100
+- **Accessibility:** 92/100
 - **Best Practices:** 90/100
 - **SEO:** 80/100
 
@@ -429,10 +449,17 @@ O projeto QUIZ SAEB 2025 está **100% funcional** para a versão MVP (Minimum Vi
 - ✅ Interface moderna e atrativa
 - ✅ Sistema de navegação fluido
 - ✅ Quiz de matemática completo
+- ✅ Quiz de português completo
 - ✅ Feedback educacional instantâneo
 - ✅ Responsividade total
 - ✅ Animações e efeitos visuais
 - ✅ Performance otimizada
+
+### Guia de Manutenção
+- Estrutura das questões: edite os arrays `questions` em `quiz_matematica.html` e `quiz_portugues.html`
+- Persistência: dados em `localStorage` sob chaves `saebStats`, `mathQuizProgress`, `portQuizProgress`
+- Acessibilidade: manter roles/aria e foco em novos componentes interativos
+- Performance: ao adicionar assets pesados, considerar lazy loading e prefetch seletivo
 
 ### Status: **PRONTO PARA DEPLOY** 🚀
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>Quiz Matemática - SAEB 2025 🔥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,6 +42,11 @@
             opacity: 0;
             animation: pageFadeIn 300ms ease-out forwards;
         }
+
+        /* Accessibility helpers */
+        .skip-link { position: absolute; left: -9999px; top: -9999px; background: var(--neon-yellow); color: var(--dark-bg); padding: 0.5rem 0.75rem; border-radius: 8px; z-index: 30000; }
+        .skip-link:focus { left: 1rem; top: 1rem; outline: 3px solid var(--neon-green); outline-offset: 2px; }
+        :focus-visible { outline: 3px solid var(--neon-yellow); outline-offset: 3px; }
 
         @keyframes pageFadeIn {
             to { opacity: 1; }
@@ -887,12 +893,13 @@
     </style>
 </head>
 <body>
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
     <!-- Background Effects -->
-    <div class="bg-grid"></div>
-    <div class="neon-particles" id="particles"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="neon-particles" id="particles" aria-hidden="true"></div>
 
     <!-- Route Loader -->
-    <div class="route-overlay" id="routeOverlay">
+    <div class="route-overlay" id="routeOverlay" role="dialog" aria-modal="true" aria-label="Carregando">
         <div class="spinner"></div>
         <div class="loading-text" id="routeOverlayText">Carregando...</div>
     </div>
@@ -900,7 +907,7 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <div class="logo" onclick="confirmExitToLobby()">🔥 QUIZ MATEMÁTICA</div>
+            <div class="logo" onclick="confirmExitToLobby()" role="link" tabindex="0" aria-label="Voltar para o lobby" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();confirmExitToLobby();}">🔥 QUIZ MATEMÁTICA</div>
             <div class="quiz-info">
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
@@ -915,7 +922,7 @@
     </header>
 
     <!-- Quiz Container -->
-    <div class="quiz-container">
+    <div class="quiz-container" id="main" role="main">
         <!-- Question Screen -->
         <div id="questionScreen" class="question-container">
             <div class="question-card">
@@ -923,12 +930,12 @@
                 <div class="question-text" id="questionText">Carregando pergunta...</div>
             </div>
             
-            <div class="alternatives-container" id="alternativesContainer">
+            <div class="alternatives-container" id="alternativesContainer" role="radiogroup" aria-label="Alternativas da questão">
                 <!-- Alternatives will be inserted here -->
             </div>
             
             <div class="quiz-actions">
-                <button class="action-btn" id="confirmBtn" onclick="confirmAnswer()" disabled>
+                <button class="action-btn" id="confirmBtn" onclick="confirmAnswer()" aria-disabled="true" disabled>
                     🎯 CONFIRMAR RESPOSTA
                 </button>
             </div>
@@ -970,8 +977,8 @@
     </div>
 
     <!-- Feedback Modal -->
-    <div class="modal-overlay" id="feedbackModal">
-        <div class="feedback-modal" id="feedbackContent">
+    <div class="modal-overlay" id="feedbackModal" role="dialog" aria-modal="true" aria-live="polite">
+        <div class="feedback-modal" id="feedbackContent" tabindex="-1">
             <!-- Content will be inserted here -->
         </div>
     </div>
@@ -1176,7 +1183,9 @@
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
             
             // Mostrar texto da questão
-            document.getElementById('questionText').textContent = question.question;
+            const qText = document.getElementById('questionText');
+            qText.textContent = question.question;
+            document.getElementById('alternativesContainer').setAttribute('aria-labelledby', 'questionNumber');
             
             // Criar alternativas
             const alternativesContainer = document.getElementById('alternativesContainer');
@@ -1185,7 +1194,11 @@
             question.alternatives.forEach((alternative, index) => {
                 const alternativeDiv = document.createElement('div');
                 alternativeDiv.className = 'alternative';
+                alternativeDiv.setAttribute('role', 'radio');
+                alternativeDiv.setAttribute('aria-checked', 'false');
+                alternativeDiv.setAttribute('tabindex', index === 0 ? '0' : '-1');
                 alternativeDiv.onclick = () => selectAnswer(index);
+                alternativeDiv.onkeydown = (e) => handleAlternativeKeydown(e, index);
                 
                 alternativeDiv.innerHTML = `
                     <div class="alternative-letter">${String.fromCharCode(65 + index)}</div>
@@ -1197,24 +1210,48 @@
             
             // Resetar seleção
             selectedAnswer = null;
-            document.getElementById('confirmBtn').disabled = true;
-            document.getElementById('confirmBtn').textContent = '🎯 CONFIRMAR RESPOSTA';
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.setAttribute('aria-disabled', 'true');
+            confirmBtn.textContent = '🎯 CONFIRMAR RESPOSTA';
         }
 
         // Selecionar resposta
         function selectAnswer(index) {
             if (answered) return;
             
-            // Remover seleção anterior
-            document.querySelectorAll('.alternative').forEach(alt => {
+            // Remover seleção anterior e atualizar estados ARIA
+            const radios = document.querySelectorAll('.alternative');
+            radios.forEach((alt, i) => {
                 alt.classList.remove('selected');
+                alt.setAttribute('aria-checked', String(i === index));
+                alt.setAttribute('tabindex', i === index ? '0' : '-1');
             });
             
             // Adicionar seleção atual
             document.querySelectorAll('.alternative')[index].classList.add('selected');
             
             selectedAnswer = index;
-            document.getElementById('confirmBtn').disabled = false;
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = false;
+            confirmBtn.setAttribute('aria-disabled', 'false');
+        }
+
+        // Acessibilidade por teclado nas alternativas
+        function handleAlternativeKeydown(e, index) {
+            const radios = Array.from(document.querySelectorAll('.alternative'));
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const next = (index + 1) % radios.length;
+                radios[next].focus();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prev = (index - 1 + radios.length) % radios.length;
+                radios[prev].focus();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                selectAnswer(index);
+            }
         }
 
         // Confirmar resposta
@@ -1226,7 +1263,9 @@
             const isCorrect = selectedAnswer === question.correct;
             
             // Desabilitar botão
-            document.getElementById('confirmBtn').disabled = true;
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.setAttribute('aria-disabled', 'true');
             
             // Mostrar feedback visual nas alternativas
             document.querySelectorAll('.alternative').forEach((alt, index) => {
@@ -1267,6 +1306,7 @@
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
                 content.className = 'feedback-modal';
+                content.setAttribute('aria-label', 'Resposta correta');
             } else {
                 const randomCharacter = errorCharacters[Math.floor(Math.random() * errorCharacters.length)];
                 const correctOption = String.fromCharCode(65 + question.correct);
@@ -1282,9 +1322,12 @@
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
                 content.className = 'feedback-modal error';
+                content.setAttribute('aria-label', 'Resposta incorreta');
             }
             
             modal.classList.add('active');
+            // Mover foco para conteúdo do modal
+            setTimeout(() => { content.focus(); }, 50);
         }
 
         // Próxima questão
