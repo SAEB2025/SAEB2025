@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>SAEB 2025 - QUIZ SAEB 2025 🔥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,6 +97,87 @@
             transition: all 0.3s ease;
         }
 
+        /* MOBILE MENU */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+            transform: scale(1.05);
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: currentColor;
+            margin: 4px auto;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--neon-green);
+            padding: 1rem;
+            z-index: 999;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-item {
+            display: block;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--neon-pink);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-item:hover {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+            transform: translateX(10px);
+        }
+
         .header-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -104,7 +185,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
             gap: 1rem;
         }
 
@@ -304,6 +384,18 @@
             z-index: 10;
             backdrop-filter: blur(20px);
             box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .stats-grid {
@@ -552,6 +644,7 @@
             display: flex;
             min-height: calc(100vh - 80px);
             padding: 2rem;
+            gap: 2rem;
         }
 
         .quiz-selection {
@@ -737,12 +830,105 @@
         /* DIAGNOSTICS PANEL */
         .diagnostics-panel {
             flex: 1;
+            max-width: 400px;
             padding: 2rem;
             background: var(--card-bg);
             border-left: 2px solid var(--neon-green);
             min-height: calc(100vh - 80px);
             position: sticky;
             top: 80px;
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+
+        /* STATS IMPROVEMENTS */
+        .stats-summary {
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .stats-summary h4 {
+            color: var(--neon-yellow);
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: var(--gradient-main);
+            color: var(--dark-bg);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--darker-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: var(--gradient-secondary);
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .xp-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--gradient-main);
+            color: var(--dark-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            font-weight: 700;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .achievement-popup.show {
+            transform: translateX(0);
         }
 
         .diagnostics-title {
@@ -1032,33 +1218,55 @@
         }
 
         /* RESPONSIVE ADJUSTMENTS */
+        @media (max-width: 1200px) {
+            .diagnostics-panel {
+                max-width: 350px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .quiz-container {
                 flex-direction: column;
             }
             
             .diagnostics-panel {
+                max-width: 100%;
                 border-left: none;
                 border-top: 2px solid var(--neon-green);
                 position: static;
                 min-height: auto;
+                max-height: none;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .nav-controls {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: block;
             }
         }
 
         @media (max-width: 768px) {
             .header-content {
-                justify-content: center;
-                text-align: center;
+                padding: 1rem;
+                justify-content: space-between;
             }
 
-            .nav-controls {
-                order: -1;
-                width: 100%;
-                justify-content: center;
+            .logo {
+                font-size: 1.3rem;
+                letter-spacing: 1px;
             }
 
             .main-container {
-                margin-top: 120px;
+                margin-top: 70px;
             }
 
             .hero {
@@ -1067,6 +1275,20 @@
 
             .stats-section {
                 margin: -2rem 1rem 2rem;
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
             }
 
             .highlight-box {
@@ -1105,16 +1327,85 @@
         }
 
         @media (max-width: 480px) {
-            .main-container {
-                margin-top: 140px;
+            .header-content {
+                padding: 0.8rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .mobile-menu-toggle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                letter-spacing: -1px;
+            }
+
+            .hero .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .cta-main {
+                padding: 1rem 2rem;
+                font-size: 1rem;
             }
 
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
             }
 
             .quiz-card {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1rem;
+            }
+
+            .quiz-icon {
+                font-size: 3rem;
+            }
+
+            .quiz-title {
+                font-size: 1.5rem;
+            }
+
+            .cards-grid {
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .diagnostic-card {
+                padding: 1rem;
+            }
+
+            .scroll-top {
+                width: 45px;
+                height: 45px;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1212,6 +1503,64 @@
             .back-btn:active {
                 transform: scale(0.95);
             }
+
+            /* Aumentar área de toque em dispositivos móveis */
+            button, a, .clickable {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Desabilitar hover effects em touch devices */
+            .card:hover,
+            .quiz-card:hover,
+            .stat-card:hover {
+                transform: none;
+            }
+        }
+
+        /* SWIPE INDICATOR */
+        .swipe-indicator {
+            display: none;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            animation: swipeHint 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .swipe-indicator {
+                display: block;
+            }
+        }
+
+        @keyframes swipeHint {
+            0%, 100% { transform: translateX(0); opacity: 0.5; }
+            50% { transform: translateX(10px); opacity: 1; }
+        }
+
+        /* LANDSCAPE MODE ADJUSTMENTS */
+        @media (max-height: 500px) and (orientation: landscape) {
+            header {
+                padding: 0.5rem 0;
+            }
+
+            .header-content {
+                padding: 0.5rem 1rem;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 2rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .stats-section {
+                margin-top: 2rem;
+            }
         }
     </style>
 </head>
@@ -1233,7 +1582,18 @@
                 <div class="prototype-tag">BETA 2025</div>
                 <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
             </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
+        <nav class="mobile-nav" id="mobileNav">
+            <a href="#" class="mobile-nav-item" onclick="showPage('home'); toggleMobileMenu();">🏠 Início</a>
+            <a href="#" class="mobile-nav-item" onclick="showPage('lobby'); toggleMobileMenu();">🎮 Jogar Quiz</a>
+            <a href="#" class="mobile-nav-item" onclick="showStats(); toggleMobileMenu();">📊 Estatísticas</a>
+            <a href="#" class="mobile-nav-item" onclick="resetProgress(); toggleMobileMenu();">🔄 Resetar Progresso</a>
+        </nav>
     </header>
 
     <div class="main-container">
@@ -1440,8 +1800,18 @@
                     <h3 class="diagnostics-title">📊 DIAGNÓSTICO</h3>
                     
                     <div id="stats-container">
-                        <div class="no-data">
-                            <h4 style="color: var(--neon-yellow); margin-bottom: 1rem;">🎲 NENHUM DADOS AINDA</h4>
+                        <!-- Player Level Summary -->
+                        <div class="stats-summary">
+                            <h4>🏆 SEU NÍVEL</h4>
+                            <div class="level-badge" id="levelBadge">Iniciante</div>
+                            <div class="xp-bar">
+                                <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                            </div>
+                            <div class="xp-text" id="xpText">0 / 100 XP</div>
+                        </div>
+
+                        <div class="no-data" id="noDataMessage">
+                            <h4 style="color: var(--neon-yellow); margin-bottom: 1rem;">🎲 NENHUM DADO AINDA</h4>
                             <p>Jogue alguns quiz para ver seus dados aparecerem aqui!</p>
                         </div>
 
@@ -1470,23 +1840,43 @@
                         </div>
 
                         <div class="player-stats">
-                            <h4 style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-bottom: 1rem;">⚡ ESTATÍSTICAS</h4>
+                            <h4 style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-bottom: 1rem;">⚡ ESTATÍSTICAS DETALHADAS</h4>
                             <div class="stat-row">
                                 <span class="stat-label">Quizzes Concluídos:</span>
                                 <span class="stat-value" id="statQuizzesCompleted">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Total de Questões:</span>
+                                <span class="stat-value" id="statTotalQuestions">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Respostas Corretas:</span>
+                                <span class="stat-value" id="statCorrectAnswers">0</span>
                             </div>
                             <div class="stat-row">
                                 <span class="stat-label">Tempo Total Jogado:</span>
                                 <span class="stat-value" id="statTotalTime">0min</span>
                             </div>
                             <div class="stat-row">
+                                <span class="stat-label">Tempo Médio/Questão:</span>
+                                <span class="stat-value" id="statAvgTime">--</span>
+                            </div>
+                            <div class="stat-row">
                                 <span class="stat-label">Melhor Streak:</span>
                                 <span class="stat-value" id="statBestStreak">0</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">Ranking:</span>
-                                <span class="stat-value" id="statRanking">Iniciante</span>
+                                <span class="stat-label">Streak Atual:</span>
+                                <span class="stat-value" id="statCurrentStreak">0</span>
                             </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Pontuação Total:</span>
+                                <span class="stat-value" id="statTotalScore">0</span>
+                            </div>
+                        </div>
+
+                        <div class="swipe-indicator">
+                            👈 Deslize para ver o quiz
                         </div>
                     </div>
                 </div>
@@ -1496,6 +1886,11 @@
 
     <!-- Scroll to Top Button -->
     <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">⬆️</button>
+
+    <!-- Achievement Popup -->
+    <div class="achievement-popup" id="achievementPopup">
+        <div id="achievementText">🏆 Conquista Desbloqueada!</div>
+    </div>
 
     <script>
         // CONTROLE DE PÁGINAS
@@ -2004,18 +2399,216 @@
         // INICIALIZAR PERFORMANCE MONITORING
         monitorPerformance();
 
+        // TOGGLE MOBILE MENU
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            const menuToggle = document.getElementById('mobileMenuToggle');
+            
+            if (mobileNav && menuToggle) {
+                mobileNav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            }
+        }
+
+        // SHOW STATS PAGE
+        function showStats() {
+            showPage('lobby');
+            // Scroll to diagnostics panel after a short delay
+            setTimeout(() => {
+                const diagnosticsPanel = document.querySelector('.diagnostics-panel');
+                if (diagnosticsPanel) {
+                    diagnosticsPanel.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 300);
+        }
+
+        // RESET PROGRESS
+        function resetProgress() {
+            if (confirm('⚠️ Tem certeza que deseja resetar todo seu progresso?\n\nIsso apagará todas as suas estatísticas e conquistas!')) {
+                localStorage.removeItem('saebStats');
+                localStorage.removeItem('saebAchievements');
+                localStorage.removeItem('saebLevel');
+                loadUserData();
+                showAchievement('🔄 Progresso Resetado', 'warning');
+            }
+        }
+
+        // SHOW ACHIEVEMENT POPUP
+        function showAchievement(text, type = 'success') {
+            const popup = document.getElementById('achievementPopup');
+            const textElement = document.getElementById('achievementText');
+            
+            if (popup && textElement) {
+                textElement.textContent = text;
+                
+                // Set color based on type
+                if (type === 'warning') {
+                    popup.style.background = 'var(--gradient-secondary)';
+                } else if (type === 'error') {
+                    popup.style.background = 'linear-gradient(135deg, #FF3333, #FF6666)';
+                } else {
+                    popup.style.background = 'var(--gradient-main)';
+                }
+                
+                popup.classList.add('show');
+                
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // CALCULATE LEVEL AND XP
+        function calculateLevel(totalScore) {
+            const levels = [
+                { min: 0, max: 99, name: 'Iniciante', color: '#888888' },
+                { min: 100, max: 299, name: 'Aprendiz', color: '#00FF88' },
+                { min: 300, max: 599, name: 'Estudante', color: '#00BFFF' },
+                { min: 600, max: 999, name: 'Competente', color: '#FFFF00' },
+                { min: 1000, max: 1499, name: 'Avançado', color: '#FF6B35' },
+                { min: 1500, max: 2499, name: 'Expert', color: '#FF0080' },
+                { min: 2500, max: 3999, name: 'Mestre', color: '#9400D3' },
+                { min: 4000, max: 5999, name: 'Grão-Mestre', color: '#FFD700' },
+                { min: 6000, max: 9999, name: 'Lendário', color: '#FF1493' },
+                { min: 10000, max: Infinity, name: 'Mítico', color: '#00FFFF' }
+            ];
+            
+            for (let level of levels) {
+                if (totalScore >= level.min && totalScore <= level.max) {
+                    const xpInLevel = totalScore - level.min;
+                    const xpNeeded = level.max - level.min + 1;
+                    const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
+                    
+                    return {
+                        name: level.name,
+                        color: level.color,
+                        xp: xpInLevel,
+                        xpNeeded: xpNeeded,
+                        progress: progress,
+                        totalScore: totalScore
+                    };
+                }
+            }
+            
+            return {
+                name: 'Iniciante',
+                color: '#888888',
+                xp: 0,
+                xpNeeded: 100,
+                progress: 0,
+                totalScore: 0
+            };
+        }
+
+        // CHECK FOR ACHIEVEMENTS
+        function checkAchievements(stats) {
+            const achievements = JSON.parse(localStorage.getItem('saebAchievements') || '{}');
+            
+            // First Quiz Achievement
+            if (!achievements.firstQuiz && stats.quizzesCompleted >= 1) {
+                achievements.firstQuiz = true;
+                showAchievement('🎯 Primeira Vitória! Completou seu primeiro quiz!');
+            }
+            
+            // 5 Quizzes Achievement
+            if (!achievements.quiz5 && stats.quizzesCompleted >= 5) {
+                achievements.quiz5 = true;
+                showAchievement('🔥 Em Chamas! 5 quizzes completados!');
+            }
+            
+            // 10 Quizzes Achievement
+            if (!achievements.quiz10 && stats.quizzesCompleted >= 10) {
+                achievements.quiz10 = true;
+                showAchievement('💎 Dedicado! 10 quizzes completados!');
+            }
+            
+            // Perfect Score Achievement
+            if (!achievements.perfect && stats.lastQuizScore === 100) {
+                achievements.perfect = true;
+                showAchievement('💯 Perfeição! Acertou todas as questões!');
+            }
+            
+            // Streak Achievements
+            if (!achievements.streak5 && stats.currentStreak >= 5) {
+                achievements.streak5 = true;
+                showAchievement('⚡ Sequência de 5! Continue assim!');
+            }
+            
+            if (!achievements.streak10 && stats.currentStreak >= 10) {
+                achievements.streak10 = true;
+                showAchievement('🌟 Sequência de 10! Você está voando!');
+            }
+            
+            // Time Achievement
+            if (!achievements.speedster && stats.lastQuizTime && stats.lastQuizTime < 60) {
+                achievements.speedster = true;
+                showAchievement('⚡ Velocista! Quiz completado em menos de 1 minuto!');
+            }
+            
+            // Score Milestones
+            if (!achievements.score1000 && stats.totalScore >= 1000) {
+                achievements.score1000 = true;
+                showAchievement('🏆 Milestone! 1000 pontos alcançados!');
+            }
+            
+            if (!achievements.score5000 && stats.totalScore >= 5000) {
+                achievements.score5000 = true;
+                showAchievement('👑 Rei dos Pontos! 5000 pontos!');
+            }
+            
+            localStorage.setItem('saebAchievements', JSON.stringify(achievements));
+        }
+
         // CARREGAR DADOS DO LOCALSTORAGE E ATUALIZAR DIAGNÓSTICO
         function loadUserData() {
             try {
                 const raw = localStorage.getItem('saebStats');
-                if (!raw) return;
+                if (!raw) {
+                    // Initialize default stats if none exist
+                    const defaultStats = {
+                        quizzesCompleted: 0,
+                        overallCorrect: 0,
+                        overallTotal: 0,
+                        mathCorrect: 0,
+                        mathTotal: 0,
+                        portCorrect: 0,
+                        portTotal: 0,
+                        totalMinutes: 0,
+                        bestStreak: 0,
+                        currentStreak: 0,
+                        totalScore: 0,
+                        totalQuestions: 0
+                    };
+                    localStorage.setItem('saebStats', JSON.stringify(defaultStats));
+                    return;
+                }
+                
                 const data = JSON.parse(raw);
 
                 const hasData = (data.quizzesCompleted || 0) > 0;
-                const noData = document.querySelector('#stats-container .no-data');
-                if (noData && hasData) noData.style.display = 'none';
+                const noData = document.getElementById('noDataMessage');
+                if (noData) {
+                    noData.style.display = hasData ? 'none' : 'block';
+                }
 
-                // Overall
+                // Update Level and XP
+                const levelInfo = calculateLevel(data.totalScore || 0);
+                const levelBadge = document.getElementById('levelBadge');
+                const xpFill = document.getElementById('xpFill');
+                const xpText = document.getElementById('xpText');
+                
+                if (levelBadge) {
+                    levelBadge.textContent = levelInfo.name;
+                    levelBadge.style.background = `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}88)`;
+                }
+                if (xpFill) {
+                    xpFill.style.width = `${levelInfo.progress}%`;
+                }
+                if (xpText) {
+                    xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP`;
+                }
+
+                // Overall Performance
                 const overall = Math.round((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100);
                 const overallValue = document.getElementById('overallPerformanceValue');
                 const overallFill = document.getElementById('overallPerformanceFill');
@@ -2023,36 +2616,55 @@
                 if (overallFill) overallFill.style.width = `${isFinite(overall) ? overall : 0}%`;
 
                 // Matemática
-                if (typeof data.mathCorrect === 'number' && typeof data.mathTotal === 'number') {
-                    const mathPct = Math.round((data.mathCorrect || 0) / Math.max(1, (data.mathTotal || 0)) * 100);
+                if (data.mathTotal > 0) {
+                    const mathPct = Math.round((data.mathCorrect || 0) / data.mathTotal * 100);
                     const mathValue = document.getElementById('mathPerformanceValue');
                     const mathFill = document.getElementById('mathPerformanceFill');
-                    if (mathValue) mathValue.textContent = `${isFinite(mathPct) ? mathPct : 0}%`;
-                    if (mathFill) mathFill.style.width = `${isFinite(mathPct) ? mathPct : 0}%`;
+                    if (mathValue) mathValue.textContent = `${mathPct}%`;
+                    if (mathFill) mathFill.style.width = `${mathPct}%`;
                 }
 
-                // Português (placeholder)
-                if (typeof data.portCorrect === 'number' && typeof data.portTotal === 'number') {
-                    const portPct = Math.round((data.portCorrect || 0) / Math.max(1, (data.portTotal || 0)) * 100);
+                // Português
+                if (data.portTotal > 0) {
+                    const portPct = Math.round((data.portCorrect || 0) / data.portTotal * 100);
                     const portValue = document.getElementById('portuguesePerformanceValue');
                     const portFill = document.getElementById('portuguesePerformanceFill');
-                    if (portValue) portValue.textContent = `${isFinite(portPct) ? portPct : 0}%`;
-                    if (portFill) portFill.style.width = `${isFinite(portPct) ? portPct : 0}%`;
+                    if (portValue) portValue.textContent = `${portPct}%`;
+                    if (portFill) portFill.style.width = `${portPct}%`;
                 }
 
-                // Estatísticas
-                const quizzesCompleted = document.getElementById('statQuizzesCompleted');
-                const totalTime = document.getElementById('statTotalTime');
-                const bestStreak = document.getElementById('statBestStreak');
-                const ranking = document.getElementById('statRanking');
-                if (quizzesCompleted) quizzesCompleted.textContent = data.quizzesCompleted || 0;
-                if (totalTime) totalTime.textContent = `${data.totalMinutes || 0}min`;
-                if (bestStreak) bestStreak.textContent = data.bestStreak || 0;
-                if (ranking) ranking.textContent = data.ranking || 'Iniciante';
+                // Detailed Statistics
+                const statElements = {
+                    statQuizzesCompleted: data.quizzesCompleted || 0,
+                    statTotalQuestions: data.totalQuestions || 0,
+                    statCorrectAnswers: data.overallCorrect || 0,
+                    statTotalTime: `${data.totalMinutes || 0}min`,
+                    statAvgTime: data.totalQuestions > 0 
+                        ? `${Math.round((data.totalMinutes * 60) / data.totalQuestions)}s` 
+                        : '--',
+                    statBestStreak: data.bestStreak || 0,
+                    statCurrentStreak: data.currentStreak || 0,
+                    statTotalScore: data.totalScore || 0
+                };
+
+                for (const [id, value] of Object.entries(statElements)) {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value;
+                }
+
+                // Check for achievements
+                checkAchievements(data);
             } catch (e) {
                 console.warn('Falha ao carregar dados locais:', e);
             }
         }
+
+        // Update stats from quiz pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'saebStats') {
+                loadUserData();
+            }
+        });
 
         // CARREGAR DADOS INICIAIS
         loadUserData();
