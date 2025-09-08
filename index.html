@@ -1449,6 +1449,7 @@
     <!-- Scroll to Top Button -->
     <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">⬆️</button>
 
+    <script src="saeb_data.js"></script>
     <script>
         // CONTROLE DE PÁGINAS
         let currentPage = 'home';
@@ -1512,7 +1513,7 @@
                         if (materia === 'matematica') {
                             window.location.href = 'quiz_matematica.html#from=lobby';
                         } else if (materia === 'portugues') {
-                            alert('🔥 Português em desenvolvimento. Em breve disponível!');
+                            window.location.href = 'quiz/portugues/index.html#from=lobby';
                         } else {
                             showPage('lobby');
                         }
@@ -1992,6 +1993,120 @@
                 if (totalTime) totalTime.textContent = `${data.totalMinutes || 0}min`;
                 if (bestStreak) bestStreak.textContent = data.bestStreak || 0;
                 if (ranking) ranking.textContent = data.ranking || 'Iniciante';
+
+                // Render painel avançado se houver módulo SAEB
+                if (window.SAEB && typeof window.SAEB.getDashboardData === 'function') {
+                    const dash = window.SAEB.getDashboardData();
+                    const container = document.getElementById('stats-container');
+                    if (container && !document.getElementById('historyList')) {
+                        // Histórico de desempenho
+                        const historyCard = document.createElement('div');
+                        historyCard.className = 'diagnostic-card';
+                        historyCard.innerHTML = `
+                            <div class="diagnostic-label">🕒 Histórico recente</div>
+                            <div id="historyList" style="display:grid;gap:.4rem;font-size:.9rem;color:var(--text-secondary);"></div>
+                        `;
+                        container.appendChild(historyCard);
+                        const historyList = historyCard.querySelector('#historyList');
+                        (dash.attempts || []).slice().reverse().forEach(a => {
+                            const d = document.createElement('div');
+                            d.innerHTML = `<span style="color:var(--neon-green);font-weight:700">${a.subject}</span> • ${new Date(a.finishedAt).toLocaleString()} • ${a.percent}% • ${a.durationMin}min`;
+                            historyList.appendChild(d);
+                        });
+
+                        // Evolução (sparklines com barras)
+                        const evolutionCard = document.createElement('div');
+                        evolutionCard.className = 'diagnostic-card';
+                        evolutionCard.innerHTML = `
+                            <div class="diagnostic-label">📈 Evolução</div>
+                            <div id="evolutionBars" style="display:flex;gap:4px;align-items:flex-end;height:80px"></div>
+                        `;
+                        container.appendChild(evolutionCard);
+                        const evo = evolutionCard.querySelector('#evolutionBars');
+                        const scores = (dash.attempts || []).map(a => a.percent);
+                        const maxH = 70;
+                        scores.forEach(p => {
+                            const bar = document.createElement('div');
+                            const h = Math.max(4, Math.round((p / 100) * maxH));
+                            bar.style.cssText = `width:8px;height:${h}px;background:var(--gradient-main);border-radius:3px;opacity:.9;`;
+                            evo.appendChild(bar);
+                        });
+
+                        // Estatísticas por área
+                        const areaCard = document.createElement('div');
+                        areaCard.className = 'diagnostic-card';
+                        areaCard.innerHTML = `
+                            <div class="diagnostic-label">🧠 Desempenho por área</div>
+                            <div id="areaStats" style="display:grid;gap:.6rem"></div>
+                        `;
+                        container.appendChild(areaCard);
+                        const areaStats = areaCard.querySelector('#areaStats');
+                        Object.keys(dash.aggregates.byArea || {}).forEach(area => {
+                            const v = dash.aggregates.byArea[area];
+                            const pct = Math.round((v.correct / Math.max(1, v.total)) * 100);
+                            const row = document.createElement('div');
+                            row.innerHTML = `
+                                <div style="display:flex;justify-content:space-between;align-items:center">
+                                    <span style="color:var(--neon-yellow);font-weight:700">${area}</span>
+                                    <span style="font-weight:900">${pct}%</span>
+                                </div>
+                                <div class="diagnostic-bar"><div class="diagnostic-fill" style="width:${pct}%"></div></div>
+                            `;
+                            areaStats.appendChild(row);
+                        });
+
+                        // Comparação com média SAEB
+                        const compareCard = document.createElement('div');
+                        compareCard.className = 'diagnostic-card';
+                        compareCard.innerHTML = `
+                            <div class="diagnostic-label">⚖️ Comparação com média SAEB</div>
+                            <div style="display:grid;gap:.6rem">
+                                <div>Geral: <strong>${dash.overallPct}%</strong> vs <span style="color:var(--neon-yellow)">${dash.benchmarks.overall}%</span></div>
+                                <div>Matemática: <strong>${dash.mathPct}%</strong> vs <span style="color:var(--neon-yellow)">${dash.benchmarks.matematica}%</span></div>
+                                <div>Português: <strong>${dash.portPct}%</strong> vs <span style="color:var(--neon-yellow)">${dash.benchmarks.portugues}%</span></div>
+                            </div>
+                        `;
+                        container.appendChild(compareCard);
+
+                        // Analytics educacionais
+                        const analyticsCard = document.createElement('div');
+                        analyticsCard.className = 'diagnostic-card';
+                        analyticsCard.innerHTML = `
+                            <div class="diagnostic-label">🔬 Analytics educacionais</div>
+                            <div id="analyticsBlock" style="display:grid;gap:.6rem"></div>
+                        `;
+                        container.appendChild(analyticsCard);
+                        const analyticsBlock = analyticsCard.querySelector('#analyticsBlock');
+                        const tAvg = Math.round((dash.avgTimeMs || 0) / 100) / 10;
+                        const diff = (dash.insights || []).find(i => i.type === 'questions');
+                        const areasInsight = (dash.insights || []).find(i => i.type === 'areas');
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = `<div style="margin-bottom:.4rem">Tempo médio por questão: <strong>${tAvg || 0}s</strong></div>`;
+                        if (diff && diff.data && diff.data.length) {
+                            wrap.innerHTML += `<div style=\"margin:.4rem 0\">Questões com menor acerto:</div>`;
+                            diff.data.forEach(q => {
+                                const el = document.createElement('div');
+                                el.style.fontSize = '.9rem';
+                                el.style.color = 'var(--text-secondary)';
+                                el.textContent = `${q.id} • ${q.area} • ${q.accuracy}%`;
+                                wrap.appendChild(el);
+                            });
+                        }
+                        if (areasInsight && areasInsight.data && areasInsight.data.length) {
+                            const sug = document.createElement('div');
+                            sug.innerHTML = `<div style=\"margin:.4rem 0\">Sugestões:</div>`;
+                            areasInsight.data.forEach(a => {
+                                const li = document.createElement('div');
+                                li.style.fontSize = '.9rem';
+                                li.style.color = 'var(--text-secondary)';
+                                li.textContent = `${a.area}: foque em revisão e exercícios (${a.pct}%).`;
+                                sug.appendChild(li);
+                            });
+                            wrap.appendChild(sug);
+                        }
+                        analyticsBlock.appendChild(wrap);
+                    }
+                }
             } catch (e) {
                 console.warn('Falha ao carregar dados locais:', e);
             }

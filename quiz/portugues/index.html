@@ -197,6 +197,7 @@
         <div class="feedback-modal" id="feedbackContent"></div>
     </div>
 
+    <script src="../../saeb_data.js"></script>
     <script>
         // Banco de questões (25+ questões do SAEB - preservadas/adaptadas)
         const questions = [
@@ -243,6 +244,9 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let questionStartTime = Date.now();
+        let questionTimes = [];
+        let questionCorrectness = [];
 
         // Persistência compartilhada com homepage (estatísticas)
         function loadStats() {
@@ -271,11 +275,13 @@
             saveStats(stats);
         }
 
-        function goToLobby() { window.location.href = '/index.html#lobby'; }
+        function goToLobby() { window.location.href = '../../index.html#lobby'; }
 
         function initQuiz() {
             selectedQuestions = getRandomQuestions(questions, 10);
             currentQuestionIndex = 0; score = 0; selectedAnswer = null; startTime = Date.now(); answered = false;
+            questionTimes = [];
+            questionCorrectness = [];
             createParticles();
             showQuestion();
         }
@@ -316,6 +322,7 @@
             const btn = document.getElementById('confirmBtn');
             btn.disabled = true;
             btn.textContent = '📝 CONFIRMAR RESPOSTA';
+            questionStartTime = Date.now();
         }
 
         function selectAnswer(index) {
@@ -339,6 +346,9 @@
                 else if (idx === selectedAnswer && !isCorrect) alt.classList.add('incorrect');
             });
             if (isCorrect) { score++; document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`; }
+            const timeSpent = Date.now() - questionStartTime;
+            questionTimes[currentQuestionIndex] = timeSpent;
+            questionCorrectness[currentQuestionIndex] = isCorrect;
             setTimeout(() => showFeedbackModal(isCorrect, q), 900);
         }
 
@@ -387,15 +397,32 @@
         function showResults() {
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
-            const elapsed = Math.floor((Date.now() - startTime) / 60000);
+            const endMs = Date.now();
+            const elapsed = Math.floor((endMs - startTime) / 60000);
             const pct = Math.round((score / selectedQuestions.length) * 100);
             document.getElementById('finalScore').textContent = `${score}/${selectedQuestions.length}`;
             document.getElementById('percentageScore').textContent = `${pct}%`;
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = selectedQuestions.length - score;
 
-            // Persistir resultados compatíveis com homepage
-            updateStatsAfterQuiz(score, selectedQuestions.length, elapsed);
+            // Persistir resultados detalhados
+            if (window.SAEB && typeof window.SAEB.recordAttempt === 'function') {
+                const questionsSummary = selectedQuestions.map((q, idx) => ({
+                    id: `P-${idx + 1}`,
+                    area: inferPortugueseArea(q.question),
+                    correct: !!questionCorrectness[idx],
+                    timeMs: questionTimes[idx] || null
+                }));
+                window.SAEB.recordAttempt({
+                    subject: 'portugues',
+                    startedAt: new Date(startTime).toISOString(),
+                    finishedAt: new Date(endMs).toISOString(),
+                    durationMs: endMs - startTime,
+                    correctCount: score,
+                    totalQuestions: selectedQuestions.length,
+                    questions: questionsSummary
+                });
+            }
 
             const list = document.getElementById('improvementList');
             list.innerHTML = '';
@@ -432,6 +459,16 @@
                 // Voltar para o lobby da raiz
                 goToLobby();
             }
+        }
+
+        function inferPortugueseArea(text) {
+            const t = (text || '').toLowerCase();
+            if (t.includes('linguagem') || t.includes('funções da linguagem') || t.includes('função da linguagem') || t.includes('comunicação')) return 'Linguagem';
+            if (t.includes('interpretação') || t.includes('finalidade') || t.includes('tema') || t.includes('sentido') || t.includes('humor')) return 'Interpretação';
+            if (t.includes('conjunção') || t.includes('travessão') || t.includes('aposto') || t.includes('conectivo') || t.includes('coesão')) return 'Gramática';
+            if (t.includes('campanha') || t.includes('divulgação científica') || t.includes('gênero') || t.includes('manual') || t.includes('receita')) return 'Gêneros Textuais';
+            if (t.includes('metáfora') || t.includes('figura de linguagem') || t.includes('candidez')) return 'Figuras de Linguagem';
+            return 'Português Geral';
         }
 
         document.getElementById('feedbackModal').onclick = function(e) { if (e.target === this) { /* não fecha */ } };

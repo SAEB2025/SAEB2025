@@ -882,6 +882,7 @@
         </div>
     </div>
 
+    <script src="saeb_data.js"></script>
     <script>
         // QUESTÕES DO QUIZ DE PORTUGUÊS (25 questões do SAEB)
         const questions = [
@@ -1058,6 +1059,9 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let questionStartTime = Date.now();
+        let questionTimes = [];
+        let questionCorrectness = [];
 
         // Inicializar o quiz
         function initQuiz() {
@@ -1068,6 +1072,8 @@
             selectedAnswer = null;
             startTime = Date.now();
             answered = false;
+            questionTimes = [];
+            questionCorrectness = [];
             
             // Criar partículas de fundo
             createParticles();
@@ -2499,6 +2505,7 @@
             selectedAnswer = null;
             document.getElementById('confirmBtn').disabled = true;
             document.getElementById('confirmBtn').textContent = '🎯 CONFIRMAR RESPOSTA';
+            questionStartTime = Date.now();
         }
 
         // Selecionar resposta
@@ -2543,6 +2550,11 @@
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             }
+
+            // Registrar tempo gasto e acerto da questão
+            const timeSpent = Date.now() - questionStartTime;
+            questionTimes[currentQuestionIndex] = timeSpent;
+            questionCorrectness[currentQuestionIndex] = isCorrect;
             
             // Mostrar modal de feedback após um pequeno delay
             setTimeout(() => {
@@ -2611,7 +2623,8 @@
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             
-            const finalTime = Math.floor((Date.now() - startTime) / 60000);
+            const endTimeMs = Date.now();
+            const finalTime = Math.floor((endTimeMs - startTime) / 60000);
             const percentage = Math.round((score / 10) * 100);
             
             // Atualizar dados na tela de resultados
@@ -2620,8 +2633,24 @@
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
             
-            // Persistir resultados
-            updateStatsAfterQuiz(score, 10, finalTime);
+            // Persistir resultados detalhados
+            if (window.SAEB && typeof window.SAEB.recordAttempt === 'function') {
+                const questionsSummary = selectedQuestions.map((q, idx) => ({
+                    id: `M-${idx + 1}`,
+                    area: inferMathArea(q.question),
+                    correct: !!questionCorrectness[idx],
+                    timeMs: questionTimes[idx] || null
+                }));
+                window.SAEB.recordAttempt({
+                    subject: 'matematica',
+                    startedAt: new Date(startTime).toISOString(),
+                    finishedAt: new Date(endTimeMs).toISOString(),
+                    durationMs: endTimeMs - startTime,
+                    correctCount: score,
+                    totalQuestions: selectedQuestions.length,
+                    questions: questionsSummary
+                });
+            }
 
             // Sugestões de melhoria baseadas na performance
             const improvementList = document.getElementById('improvementList');
@@ -2653,6 +2682,19 @@
                     <li>Experimente questões de nível superior</li>
                 `;
             }
+        }
+
+        function inferMathArea(text) {
+            const t = (text || '').toLowerCase();
+            if (t.includes('%') || t.includes('porcent') || t.includes('percentual')) return 'Porcentagem';
+            if (t.includes('parcela') || t.includes('desconto') || t.includes('juros') || t.includes('parcel')) return 'Aritmética Financeira';
+            if (t.includes('parábola') || t.includes('quadrática') || t.includes('vértice') || t.includes('função')) return 'Funções';
+            if (t.includes('polinômio') || t.includes('polinomio')) return 'Polinômios';
+            if (t.includes('√') || t.includes('raiz')) return 'Radiciação';
+            if (t.includes('perímetro') || t.includes('metros') || t.includes('m de altura') || t.includes('terreno')) return 'Geometria';
+            if (t.includes('pesquisa') || t.includes('pessoas') || t.includes('percentual') && t.includes('mulher')) return 'Estatística';
+            if (t.includes('exponenc') || t.includes('2^')) return 'Funções Exponenciais';
+            return 'Matemática Geral';
         }
 
         // Voltar ao lobby
