@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Sistema de XP e Patentes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #00ff00;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #444;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .rank-display {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎮 Teste do Sistema de XP e Patentes do Free Fire 🎮</h1>
+        
+        <div class="rank-display" id="currentRank">
+            Carregando...
+        </div>
+        
+        <div class="test-section">
+            <h2>1. Teste de XP</h2>
+            <button onclick="testAddXP()">Adicionar 50 XP (1 acerto)</button>
+            <button onclick="testAdd500XP()">Adicionar 500 XP (10 acertos)</button>
+            <button onclick="testAdd1000XP()">Adicionar 1000 XP (20 acertos)</button>
+            <button onclick="resetXP()">Resetar XP</button>
+            <div id="xpResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Teste de Patentes</h2>
+            <button onclick="showAllRanks()">Mostrar Todas as Patentes</button>
+            <button onclick="testRankProgression()">Testar Progressão de Patentes</button>
+            <div id="rankResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Teste de Persistência</h2>
+            <button onclick="testSaveLoad()">Testar Salvar/Carregar</button>
+            <button onclick="clearAllData()">Limpar Todos os Dados</button>
+            <div id="persistResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Ir para o Quiz</h2>
+            <button onclick="goToQuiz()">Abrir Quiz de Português</button>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de Patentes do Free Fire
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
+        
+        let playerXP = 0;
+        let playerRank = 0;
+        
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    playerXP = parsed.xp || 0;
+                    updateRank();
+                }
+            } catch (e) {
+                console.error('Erro ao carregar dados:', e);
+            }
+        }
+        
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({
+                    xp: playerXP,
+                    rank: playerRank
+                }));
+            } catch (e) {
+                console.error('Erro ao salvar dados:', e);
+            }
+        }
+        
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+        
+        function getCurrentRank() {
+            return ranks[playerRank];
+        }
+        
+        function getNextRank() {
+            if (playerRank < ranks.length - 1) {
+                return ranks[playerRank + 1];
+            }
+            return null;
+        }
+        
+        function updateDisplay() {
+            const rank = getCurrentRank();
+            const nextRank = getNextRank();
+            let display = `${rank.icon} ${rank.name} - ${playerXP} XP`;
+            
+            if (nextRank) {
+                const xpToNext = nextRank.minXP - playerXP;
+                display += `<br><small>Faltam ${xpToNext} XP para ${nextRank.icon} ${nextRank.name}</small>`;
+            } else {
+                display += `<br><small>Patente Máxima Alcançada!</small>`;
+            }
+            
+            document.getElementById('currentRank').innerHTML = display;
+        }
+        
+        function testAddXP() {
+            const previousRank = playerRank;
+            playerXP += 50;
+            updateRank();
+            savePlayerData();
+            updateDisplay();
+            
+            let message = `XP adicionado! Total: ${playerXP} XP`;
+            if (playerRank > previousRank) {
+                const rank = getCurrentRank();
+                message += `\n🎉 PARABÉNS! Você subiu para ${rank.icon} ${rank.name}!`;
+            }
+            
+            document.getElementById('xpResult').innerText = message;
+        }
+        
+        function testAdd500XP() {
+            const previousRank = playerRank;
+            playerXP += 500;
+            updateRank();
+            savePlayerData();
+            updateDisplay();
+            
+            let message = `500 XP adicionados! Total: ${playerXP} XP`;
+            if (playerRank > previousRank) {
+                const rank = getCurrentRank();
+                message += `\n🎉 PARABÉNS! Você subiu para ${rank.icon} ${rank.name}!`;
+            }
+            
+            document.getElementById('xpResult').innerText = message;
+        }
+        
+        function testAdd1000XP() {
+            const previousRank = playerRank;
+            playerXP += 1000;
+            updateRank();
+            savePlayerData();
+            updateDisplay();
+            
+            let message = `1000 XP adicionados! Total: ${playerXP} XP`;
+            if (playerRank > previousRank) {
+                const rank = getCurrentRank();
+                message += `\n🎉 PARABÉNS! Você subiu para ${rank.icon} ${rank.name}!`;
+            }
+            
+            document.getElementById('xpResult').innerText = message;
+        }
+        
+        function resetXP() {
+            playerXP = 0;
+            playerRank = 0;
+            savePlayerData();
+            updateDisplay();
+            document.getElementById('xpResult').innerText = 'XP resetado para 0!';
+        }
+        
+        function showAllRanks() {
+            let ranksDisplay = 'TODAS AS PATENTES DO FREE FIRE:\n\n';
+            ranks.forEach(rank => {
+                ranksDisplay += `${rank.icon} ${rank.name} - ${rank.minXP} XP\n`;
+            });
+            document.getElementById('rankResult').innerText = ranksDisplay;
+        }
+        
+        function testRankProgression() {
+            let progression = 'SIMULAÇÃO DE PROGRESSÃO:\n\n';
+            let testXP = 0;
+            
+            for (let i = 0; i < 10; i++) {
+                testXP = i * 250;
+                let rankIndex = 0;
+                for (let j = ranks.length - 1; j >= 0; j--) {
+                    if (testXP >= ranks[j].minXP) {
+                        rankIndex = j;
+                        break;
+                    }
+                }
+                const rank = ranks[rankIndex];
+                progression += `${testXP} XP = ${rank.icon} ${rank.name}\n`;
+            }
+            
+            document.getElementById('rankResult').innerText = progression;
+        }
+        
+        function testSaveLoad() {
+            const currentXP = playerXP;
+            const currentRankIndex = playerRank;
+            
+            // Salvar
+            savePlayerData();
+            
+            // Modificar temporariamente
+            playerXP = 999999;
+            playerRank = 0;
+            
+            // Recarregar
+            loadPlayerData();
+            
+            const success = (playerXP === currentXP && playerRank === currentRankIndex);
+            
+            document.getElementById('persistResult').innerText = 
+                success ? 
+                '✅ Teste de persistência bem-sucedido!\nDados salvos e carregados corretamente.' :
+                '❌ Erro no teste de persistência!';
+            
+            updateDisplay();
+        }
+        
+        function clearAllData() {
+            localStorage.removeItem('playerData');
+            playerXP = 0;
+            playerRank = 0;
+            updateDisplay();
+            document.getElementById('persistResult').innerText = 
+                '🗑️ Todos os dados foram limpos!';
+        }
+        
+        function goToQuiz() {
+            window.location.href = 'quiz_portugues.html';
+        }
+        
+        // Inicializar
+        window.addEventListener('load', function() {
+            loadPlayerData();
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
