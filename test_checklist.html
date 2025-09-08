@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist de Testes - SAEB 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: #555;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .checkbox {
+            width: 25px;
+            height: 25px;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+        
+        .test-label {
+            flex: 1;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .status {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .status.pass {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status.fail {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .status.pending {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+        
+        .summary h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .test-label {
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Checklist de Testes - SAEB 2025</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill">0%</div>
+        </div>
+        
+        <!-- TESTES DE NAVEGAÇÃO -->
+        <div class="test-section">
+            <h2>📱 Navegação e Interface</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav1">
+                <label for="nav1" class="test-label">Página inicial carrega corretamente</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav2">
+                <label for="nav2" class="test-label">Navegação entre Home e Lobby funciona</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav3">
+                <label for="nav3" class="test-label">Botão "Voltar" aparece corretamente nas páginas internas</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav4">
+                <label for="nav4" class="test-label">Logo clicável retorna para Home</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav5">
+                <label for="nav5" class="test-label">Scroll suave entre seções</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="nav6">
+                <label for="nav6" class="test-label">Botão "Scroll to Top" funciona</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- TESTES DE ANIMAÇÃO -->
+        <div class="test-section">
+            <h2>✨ Animações e Efeitos Visuais</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim1">
+                <label for="anim1" class="test-label">Partículas de fundo animadas</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim2">
+                <label for="anim2" class="test-label">Grid de fundo em movimento</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim3">
+                <label for="anim3" class="test-label">Efeito hover nos cards</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim4">
+                <label for="anim4" class="test-label">Animação de typing no título</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim5">
+                <label for="anim5" class="test-label">Contador animado nas estatísticas</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="anim6">
+                <label for="anim6" class="test-label">Reveal on scroll das seções</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- TESTES DO QUIZ -->
+        <div class="test-section">
+            <h2>🎮 Funcionalidades do Quiz</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz1">
+                <label for="quiz1" class="test-label">Cards de seleção de matéria funcionam</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz2">
+                <label for="quiz2" class="test-label">Quiz de Matemática carrega questões</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz3">
+                <label for="quiz3" class="test-label">Seleção de alternativas funciona</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz4">
+                <label for="quiz4" class="test-label">Feedback de resposta correta/incorreta</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz5">
+                <label for="quiz5" class="test-label">Contador de questões atualiza</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz6">
+                <label for="quiz6" class="test-label">Tela de resultados exibe corretamente</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="quiz7">
+                <label for="quiz7" class="test-label">Cálculo de pontuação está correto</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- TESTES DE RESPONSIVIDADE -->
+        <div class="test-section">
+            <h2>📱 Responsividade</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="resp1">
+                <label for="resp1" class="test-label">Desktop (1920x1080)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="resp2">
+                <label for="resp2" class="test-label">Laptop (1366x768)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="resp3">
+                <label for="resp3" class="test-label">Tablet (768x1024)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="resp4">
+                <label for="resp4" class="test-label">Mobile (375x667)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="resp5">
+                <label for="resp5" class="test-label">Orientação landscape funciona</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- TESTES DE PERFORMANCE -->
+        <div class="test-section">
+            <h2>⚡ Performance</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="perf1">
+                <label for="perf1" class="test-label">Página carrega em menos de 3 segundos</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="perf2">
+                <label for="perf2" class="test-label">Animações fluidas (60 FPS)</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="perf3">
+                <label for="perf3" class="test-label">Sem vazamentos de memória</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="perf4">
+                <label for="perf4" class="test-label">Scroll suave sem travamentos</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- TESTES DE COMPATIBILIDADE -->
+        <div class="test-section">
+            <h2>🌐 Compatibilidade</h2>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="comp1">
+                <label for="comp1" class="test-label">Chrome</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="comp2">
+                <label for="comp2" class="test-label">Firefox</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="comp3">
+                <label for="comp3" class="test-label">Safari</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="comp4">
+                <label for="comp4" class="test-label">Edge</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+            
+            <div class="test-item">
+                <input type="checkbox" class="checkbox" id="comp5">
+                <label for="comp5" class="test-label">Mobile browsers</label>
+                <span class="status pending">PENDENTE</span>
+            </div>
+        </div>
+        
+        <!-- RESUMO -->
+        <div class="summary">
+            <h3>📊 Resumo dos Testes</h3>
+            <div class="summary-item">
+                <span>Total de Testes:</span>
+                <strong id="totalTests">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Testes Aprovados:</span>
+                <strong id="passedTests" style="color: #28a745;">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Testes Pendentes:</span>
+                <strong id="pendingTests" style="color: #ffc107;">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Taxa de Aprovação:</span>
+                <strong id="successRate" style="color: #667eea;">0%</strong>
+            </div>
+        </div>
+        
+        <!-- AÇÕES -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="openSite()">🌐 Abrir Site</button>
+            <button class="btn btn-success" onclick="markAllPassed()">✅ Marcar Todos Como Aprovados</button>
+            <button class="btn btn-primary" onclick="exportResults()">📥 Exportar Relatório</button>
+        </div>
+    </div>
+    
+    <script>
+        // Atualizar progresso
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const checked = document.querySelectorAll('.checkbox:checked').length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressFill').textContent = percentage + '%';
+            
+            // Atualizar resumo
+            document.getElementById('totalTests').textContent = total;
+            document.getElementById('passedTests').textContent = checked;
+            document.getElementById('pendingTests').textContent = total - checked;
+            document.getElementById('successRate').textContent = percentage + '%';
+        }
+        
+        // Adicionar listeners aos checkboxes
+        document.querySelectorAll('.checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const statusSpan = this.parentElement.querySelector('.status');
+                if (this.checked) {
+                    statusSpan.textContent = 'APROVADO';
+                    statusSpan.className = 'status pass';
+                } else {
+                    statusSpan.textContent = 'PENDENTE';
+                    statusSpan.className = 'status pending';
+                }
+                updateProgress();
+            });
+        });
+        
+        // Marcar todos como aprovados
+        function markAllPassed() {
+            document.querySelectorAll('.checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+                const statusSpan = checkbox.parentElement.querySelector('.status');
+                statusSpan.textContent = 'APROVADO';
+                statusSpan.className = 'status pass';
+            });
+            updateProgress();
+        }
+        
+        // Abrir site
+        function openSite() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Exportar resultados
+        function exportResults() {
+            const results = [];
+            document.querySelectorAll('.test-item').forEach(item => {
+                const label = item.querySelector('.test-label').textContent;
+                const status = item.querySelector('.checkbox').checked ? 'APROVADO' : 'PENDENTE';
+                results.push(`${label}: ${status}`);
+            });
+            
+            const report = `RELATÓRIO DE TESTES - SAEB 2025\n` +
+                          `Data: ${new Date().toLocaleString('pt-BR')}\n` +
+                          `================================\n\n` +
+                          results.join('\n') + '\n\n' +
+                          `================================\n` +
+                          `Taxa de Aprovação: ${document.getElementById('successRate').textContent}`;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'relatorio_testes_saeb2025.txt';
+            a.click();
+        }
+        
+        // Inicializar
+        updateProgress();
+    </script>
+</body>
+</html>
