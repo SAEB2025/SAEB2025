@@ -965,6 +965,10 @@
                 <button class="lobby-btn" onclick="returnToLobby()">
                     🏠 VOLTAR PARA O LOBBY
                 </button>
+                <button class="lobby-btn" onclick="restartQuiz()">
+                    🔁 JOGAR DE NOVO
+                </button>
+                <p id="autoRestartMsg" style="color: var(--text-secondary); margin-top: 1rem;"></p>
             </div>
         </div>
     </div>
@@ -1020,6 +1024,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let autoRestartTimeout = null;
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1156,6 +1161,40 @@
             startTime = Date.now();
             answered = false;
             
+            createParticles();
+            showQuestion();
+        }
+
+        // Reiniciar o quiz com novo conjunto de perguntas
+        function restartQuiz() {
+            try { if (autoRestartTimeout) { clearTimeout(autoRestartTimeout); autoRestartTimeout = null; } } catch(e){}
+            // Resetar estado
+            selectedQuestions = getRandomQuestions(questions, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswer = null;
+            startTime = Date.now();
+            answered = false;
+
+            // Alternar telas
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.remove('hidden');
+
+            // Resetar UI
+            const alternativesContainer = document.getElementById('alternativesContainer');
+            if (alternativesContainer) alternativesContainer.innerHTML = '';
+            document.getElementById('questionCounter').textContent = 'QUESTÃO 1/10';
+            document.getElementById('scoreDisplay').textContent = 'ACERTOS: 0';
+            document.getElementById('questionNumber').textContent = 'QUESTÃO 1';
+            document.getElementById('questionText').textContent = 'Carregando pergunta...';
+            const msg = document.getElementById('autoRestartMsg');
+            if (msg) msg.textContent = '';
+
+            // Persistência
+            clearProgress();
+            saveProgress();
+
+            // Visual
             createParticles();
             showQuestion();
         }
@@ -1362,10 +1401,21 @@
                     <li>Experimente questões de nível superior</li>
                 `;
             }
+
+            // Mensagem e auto-reinício
+            const autoMsg = document.getElementById('autoRestartMsg');
+            if (autoMsg) {
+                autoMsg.textContent = 'Reiniciando com novas perguntas em 5s...';
+            }
+            try { if (autoRestartTimeout) clearTimeout(autoRestartTimeout); } catch(e){}
+            autoRestartTimeout = setTimeout(() => {
+                restartQuiz();
+            }, 5000);
         }
 
         // Voltar ao lobby
         function returnToLobby() {
+            try { if (autoRestartTimeout) { clearTimeout(autoRestartTimeout); autoRestartTimeout = null; } } catch(e){}
             confirmExitToLobby();
         }
 
