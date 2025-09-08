@@ -1066,6 +1066,11 @@
             else if (overallPct >= 50) stats.ranking = 'Intermediário';
             else stats.ranking = 'Iniciante';
 
+            // XP: 50 por acerto e compatibilidade com lobby
+            stats.totalXP = (stats.totalXP || 0) + (finalCorrect * 50);
+            stats.totalScore = (stats.totalScore || 0) + (finalCorrect * 50);
+            stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
+
             saveStats(stats);
         }
 
@@ -1287,6 +1292,7 @@
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
+                    <div class="correct-answer">Você ganhou <strong>+50 XP</strong>!</div>
                     <div class="correct-answer">Resposta correta!</div>
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
