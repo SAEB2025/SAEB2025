@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Responsividade - SAEB 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0A0A0A;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #FF0080, #00FF88, #00BFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .test-card {
+            background: #151515;
+            border: 2px solid #00FF88;
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .test-card h3 {
+            color: #00FF88;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .status.ok {
+            background: #00FF88;
+            color: #000;
+        }
+
+        .status.improved {
+            background: #00BFFF;
+            color: #000;
+        }
+
+        .status.new {
+            background: #FF0080;
+            color: #fff;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list li:before {
+            content: "✅ ";
+            color: #00FF88;
+        }
+
+        .demo-section {
+            background: #151515;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .demo-section h2 {
+            color: #FFFF00;
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .demo-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #FF0080, #00FF88);
+            border: none;
+            border-radius: 25px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .viewport-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .screen-size {
+            font-size: 24px;
+            color: #00BFFF;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .demo-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .test-card {
+                padding: 15px;
+            }
+
+            .demo-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 TESTE DE RESPONSIVIDADE E MELHORIAS</h1>
+
+        <div class="viewport-info">
+            <p>Tamanho da Tela:</p>
+            <div class="screen-size" id="screenSize">Calculando...</div>
+            <p id="deviceType">Detectando dispositivo...</p>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>📱 Responsividade Mobile</h3>
+                <span class="status ok">IMPLEMENTADO</span>
+                <ul class="feature-list">
+                    <li>Menu hambúrguer para navegação mobile</li>
+                    <li>Layout adaptativo para todas as telas</li>
+                    <li>Botões com área de toque otimizada (44px mínimo)</li>
+                    <li>Fontes e espaçamentos responsivos com clamp()</li>
+                    <li>Grid flexível que se adapta ao tamanho da tela</li>
+                </ul>
+            </div>
+
+            <div class="test-card">
+                <h3>📊 Sistema de Estatísticas</h3>
+                <span class="status improved">MELHORADO</span>
+                <ul class="feature-list">
+                    <li>Sistema de níveis e XP com 10 ranks</li>
+                    <li>Conquistas desbloqueáveis</li>
+                    <li>Estatísticas detalhadas por matéria</li>
+                    <li>Tracking de streak e tempo médio</li>
+                    <li>Persistência de dados no localStorage</li>
+                </ul>
+            </div>
+
+            <div class="test-card">
+                <h3>🎮 Experiência Touch</h3>
+                <span class="status new">NOVO</span>
+                <ul class="feature-list">
+                    <li>Gestos touch otimizados</li>
+                    <li>Feedback visual em interações</li>
+                    <li>Swipe indicators para mobile</li>
+                    <li>Desabilitação de hover em touch devices</li>
+                    <li>Animações suaves para transições</li>
+                </ul>
+            </div>
+
+            <div class="test-card">
+                <h3>⚡ Performance</h3>
+                <span class="status improved">OTIMIZADO</span>
+                <ul class="feature-list">
+                    <li>Throttling de eventos de scroll</li>
+                    <li>Redução de partículas em mobile</li>
+                    <li>Lazy loading de animações</li>
+                    <li>CSS optimizado com will-change</li>
+                    <li>Viewport meta tag otimizada</li>
+                </ul>
+            </div>
+
+            <div class="test-card">
+                <h3>🏆 Sistema de Gamificação</h3>
+                <span class="status new">NOVO</span>
+                <ul class="feature-list">
+                    <li>10 níveis de progressão (Iniciante a Mítico)</li>
+                    <li>Barra de XP animada com shimmer effect</li>
+                    <li>Popup de conquistas em tempo real</li>
+                    <li>Badges coloridos por nível</li>
+                    <li>Sistema de pontuação acumulativa</li>
+                </ul>
+            </div>
+
+            <div class="test-card">
+                <h3>🎨 Melhorias Visuais</h3>
+                <span class="status improved">APRIMORADO</span>
+                <ul class="feature-list">
+                    <li>Animações de entrada suaves</li>
+                    <li>Efeitos de hover melhorados</li>
+                    <li>Gradientes dinâmicos</li>
+                    <li>Modo landscape otimizado</li>
+                    <li>Indicadores visuais de swipe</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 FUNCIONALIDADES IMPLEMENTADAS</h2>
+            
+            <h3 style="color: #00FF88; margin: 20px 0;">Menu Mobile:</h3>
+            <p>✅ Menu hambúrguer aparece automaticamente em telas menores que 1024px</p>
+            <p>✅ Navegação completa com links para todas as seções</p>
+            <p>✅ Animação suave de abertura/fechamento</p>
+            
+            <h3 style="color: #00FF88; margin: 20px 0;">Sistema de Níveis:</h3>
+            <p>📈 Iniciante (0-99 XP)</p>
+            <p>📈 Aprendiz (100-299 XP)</p>
+            <p>📈 Estudante (300-599 XP)</p>
+            <p>📈 Competente (600-999 XP)</p>
+            <p>📈 Avançado (1000-1499 XP)</p>
+            <p>📈 Expert (1500-2499 XP)</p>
+            <p>📈 Mestre (2500-3999 XP)</p>
+            <p>📈 Grão-Mestre (4000-5999 XP)</p>
+            <p>📈 Lendário (6000-9999 XP)</p>
+            <p>📈 Mítico (10000+ XP)</p>
+            
+            <h3 style="color: #00FF88; margin: 20px 0;">Conquistas:</h3>
+            <p>🏆 Primeira Vitória - Complete seu primeiro quiz</p>
+            <p>🏆 Em Chamas - Complete 5 quizzes</p>
+            <p>🏆 Dedicado - Complete 10 quizzes</p>
+            <p>🏆 Perfeição - Acerte todas as questões</p>
+            <p>🏆 Sequência de 5 - Mantenha uma streak de 5</p>
+            <p>🏆 Sequência de 10 - Mantenha uma streak de 10</p>
+            <p>🏆 Velocista - Complete um quiz em menos de 1 minuto</p>
+            <p>🏆 Milestone - Alcance 1000 pontos</p>
+            <p>🏆 Rei dos Pontos - Alcance 5000 pontos</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>📱 TESTE DE RESPONSIVIDADE</h2>
+            <p>Redimensione a janela do navegador ou acesse em diferentes dispositivos para ver as adaptações:</p>
+            
+            <div class="button-group">
+                <button class="demo-btn" onclick="testMobile()">Simular Mobile (360px)</button>
+                <button class="demo-btn" onclick="testTablet()">Simular Tablet (768px)</button>
+                <button class="demo-btn" onclick="testDesktop()">Simular Desktop (1920px)</button>
+                <button class="demo-btn" onclick="resetSize()">Resetar Tamanho</button>
+            </div>
+            
+            <p style="margin-top: 20px; color: #00BFFF;">
+                💡 Dica: Abra o DevTools (F12) e teste o modo responsivo para ver todas as adaptações!
+            </p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 COMO TESTAR</h2>
+            <div class="button-group">
+                <button class="demo-btn" onclick="window.location.href='index.html'">
+                    Ir para o Site Principal
+                </button>
+                <button class="demo-btn" onclick="window.location.href='index.html#lobby'">
+                    Testar Quiz Lobby
+                </button>
+                <button class="demo-btn" onclick="testStats()">
+                    Simular Estatísticas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update screen size display
+        function updateScreenSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementById('screenSize').textContent = `${width} x ${height}px`;
+            
+            let deviceType = 'Desktop';
+            if (width <= 480) {
+                deviceType = '📱 Mobile';
+            } else if (width <= 768) {
+                deviceType = '📱 Tablet';
+            } else if (width <= 1024) {
+                deviceType = '💻 Laptop';
+            } else {
+                deviceType = '🖥️ Desktop';
+            }
+            
+            document.getElementById('deviceType').textContent = `Dispositivo: ${deviceType}`;
+        }
+
+        // Simulate different screen sizes
+        function testMobile() {
+            window.resizeTo(360, 640);
+            updateScreenSize();
+        }
+
+        function testTablet() {
+            window.resizeTo(768, 1024);
+            updateScreenSize();
+        }
+
+        function testDesktop() {
+            window.resizeTo(1920, 1080);
+            updateScreenSize();
+        }
+
+        function resetSize() {
+            window.resizeTo(window.screen.width, window.screen.height);
+            updateScreenSize();
+        }
+
+        // Simulate stats
+        function testStats() {
+            const testData = {
+                quizzesCompleted: 5,
+                overallCorrect: 35,
+                overallTotal: 50,
+                mathCorrect: 18,
+                mathTotal: 25,
+                portCorrect: 17,
+                portTotal: 25,
+                totalMinutes: 45,
+                bestStreak: 8,
+                currentStreak: 3,
+                totalScore: 750,
+                totalQuestions: 50,
+                lastQuizScore: 80,
+                lastQuizTime: 8
+            };
+            
+            localStorage.setItem('saebStats', JSON.stringify(testData));
+            alert('✅ Estatísticas de teste salvas!\n\nVolte ao site principal para ver as estatísticas atualizadas no painel de diagnóstico.');
+        }
+
+        // Initialize
+        updateScreenSize();
+        window.addEventListener('resize', updateScreenSize);
+
+        // Show welcome message
+        setTimeout(() => {
+            console.log('%c🚀 SAEB 2025 - Teste de Responsividade', 'color: #00FF88; font-size: 20px; font-weight: bold;');
+            console.log('%c✅ Todas as melhorias foram implementadas com sucesso!', 'color: #00BFFF; font-size: 14px;');
+        }, 500);
+    </script>
+</body>
+</html>
