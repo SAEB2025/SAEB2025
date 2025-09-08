@@ -1178,6 +1178,31 @@
             }
         }
 
+        // Free Fire rank mapping and XP helpers
+        const FREE_FIRE_RANKS = [
+            'Bronze I','Bronze II','Bronze III',
+            'Prata I','Prata II','Prata III',
+            'Ouro I','Ouro II','Ouro III','Ouro IV',
+            'Platina I','Platina II','Platina III','Platina IV',
+            'Diamante I','Diamante II','Diamante III','Diamante IV',
+            'Mestre','Desafiante'
+        ];
+
+        function updateRankingByXP(stats) {
+            const currentXP = stats.xp || 0;
+            const rankIndex = Math.min(Math.floor(currentXP / 100), FREE_FIRE_RANKS.length - 1);
+            stats.ranking = FREE_FIRE_RANKS[rankIndex];
+        }
+
+        function addXP(amount) {
+            const stats = loadStats();
+            stats.xp = (stats.xp || 0) + amount;
+            // compat com UI antiga
+            stats.totalScore = (stats.totalScore || 0) + amount;
+            updateRankingByXP(stats);
+            saveStats(stats);
+        }
+
         function updateStatsAfterQuiz(finalCorrect, totalQuestions, elapsedMinutes) {
             const stats = loadStats();
             stats.quizzesCompleted = (stats.quizzesCompleted || 0) + 1;
@@ -1191,11 +1216,8 @@
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
             stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
 
-            const overallPct = Math.round((stats.overallCorrect || 0) / Math.max(1, (stats.overallTotal || 0)) * 100);
-            if (overallPct >= 90) stats.ranking = 'Lendário';
-            else if (overallPct >= 75) stats.ranking = 'Pro';
-            else if (overallPct >= 50) stats.ranking = 'Intermediário';
-            else stats.ranking = 'Iniciante';
+            // Atualizar patente com base no XP
+            updateRankingByXP(stats);
 
             saveStats(stats);
         }
@@ -1271,16 +1293,22 @@
             if (usedQuestionIndices.length >= questions.length - 10) {
                 usedQuestionIndices = [];
             }
-            
-            // Filtrar questões não usadas
-            const availableQuestions = questions.filter((_, index) => 
-                !usedQuestionIndices.includes(index)
+
+            // Filtrar questões que exigem texto base (e que já foram usadas)
+            const TEXT_BASED_REGEX = /(texto|tirinha)/i;
+            let availableQuestions = questions.filter((q, index) => 
+                !TEXT_BASED_REGEX.test(q.question || '') && !usedQuestionIndices.includes(index)
             );
-            
+
+            // Fallback: se houver menos de 10 após filtro, relaxar filtro para manter 10 questões
+            if (availableQuestions.length < 10) {
+                availableQuestions = questions.filter((_, index) => !usedQuestionIndices.includes(index));
+            }
+
             // Selecionar 10 questões aleatórias das disponíveis
             const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
             selectedQuestions = shuffled.slice(0, 10);
-            
+
             // Rastrear índices das questões selecionadas
             selectedIndices = selectedQuestions.map(q => {
                 const index = questions.indexOf(q);
@@ -1391,6 +1419,7 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                addXP(50);
             }
             setTimeout(() => {
                 showFeedbackModal(isCorrect, question);
