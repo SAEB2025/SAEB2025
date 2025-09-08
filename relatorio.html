@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório SAEB 2025 - Avançado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --neon-green: #00FF88;
+            --neon-pink: #FF0080;
+            --neon-blue: #00BFFF;
+            --neon-yellow: #FFFF00;
+            --dark-bg: #0A0A0A;
+            --darker-bg: #050505;
+            --card-bg: #151515;
+            --text-primary: #FFFFFF;
+            --text-secondary: #CCCCCC;
+            --accent-orange: #FF6B35;
+            --gradient-main: linear-gradient(135deg, #FF0080, #00FF88, #00BFFF);
+            --gradient-secondary: linear-gradient(45deg, #FF6B35, #FFFF00);
+        }
+        body { font-family: 'Roboto Condensed', sans-serif; background: var(--dark-bg); color: var(--text-primary); min-height: 100vh; }
+        header { position: sticky; top: 0; background: rgba(10,10,10,0.9); backdrop-filter: blur(18px); border-bottom: 2px solid var(--neon-green); z-index: 1000; }
+        .header-content { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .logo { font-family: 'Oswald', sans-serif; font-weight: 900; font-size: clamp(1.4rem, 4vw, 2rem); background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; cursor: pointer; }
+        .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+        .btn { background: var(--gradient-main); color: #000; border: none; border-radius: 999px; padding: .7rem 1.2rem; font-weight: 900; letter-spacing: .5px; cursor: pointer; box-shadow: 0 5px 20px rgba(0,255,136,.25); }
+        .btn.secondary { background: var(--gradient-secondary); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .grid { display: grid; gap: 1rem; }
+        .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        @media (max-width: 980px) { .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; } }
+        .card { background: var(--card-bg); border: 2px solid var(--neon-blue); border-radius: 16px; padding: 1.25rem; position: relative; overflow: hidden; }
+        .card h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: .5px; margin-bottom: .75rem; color: var(--neon-blue); }
+        .pill { display: inline-flex; gap: .35rem; align-items: center; padding: .35rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 900; }
+        .pill.green { background: rgba(0,255,136,.12); border: 1px solid var(--neon-green); color: var(--neon-green); }
+        .pill.pink { background: rgba(255,0,128,.12); border: 1px solid var(--neon-pink); color: var(--neon-pink); }
+        .metric { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1rem; align-items: center; margin: .35rem 0; }
+        .metric .label { color: var(--text-secondary); font-size: .9rem; }
+        .bar { height: 10px; width: 100%; background: #0e0e0e; border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); }
+        .bar > span { display: block; height: 100%; background: var(--gradient-main); border-radius: 999px; width: 0%; transition: width .8s ease; }
+        .score-ring { width: 140px; height: 140px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--neon-green) 0deg, var(--neon-green) var(--deg,0deg), rgba(255,255,255,.08) var(--deg,0deg)); position: relative; }
+        .score-ring::after { content: ''; position: absolute; inset: 10px; background: var(--card-bg); border-radius: 50%; }
+        .score-ring .value { position: relative; font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 18px rgba(0,255,136,.35); }
+        .section-title { font-family: 'Oswald', sans-serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); text-transform: uppercase; letter-spacing: 1px; margin: 1rem 0; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtle { color: var(--text-secondary); font-size: .95rem; }
+        .list { list-style: none; }
+        .list li { position: relative; padding-left: 1.6rem; margin: .4rem 0; color: var(--text-secondary); }
+        .list li::before { content: '✔'; position: absolute; left: 0; top: 0; color: var(--neon-green); }
+        .axis-chip { display: inline-flex; align-items: center; gap: .4rem; padding: .25rem .55rem; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; color: var(--text-secondary); font-size: .85rem; }
+        .tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
+        .tab { background: var(--darker-bg); border: 1px solid rgba(255,255,255,.12); color: var(--text-secondary); padding: .5rem .9rem; border-radius: 999px; cursor: pointer; font-weight: 700; }
+        .tab.active { border-color: var(--neon-green); color: var(--neon-green); }
+        .hidden { display: none !important; }
+        .table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+        .table th, .table td { text-align: left; padding: .75rem 1rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+        .table th { color: var(--text-secondary); font-weight: 700; }
+        .trend-up { color: #3bd28a; font-weight: 900; }
+        .trend-down { color: #ff6b6b; font-weight: 900; }
+        .empty { text-align: center; padding: 2rem; border: 2px dashed rgba(255,255,255,.12); border-radius: 12px; color: var(--text-secondary); }
+        .certificate { background: var(--card-bg); border: 2px solid var(--neon-yellow); border-radius: 16px; padding: 1rem; display: grid; gap: .75rem; }
+        .input { background: #0e0e0e; color: var(--text-primary); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; padding: .7rem .9rem; outline: none; }
+        @media print {
+            header, .no-print { display: none !important; }
+            body { background: #fff; color: #000; }
+            .card { border-color: #000 !important; }
+        }
+    </style>
+    <meta name="color-scheme" content="dark light">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()">📊 Relatório SAEB 2025</div>
+            <div class="actions no-print">
+                <button class="btn" onclick="printReport()">🖨️ Imprimir/PDF</button>
+                <button class="btn secondary" onclick="shareSummary()">📤 Compartilhar</button>
+                <button class="btn" onclick="downloadJSON()">📥 Baixar JSON</button>
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        <h2 class="section-title">Visão Geral</h2>
+        <div class="grid cols-3">
+            <div class="card">
+                <h3>Desempenho Geral</h3>
+                <div style="display:flex; gap:1rem; align-items:center;">
+                    <div class="score-ring" id="scoreRing" style="--deg:0deg"><div class="value" id="overallPct">0%</div></div>
+                    <div class="subtle">
+                        <div><strong id="overallLabel">-</strong></div>
+                        <div><span id="overallCorrect">0</span>/<span id="overallTotal">0</span> questões</div>
+                        <div>Tempo total: <span id="overallTime">0</span> min</div>
+                        <div>Quizzes: <span id="overallQuizzes">0</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Matemática por Eixo</h3>
+                <div id="mathAxis"></div>
+                <div class="subtle" id="mathAxisEmpty" style="display:none">Sem tentativas registradas</div>
+            </div>
+            <div class="card">
+                <h3>Português por Eixo</h3>
+                <div id="portAxis"></div>
+                <div class="subtle" id="portAxisEmpty" style="display:none">Sem tentativas registradas</div>
+            </div>
+        </div>
+
+        <div class="grid cols-2" style="margin-top:1rem;">
+            <div class="card">
+                <h3>Comparação com Níveis de Proficiência</h3>
+                <div class="grid cols-2">
+                    <div>
+                        <div class="pill green" id="overallLevel">Nível: -</div>
+                        <ul class="list" style="margin-top:.75rem;">
+                            <li><strong>Abaixo do Básico</strong>: &lt; 50%</li>
+                            <li><strong>Básico</strong>: 50% - 69%</li>
+                            <li><strong>Adequado</strong>: 70% - 89%</li>
+                            <li><strong>Avançado</strong>: ≥ 90%</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="subtle">Pontos fortes</div>
+                        <div id="strengths"></div>
+                        <div class="subtle" style="margin-top:.75rem;">Pontos a melhorar</div>
+                        <div id="weaknesses"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Recomendações Personalizadas</h3>
+                <div id="recommendations"></div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Histórico comparativo</h2>
+        <div class="card">
+            <div class="tabs no-print">
+                <div class="tab active" data-filter="all" onclick="filterHistory('all', this)">Todas</div>
+                <div class="tab" data-filter="matematica" onclick="filterHistory('matematica', this)">Matemática</div>
+                <div class="tab" data-filter="portugues" onclick="filterHistory('portugues', this)">Português</div>
+            </div>
+            <div id="historyContainer"></div>
+        </div>
+
+        <h2 class="section-title">Certificado</h2>
+        <div class="certificate">
+            <div class="grid cols-2">
+                <div>
+                    <div class="subtle">Digite seu nome para emitir o certificado</div>
+                    <input class="input" id="certName" placeholder="Seu nome completo" />
+                    <div style="display:flex; gap:.5rem; margin-top:.6rem;" class="no-print">
+                        <button class="btn" onclick="generateCertificate()">🏅 Gerar Certificado (PNG)</button>
+                        <button class="btn secondary" onclick="downloadCertificate()">⬇️ Baixar PNG</button>
+                    </div>
+                </div>
+                <div>
+                    <canvas id="certCanvas" width="1000" height="700" style="width:100%; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:#111"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function goHome(){ window.location.href = 'index.html#lobby'; }
+        function printReport(){ window.print(); }
+        function shareSummary(){
+            const s = buildSummaryText();
+            if (navigator.share) {
+                navigator.share({ title: 'Relatório SAEB 2025', text: s }).catch(()=>copyText(s));
+            } else { copyText(s); }
+        }
+        function copyText(t){
+            try { navigator.clipboard.writeText(t); alert('Resumo copiado!'); } catch(e){ alert('Copie manualmente:\n\n' + t); }
+        }
+        function downloadJSON(){
+            const { stats, history } = loadData();
+            const blob = new Blob([JSON.stringify({ stats, history }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'saeb_relatorio.json'; a.click();
+            setTimeout(()=>URL.revokeObjectURL(url), 1000);
+        }
+
+        function loadData(){
+            let stats = {}; let history = [];
+            try { const raw = localStorage.getItem('saebStats'); stats = raw ? JSON.parse(raw) : {}; } catch(e){}
+            try { const rawH = localStorage.getItem('saebHistory'); history = rawH ? JSON.parse(rawH) : []; } catch(e){}
+            return { stats, history };
+        }
+
+        function pct(correct, total){ return Math.round((correct / Math.max(1,total)) * 100); }
+        function degFor(percent){ return Math.round(360 * Math.max(0, Math.min(100, percent)) / 100) + 'deg'; }
+        function levelFor(percent){
+            if (percent >= 90) return { label: 'Avançado', color: 'var(--neon-green)' };
+            if (percent >= 70) return { label: 'Adequado', color: 'var(--neon-yellow)' };
+            if (percent >= 50) return { label: 'Básico', color: 'var(--neon-pink)' };
+            return { label: 'Abaixo do Básico', color: '#ff6b6b' };
+        }
+
+        function aggregateAxes(history, subject){
+            const axes = {};
+            history.filter(h => !subject || h.subject === subject).forEach(h => {
+                (h.axes ? Object.keys(h.axes) : []).forEach(ax => {
+                    const a = h.axes[ax];
+                    if (!axes[ax]) axes[ax] = { correct: 0, total: 0 };
+                    axes[ax].correct += a.correct || 0;
+                    axes[ax].total += a.total || 0;
+                });
+            });
+            return axes;
+        }
+
+        function renderAxisBars(containerId, axes){
+            const el = document.getElementById(containerId);
+            el.innerHTML = '';
+            const keys = Object.keys(axes);
+            if (keys.length === 0) {
+                const emptyId = containerId === 'mathAxis' ? 'mathAxisEmpty' : 'portAxisEmpty';
+                document.getElementById(emptyId).style.display = 'block';
+                return;
+            }
+            keys.sort((a,b)=> pct(axes[b].correct, axes[b].total) - pct(axes[a].correct, axes[a].total));
+            keys.forEach(k => {
+                const p = pct(axes[k].correct, axes[k].total);
+                const row = document.createElement('div');
+                row.className = 'metric';
+                row.innerHTML = `<div class="label">${k} <span class="subtle">(${axes[k].correct}/${axes[k].total})</span></div><div class="bar"><span style="width:${p}%"></span></div>`;
+                el.appendChild(row);
+            });
+        }
+
+        function strengthsAndWeaknesses(axesAll){
+            const entries = Object.entries(axesAll).map(([k,v])=>({ axis:k, p:pct(v.correct, v.total) }));
+            entries.sort((a,b)=>b.p - a.p);
+            const strengths = entries.filter(e=>e.p >= 80).slice(0,3);
+            const weaknesses = entries.filter(e=>e.p < 60).slice(-3).sort((a,b)=>a.p - b.p);
+            return { strengths, weaknesses };
+        }
+
+        function renderChips(targetId, arr){
+            const el = document.getElementById(targetId);
+            el.innerHTML = '';
+            if (!arr || arr.length===0){ el.innerHTML = '<div class="subtle">Nenhum</div>'; return; }
+            arr.forEach(item => {
+                const chip = document.createElement('div');
+                chip.className = 'axis-chip';
+                chip.innerHTML = `🎯 <strong>${item.axis}</strong> <span class="subtle">${item.p}%</span>`;
+                el.appendChild(chip);
+            });
+        }
+
+        function generateRecommendations(weak){
+            if (!weak || weak.length===0) return `<div class="subtle">Sem recomendações específicas. Continue praticando! ✅</div>`;
+            const recs = weak.map(w => {
+                const axis = w.axis.toLowerCase();
+                if (axis.includes('álgebra') || axis.includes('algebra')) {
+                    return `<li>Revisar funções, polinômios e vértice de parábolas; praticar resolução de equações quadráticas.</li>`;
+                }
+                if (axis.includes('números') || axis.includes('numeros') || axis.includes('propor')) {
+                    return `<li>Treinar porcentagem, frações e regra de três com problemas contextualizados.</li>`;
+                }
+                if (axis.includes('geometr')) {
+                    return `<li>Estudar perímetro, área e medidas; resolver exercícios com figuras e unidades.</li>`;
+                }
+                if (axis.includes('estat') || axis.includes('probab')) {
+                    return `<li>Praticar leitura de tabelas e gráficos; revisar conceitos básicos de probabilidade.</li>`;
+                }
+                if (axis.includes('análise') || axis.includes('analise') || axis.includes('lingu')) {
+                    return `<li>Revisar classes gramaticais e conectivos; observar efeitos de sentido (ex.: travessão, conjunções).</li>`;
+                }
+                if (axis.includes('gênero') || axis.includes('genero')) {
+                    return `<li>Explorar gêneros textuais e suas finalidades (campanhas, manuais, receitas, divulgação científica).</li>`;
+                }
+                if (axis.includes('semânt') || axis.includes('vocab')) {
+                    return `<li>Ampliar vocabulário e estudar polissemia; praticar interpretação de palavras em contexto.</li>`;
+                }
+                if (axis.includes('multimodal') || axis.includes('imagem')) {
+                    return `<li>Exercitar leitura integrada de texto e imagem (tirinhas, infográficos), identificando o humor e a intenção.</li>`;
+                }
+                return `<li>Praticar exercícios adicionais no eixo ${w.axis} com foco em questões recentes do SAEB.</li>`;
+            }).join('');
+            const extra = `
+                <div class="subtle" style="margin-top:.75rem;">Materiais sugeridos:</div>
+                <ul class="list">
+                    <li>Plataformas de estudo com exercícios do SAEB</li>
+                    <li>Vídeos curtos sobre os tópicos destacados</li>
+                    <li>Simulados semanais com revisão dos erros</li>
+                </ul>
+                <div class="subtle" style="margin-top:.75rem;">Próximos passos:</div>
+                <ul class="list">
+                    <li>Definir metas de melhora de +10% no eixo mais fraco em 2 semanas</li>
+                    <li>Praticar 20 minutos/dia no eixo em destaque</li>
+                    <li>Refazer os simulados e comparar evolução no histórico</li>
+                </ul>
+            `;
+            return `<ul class="list">${recs}</ul>${extra}`;
+        }
+
+        function buildSummaryText(){
+            const { stats } = loadData();
+            const overall = pct(stats.overallCorrect||0, stats.overallTotal||0);
+            const lvl = levelFor(overall).label;
+            return `Relatório SAEB 2025\nGeral: ${overall}% (${stats.overallCorrect||0}/${stats.overallTotal||0})\nNível: ${lvl}\nQuizzes: ${stats.quizzesCompleted||0}\nTempo total: ${stats.totalMinutes||0} min`;
+        }
+
+        function renderHistoryTable(history, filter){
+            const container = document.getElementById('historyContainer');
+            const filtered = history.filter(h => filter==='all' ? true : h.subject === filter);
+            if (filtered.length === 0){
+                container.innerHTML = '<div class="empty">Sem tentativas registradas ainda.</div>';
+                return;
+            }
+            let rows = '';
+            filtered.forEach((h, idx) => {
+                const p = h.percentage;
+                const trend = idx===0 ? '' : (p >= filtered[idx-1].percentage ? `<span class="trend-up">▲</span>` : `<span class="trend-down">▼</span>`);
+                rows += `<tr>
+                    <td>${new Date(h.date).toLocaleString('pt-BR')}</td>
+                    <td>${h.subject === 'matematica' ? '🔢 Matemática' : '📝 Português'}</td>
+                    <td>${h.correct}/${h.totalQuestions}</td>
+                    <td>${p}% ${trend}</td>
+                    <td>${h.elapsedMinutes} min</td>
+                </tr>`;
+            });
+            container.innerHTML = `
+                <div style="overflow:auto">
+                    <table class="table">
+                        <thead>
+                            <tr><th>Data</th><th>Matéria</th><th>Acertos</th><th>Desempenho</th><th>Tempo</th></tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function filterHistory(filter, el){
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const { history } = loadData();
+            renderHistoryTable(history, filter);
+        }
+
+        function generateCertificate(){
+            const canvas = document.getElementById('certCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+            const grad = ctx.createLinearGradient(0,0,w,h);
+            grad.addColorStop(0, '#0f0f0f'); grad.addColorStop(1, '#111a1a');
+            ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+            ctx.strokeStyle = '#00FF88'; ctx.lineWidth = 6; ctx.strokeRect(15,15,w-30,h-30);
+            ctx.strokeStyle = '#00BFFF'; ctx.lineWidth = 2; ctx.strokeRect(28,28,w-56,h-56);
+            ctx.font = 'bold 44px Oswald, sans-serif'; ctx.fillStyle = '#00FF88';
+            ctx.fillText('CERTIFICADO DE PARTICIPAÇÃO', 80, 120);
+            ctx.font = '28px Roboto Condensed, sans-serif'; ctx.fillStyle = '#ddd';
+            ctx.fillText('Concedido a', 80, 180);
+            const name = (document.getElementById('certName').value || 'Estudante Destaque').toUpperCase();
+            ctx.font = 'bold 56px Oswald, sans-serif'; ctx.fillStyle = '#FFFF00';
+            ctx.fillText(name, 80, 250);
+            const { stats } = loadData();
+            const overall = pct(stats.overallCorrect||0, stats.overallTotal||0);
+            const lvl = levelFor(overall).label;
+            ctx.font = '28px Roboto Condensed, sans-serif'; ctx.fillStyle = '#ccc';
+            ctx.fillText(`Pela participação no SAEB 2025 (Simulados) com desempenho geral de ${overall}%`, 80, 310);
+            ctx.fillText(`Nível de Proficiência: ${lvl}`, 80, 350);
+            const dateStr = new Date().toLocaleDateString('pt-BR');
+            ctx.fillText(`Data: ${dateStr}`, 80, 390);
+            // Selo
+            ctx.beginPath(); ctx.arc(w-160, h-160, 90, 0, 2*Math.PI); ctx.fillStyle = 'rgba(0,255,136,.08)'; ctx.fill();
+            ctx.strokeStyle = '#00FF88'; ctx.lineWidth = 4; ctx.stroke();
+            ctx.font = 'bold 28px Oswald, sans-serif'; ctx.fillStyle = '#00FF88'; ctx.fillText('SAEB 2025', w-230, h-170);
+            ctx.font = 'bold 48px Oswald, sans-serif'; ctx.fillStyle = '#00BFFF'; ctx.fillText('✔', w-150, h-120);
+        }
+        function downloadCertificate(){
+            const canvas = document.getElementById('certCanvas');
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a'); a.href = url; a.download = 'certificado_saeb.png'; a.click();
+        }
+
+        function init(){
+            const { stats, history } = loadData();
+            const overall = pct(stats.overallCorrect||0, stats.overallTotal||0);
+            document.getElementById('overallPct').textContent = overall + '%';
+            document.getElementById('scoreRing').style.setProperty('--deg', degFor(overall));
+            document.getElementById('overallCorrect').textContent = stats.overallCorrect || 0;
+            document.getElementById('overallTotal').textContent = stats.overallTotal || 0;
+            document.getElementById('overallTime').textContent = stats.totalMinutes || 0;
+            document.getElementById('overallQuizzes').textContent = stats.quizzesCompleted || 0;
+            const lvl = levelFor(overall);
+            const lvlEl = document.getElementById('overallLevel');
+            lvlEl.textContent = 'Nível: ' + lvl.label; lvlEl.style.color = lvl.color; lvlEl.style.borderColor = lvl.color;
+            document.getElementById('overallLabel').textContent = lvl.label;
+
+            const mathAxes = aggregateAxes(history, 'matematica');
+            const portAxes = aggregateAxes(history, 'portugues');
+            renderAxisBars('mathAxis', mathAxes);
+            renderAxisBars('portAxis', portAxes);
+
+            const allAxes = aggregateAxes(history);
+            const { strengths, weaknesses } = strengthsAndWeaknesses(allAxes);
+            renderChips('strengths', strengths);
+            renderChips('weaknesses', weaknesses);
+            document.getElementById('recommendations').innerHTML = generateRecommendations(weaknesses);
+
+            renderHistoryTable(history, 'all');
+            generateCertificate();
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

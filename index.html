@@ -1183,6 +1183,7 @@
             <div class="logo" onclick="showPage('home')">🔥 SAEB 2025</div>
             <div class="nav-controls">
                 <div class="prototype-tag">BETA 2025</div>
+                <button class="back-btn" onclick="window.location.href='relatorio.html'">📊 RELATÓRIO</button>
                 <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
             </div>
         </div>
@@ -1510,9 +1511,9 @@
                     
                     setTimeout(() => {
                         if (materia === 'matematica') {
-                            window.location.href = 'quiz_matematica.html#from=lobby';
+                            window.location.href = '/quiz/matematica/index.html#from=lobby';
                         } else if (materia === 'portugues') {
-                            alert('🔥 Português em desenvolvimento. Em breve disponível!');
+                            window.location.href = '/quiz/portugues/index.html#from=lobby';
                         } else {
                             showPage('lobby');
                         }

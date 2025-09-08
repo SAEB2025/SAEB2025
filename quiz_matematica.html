@@ -868,9 +868,10 @@
                     </ul>
                 </div>
 
-                <button class="lobby-btn" onclick="returnToLobby()">
-                    🏠 VOLTAR PARA O LOBBY
-                </button>
+                <div style="display:flex; gap: .75rem; justify-content:center; flex-wrap:wrap;">
+                    <button class="lobby-btn" onclick="returnToLobby()">🏠 VOLTAR PARA O LOBBY</button>
+                    <button class="lobby-btn" onclick="goToReport()">📊 VER RELATÓRIO</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1058,6 +1059,8 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let sessionAxis = {};
+        let answers = [];
 
         // Inicializar o quiz
         function initQuiz() {
@@ -2418,9 +2421,8 @@
             saveStats(stats);
         }
 
-        function goToLobby() {
-            window.location.href = 'index.html#lobby';
-        }
+        function goToLobby() { window.location.href = '/index.html#lobby'; }
+        function goToReport() { window.location.href = '/relatorio.html'; }
 
         // Inicializar o quiz
         function initQuiz() {
@@ -2539,10 +2541,13 @@
             });
             
             // Atualizar pontuação
-            if (isCorrect) {
-                score++;
-                document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
-            }
+            if (isCorrect) { score++; document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`; }
+            // Registrar eixo do item na sessão
+            const axis = guessAxisForMath(question.question + ' ' + (question.explanation || ''));
+            if (!sessionAxis[axis]) sessionAxis[axis] = { correct: 0, total: 0 };
+            sessionAxis[axis].total += 1;
+            if (isCorrect) sessionAxis[axis].correct += 1;
+            answers.push({ correct: isCorrect, axis });
             
             // Mostrar modal de feedback após um pequeno delay
             setTimeout(() => {
@@ -2622,6 +2627,7 @@
             
             // Persistir resultados
             updateStatsAfterQuiz(score, 10, finalTime);
+            recordHistoryEntry('matematica', score, 10, finalTime, sessionAxis);
 
             // Sugestões de melhoria baseadas na performance
             const improvementList = document.getElementById('improvementList');
@@ -2682,14 +2688,36 @@
         });
 
         // Inicializar quando a página carregar
-        window.addEventListener('load', function() {
-            initQuiz();
-        });
+        window.addEventListener('load', function() { initQuiz(); });
 
         // Tratamento de erros
-        window.addEventListener('error', function(e) {
-            console.error('Erro no quiz:', e);
-        });
+        window.addEventListener('error', function(e) { console.error('Erro no quiz:', e); });
+
+        // Histórico detalhado (por eixo) e classificação de eixos
+        function loadHistory(){ try { const raw = localStorage.getItem('saebHistory'); return raw ? JSON.parse(raw) : []; } catch(e){ return []; } }
+        function saveHistory(hist){ try { localStorage.setItem('saebHistory', JSON.stringify(hist)); } catch(e){} }
+        function recordHistoryEntry(subject, correct, totalQuestions, elapsedMinutes, axes){
+            const history = loadHistory();
+            history.push({
+                date: new Date().toISOString(),
+                subject,
+                correct,
+                totalQuestions,
+                elapsedMinutes,
+                percentage: Math.round((correct/Math.max(1,totalQuestions))*100),
+                axes
+            });
+            while (history.length > 100) history.shift();
+            saveHistory(history);
+        }
+        function guessAxisForMath(text){
+            const t = (text||'').toLowerCase();
+            if (t.includes('porcent') || t.includes('percent') || t.includes('fraç') || t.includes('fracao') || t.includes('fração') || t.includes('regra de três') || t.includes('propor')) return 'Números e Operações/Proporcionalidade';
+            if (t.includes('equação') || t.includes('equacao') || t.includes('função') || t.includes('funcao') || t.includes('parábola') || t.includes('parabola') || t.includes('polinôm') || t.includes('polinom')) return 'Álgebra e Funções';
+            if (t.includes('perímetro') || t.includes('area') || t.includes('área') || t.includes('volume') || t.includes('ângulo') || t.includes('angulo') || t.includes('figura') || t.includes('metros') || t.includes('m²') || t.includes('m3')) return 'Geometria e Medidas';
+            if (t.includes('média') || t.includes('media') || t.includes('gráfico') || t.includes('grafico') || t.includes('tabela') || t.includes('probab') || t.includes('pesquisa')) return 'Estatística e Probabilidade';
+            return 'Resolução de Problemas';
+        }
     </script>
 </body>
 </html>
