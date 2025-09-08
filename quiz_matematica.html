@@ -962,9 +962,14 @@
                     </ul>
                 </div>
 
-                <button class="lobby-btn" onclick="returnToLobby()">
-                    🏠 VOLTAR PARA O LOBBY
-                </button>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="lobby-btn" onclick="returnToLobby()">
+                        🏠 VOLTAR PARA O LOBBY
+                    </button>
+                    <button class="lobby-btn" onclick="restartQuiz()" style="background: var(--gradient-secondary);">
+                        🔄 JOGAR NOVAMENTE
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1020,6 +1025,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1126,10 +1132,29 @@
             }
         }
 
-        // Selecionar questões aleatórias
+        // Selecionar questões aleatórias não repetidas
         function getRandomQuestions(questionArray, count) {
-            const shuffled = [...questionArray].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
+            // Se já usamos todas as questões, resetar
+            if (usedQuestionIndices.length >= questionArray.length - count) {
+                usedQuestionIndices = [];
+            }
+            
+            // Filtrar questões não usadas
+            const availableQuestions = questionArray.filter((_, index) => 
+                !usedQuestionIndices.includes(index)
+            );
+            
+            // Embaralhar e selecionar
+            const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, count);
+            
+            // Adicionar índices das questões selecionadas ao rastreamento
+            selected.forEach(q => {
+                const index = questionArray.indexOf(q);
+                if (index !== -1) usedQuestionIndices.push(index);
+            });
+            
+            return selected;
         }
 
         // Criar partículas animadas
@@ -1367,6 +1392,16 @@
         // Voltar ao lobby
         function returnToLobby() {
             confirmExitToLobby();
+        }
+
+        // Reiniciar o quiz com novas perguntas
+        function restartQuiz() {
+            // Esconder tela de resultados
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.remove('hidden');
+            
+            // Reinicializar o quiz com novas questões
+            initQuiz();
         }
 
         // Fechar modal clicando fora dele

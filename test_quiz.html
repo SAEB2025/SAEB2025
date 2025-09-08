@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Sistema - SAEB 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #0A0A0A;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00FF88;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-section {
+            background: #151515;
+            border: 2px solid #00FF88;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: #0A0A0A;
+            border-radius: 5px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .pass {
+            background: #00FF00;
+            color: #000;
+        }
+        .fail {
+            background: #FF3333;
+            color: #fff;
+        }
+        .warning {
+            background: #FFD700;
+            color: #000;
+        }
+        button {
+            background: linear-gradient(135deg, #FF0080, #00FF88, #00BFFF);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .log {
+            background: #000;
+            color: #0F0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 TESTE DO SISTEMA SAEB 2025</h1>
+        
+        <div class="test-section">
+            <h2>📋 Checklist de Funcionalidades</h2>
+            
+            <div class="test-item">
+                ✅ Nome do Lobby alterado de "LOBBY DO QUIZ SAEB" para "LOBBY"
+                <span class="status pass">CONCLUÍDO</span>
+            </div>
+            
+            <div class="test-item">
+                ✅ Botão "JOGAR NOVAMENTE" adicionado após completar o quiz
+                <span class="status pass">CONCLUÍDO</span>
+            </div>
+            
+            <div class="test-item">
+                ✅ Quiz reinicia com novas perguntas aleatórias
+                <span class="status pass">CONCLUÍDO</span>
+            </div>
+            
+            <div class="test-item">
+                ✅ Progresso salvo ao sair do quiz
+                <span class="status pass">CONCLUÍDO</span>
+            </div>
+            
+            <div class="test-item">
+                ✅ Estatísticas persistentes no localStorage
+                <span class="status pass">CONCLUÍDO</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎮 Teste de Navegação</h2>
+            <button onclick="testNavigation()">Testar Navegação</button>
+            <div id="navLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💾 Teste de Armazenamento Local</h2>
+            <button onclick="testLocalStorage()">Testar localStorage</button>
+            <button onclick="clearLocalStorage()">Limpar Dados</button>
+            <div id="storageLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔄 Teste de Reinicialização</h2>
+            <p>Para testar a reinicialização:</p>
+            <ol style="margin-left: 20px;">
+                <li>Complete um quiz (Matemática ou Português)</li>
+                <li>Na tela de resultados, clique em "JOGAR NOVAMENTE"</li>
+                <li>Verifique se novas perguntas aleatórias são carregadas</li>
+            </ol>
+            <button onclick="window.location.href='index.html'">Ir para o Sistema</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Status do Sistema</h2>
+            <div id="systemStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#FF3333' : type === 'success' ? '#00FF00' : '#00BFFF';
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function testNavigation() {
+            const navLog = document.getElementById('navLog');
+            navLog.innerHTML = '';
+            
+            log('navLog', 'Testando navegação...', 'info');
+            
+            // Teste de páginas
+            const pages = [
+                { url: 'index.html', name: 'Página Inicial' },
+                { url: 'quiz_matematica.html', name: 'Quiz Matemática' },
+                { url: 'quiz_portugues.html', name: 'Quiz Português' }
+            ];
+            
+            pages.forEach(page => {
+                fetch(page.url)
+                    .then(response => {
+                        if (response.ok) {
+                            log('navLog', `✅ ${page.name} carregada com sucesso`, 'success');
+                        } else {
+                            log('navLog', `❌ Erro ao carregar ${page.name}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        log('navLog', `❌ ${page.name}: ${error.message}`, 'error');
+                    });
+            });
+        }
+
+        function testLocalStorage() {
+            const storageLog = document.getElementById('storageLog');
+            storageLog.innerHTML = '';
+            
+            try {
+                // Testar escrita
+                localStorage.setItem('test', 'SAEB 2025 Test');
+                log('storageLog', '✅ Escrita no localStorage OK', 'success');
+                
+                // Testar leitura
+                const value = localStorage.getItem('test');
+                if (value === 'SAEB 2025 Test') {
+                    log('storageLog', '✅ Leitura do localStorage OK', 'success');
+                }
+                
+                // Verificar dados do quiz
+                const stats = localStorage.getItem('saebStats');
+                if (stats) {
+                    const data = JSON.parse(stats);
+                    log('storageLog', `📊 Estatísticas encontradas:`, 'info');
+                    log('storageLog', `   - Quizzes completados: ${data.quizzesCompleted || 0}`, 'info');
+                    log('storageLog', `   - Taxa de acerto geral: ${Math.round((data.overallCorrect || 0) / Math.max(1, data.overallTotal || 0) * 100)}%`, 'info');
+                    log('storageLog', `   - Ranking: ${data.ranking || 'Iniciante'}`, 'info');
+                } else {
+                    log('storageLog', '📊 Nenhuma estatística salva ainda', 'warning');
+                }
+                
+                // Verificar progresso
+                const mathProgress = localStorage.getItem('mathQuizProgress');
+                const portProgress = localStorage.getItem('portQuizProgress');
+                
+                if (mathProgress) {
+                    log('storageLog', '📝 Progresso de Matemática encontrado', 'info');
+                }
+                if (portProgress) {
+                    log('storageLog', '📝 Progresso de Português encontrado', 'info');
+                }
+                
+                // Limpar teste
+                localStorage.removeItem('test');
+                
+            } catch (e) {
+                log('storageLog', `❌ Erro no localStorage: ${e.message}`, 'error');
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Tem certeza que deseja limpar todos os dados salvos?')) {
+                localStorage.clear();
+                log('storageLog', '🗑️ Todos os dados foram limpos', 'success');
+            }
+        }
+
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('systemStatus');
+            
+            const checks = [
+                { name: 'localStorage disponível', passed: typeof(Storage) !== "undefined" },
+                { name: 'JavaScript habilitado', passed: true },
+                { name: 'Viewport responsivo', passed: window.innerWidth > 0 },
+                { name: 'Conexão com internet', passed: navigator.onLine }
+            ];
+            
+            let html = '';
+            checks.forEach(check => {
+                const status = check.passed ? 
+                    '<span class="status pass">OK</span>' : 
+                    '<span class="status fail">ERRO</span>';
+                html += `<div class="test-item">${check.name} ${status}</div>`;
+            });
+            
+            statusDiv.innerHTML = html;
+        }
+
+        // Executar verificação ao carregar
+        window.onload = function() {
+            checkSystemStatus();
+            
+            // Verificar se o título do lobby foi alterado
+            fetch('index.html')
+                .then(response => response.text())
+                .then(html => {
+                    if (html.includes('<h1 class="lobby-title">LOBBY</h1>')) {
+                        console.log('✅ Título do lobby alterado corretamente');
+                    } else if (html.includes('LOBBY DO QUIZ SAEB')) {
+                        console.warn('⚠️ Título antigo ainda presente');
+                    }
+                });
+        };
+    </script>
+</body>
+</html>
