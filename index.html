@@ -134,6 +134,69 @@
             gap: 1rem;
         }
 
+        /* NAVIGATION (Desktop & Mobile) */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            padding: 0.4rem 0.7rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--gradient-secondary);
+            color: var(--dark-bg);
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 900;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+
+        .mobile-nav {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            border-bottom: 2px solid var(--neon-green);
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            z-index: 1500;
+        }
+
+        .mobile-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .mobile-nav.open { display: flex; }
+
         .prototype-tag {
             background: var(--gradient-secondary);
             color: var(--dark-bg);
@@ -832,6 +895,34 @@
             margin-top: 2rem;
         }
 
+        .stats-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+        }
+
+        .history-item .h-left { color: var(--text-secondary); }
+        .history-item .h-right { color: var(--neon-green); font-weight: 700; }
+
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -1057,6 +1148,9 @@
                 justify-content: center;
             }
 
+            .nav-menu { display: none; }
+            .menu-toggle { display: inline-block; }
+
             .main-container {
                 margin-top: 120px;
             }
@@ -1230,11 +1324,26 @@
         <div class="header-content">
             <div class="logo" onclick="showPage('home')">🔥 SAEB 2025</div>
             <div class="nav-controls">
+                <nav class="nav-menu" id="navMenu">
+                    <a href="#" id="navHome">Início</a>
+                    <a href="#" id="navLobby">Lobby</a>
+                    <a href="quiz_matematica.html#from=menu" id="navMath">Matemática</a>
+                    <a href="quiz_portugues.html#from=menu" id="navPort">Português</a>
+                </nav>
+                <button class="menu-toggle" id="menuToggle">☰ Menu</button>
                 <div class="prototype-tag">BETA 2025</div>
                 <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#" data-nav="home">Início</a>
+        <a href="#" data-nav="lobby">Lobby</a>
+        <a href="#" data-nav="math">Matemática</a>
+        <a href="#" data-nav="port">Português</a>
+    </div>
 
     <div class="main-container">
         <!-- HOME PAGE -->
@@ -1480,13 +1589,31 @@
                                 <span class="stat-value" id="statTotalTime">0min</span>
                             </div>
                             <div class="stat-row">
+                                <span class="stat-label">Média por Quiz:</span>
+                                <span class="stat-value" id="statAvgTime">0min</span>
+                            </div>
+                            <div class="stat-row">
                                 <span class="stat-label">Melhor Streak:</span>
                                 <span class="stat-value" id="statBestStreak">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Streak Atual:</span>
+                                <span class="stat-value" id="statCurrentStreak">0</span>
                             </div>
                             <div class="stat-row">
                                 <span class="stat-label">Ranking:</span>
                                 <span class="stat-value" id="statRanking">Iniciante</span>
                             </div>
+                        </div>
+
+                        <div class="stats-actions">
+                            <button class="back-btn" id="btnExportStats">📤 Exportar</button>
+                            <button class="back-btn" id="btnResetStats" style="background: linear-gradient(45deg, #FF3333, #FF6B35); color: #000;">🗑️ Resetar</button>
+                        </div>
+
+                        <div class="player-stats">
+                            <h4 style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-bottom: 1rem;">🕒 HISTÓRICO RECENTE</h4>
+                            <div id="historyList" class="history-list"></div>
                         </div>
                     </div>
                 </div>
@@ -2043,12 +2170,22 @@
                 // Estatísticas
                 const quizzesCompleted = document.getElementById('statQuizzesCompleted');
                 const totalTime = document.getElementById('statTotalTime');
+                const avgTime = document.getElementById('statAvgTime');
                 const bestStreak = document.getElementById('statBestStreak');
+                const currentStreak = document.getElementById('statCurrentStreak');
                 const ranking = document.getElementById('statRanking');
                 if (quizzesCompleted) quizzesCompleted.textContent = data.quizzesCompleted || 0;
                 if (totalTime) totalTime.textContent = `${data.totalMinutes || 0}min`;
+                if (avgTime) {
+                    const avg = (data.quizzesCompleted || 0) > 0 ? Math.round((data.totalMinutes || 0) / data.quizzesCompleted) : 0;
+                    avgTime.textContent = `${avg}min`;
+                }
                 if (bestStreak) bestStreak.textContent = data.bestStreak || 0;
+                if (currentStreak) currentStreak.textContent = data.currentStreak || 0;
                 if (ranking) ranking.textContent = data.ranking || 'Iniciante';
+
+                // Histórico recente
+                renderHistory();
             } catch (e) {
                 console.warn('Falha ao carregar dados locais:', e);
             }
@@ -2056,6 +2193,128 @@
 
         // CARREGAR DADOS INICIAIS
         loadUserData();
+
+        // -------- NAVIGATION & HISTORY HELPERS --------
+        function showRouteAndGo(url, text) {
+            try { showRouteLoader(text || 'Carregando...'); } catch (_) {}
+            setTimeout(() => { window.location.href = url; }, 250);
+        }
+
+        function setupNav() {
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+
+            if (menuToggle && mobileNav) {
+                menuToggle.addEventListener('click', function() {
+                    mobileNav.classList.toggle('open');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!mobileNav.contains(e.target) && e.target !== menuToggle) {
+                        mobileNav.classList.remove('open');
+                    }
+                });
+
+                mobileNav.querySelectorAll('a').forEach(a => {
+                    a.addEventListener('click', function(ev) {
+                        ev.preventDefault();
+                        const dest = this.getAttribute('data-nav');
+                        if (dest === 'home') showPage('home');
+                        else if (dest === 'lobby') showPage('lobby');
+                        else if (dest === 'math') showRouteAndGo('quiz_matematica.html#from=menu', 'Abrindo Matemática...');
+                        else if (dest === 'port') showRouteAndGo('quiz_portugues.html#from=menu', 'Abrindo Português...');
+                        mobileNav.classList.remove('open');
+                    });
+                });
+            }
+
+            const navHome = document.getElementById('navHome');
+            const navLobby = document.getElementById('navLobby');
+            const navMath = document.getElementById('navMath');
+            const navPort = document.getElementById('navPort');
+            if (navHome) navHome.addEventListener('click', (e) => { e.preventDefault(); showPage('home'); });
+            if (navLobby) navLobby.addEventListener('click', (e) => { e.preventDefault(); showPage('lobby'); });
+            if (navMath) navMath.addEventListener('click', (e) => { e.preventDefault(); showRouteAndGo('quiz_matematica.html#from=menu', 'Abrindo Matemática...'); });
+            if (navPort) navPort.addEventListener('click', (e) => { e.preventDefault(); showRouteAndGo('quiz_portugues.html#from=menu', 'Abrindo Português...'); });
+        }
+
+        function getHistory() {
+            try {
+                const raw = localStorage.getItem('saebHistory');
+                return raw ? JSON.parse(raw) : [];
+            } catch (_) { return []; }
+        }
+
+        function formatDuration(mins) {
+            const m = Math.max(0, Math.round(mins || 0));
+            if (m < 60) return `${m}min`;
+            const h = Math.floor(m / 60); const r = m % 60;
+            return `${h}h ${r}min`;
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (!list) return;
+            const hist = getHistory();
+            if (!hist.length) { list.innerHTML = '<div class="history-item"><div class="h-left">Sem partidas ainda</div><div class="h-right">—</div></div>'; return; }
+            const recent = hist.slice(-5).reverse();
+            list.innerHTML = recent.map(item => {
+                const d = new Date(item.date);
+                const left = `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · ${item.subject}`;
+                const right = `${item.correct}/${item.total} (${Math.round(item.pct || (item.correct / Math.max(1,item.total))*100)}%) · ${formatDuration(item.minutes)}`;
+                return `<div class="history-item"><div class="h-left">${left}</div><div class="h-right">${right}</div></div>`;
+            }).join('');
+        }
+
+        function resetStats() {
+            if (!confirm('Tem certeza que deseja resetar todas as estatísticas?')) return;
+            try {
+                localStorage.removeItem('saebStats');
+                localStorage.removeItem('saebHistory');
+                // Progresso em aberto
+                localStorage.removeItem('mathQuizProgress');
+                localStorage.removeItem('portQuizProgress');
+            } catch (_) {}
+            const noData = document.querySelector('#stats-container .no-data');
+            if (noData) noData.style.display = 'block';
+            // Reset UI
+            ['overallPerformanceValue','mathPerformanceValue','portuguesePerformanceValue'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0%'; });
+            ['overallPerformanceFill','mathPerformanceFill','portuguesePerformanceFill'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = '0%'; });
+            const fields = {
+                statQuizzesCompleted: '0',
+                statTotalTime: '0min',
+                statAvgTime: '0min',
+                statBestStreak: '0',
+                statCurrentStreak: '0',
+                statRanking: 'Iniciante'
+            };
+            Object.entries(fields).forEach(([id,val]) => { const el = document.getElementById(id); if (el) el.textContent = val; });
+            renderHistory();
+        }
+
+        function exportStats() {
+            try {
+                const stats = JSON.parse(localStorage.getItem('saebStats') || '{}');
+                const history = getHistory();
+                const payload = { generatedAt: new Date().toISOString(), stats, history };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'saeb_estatisticas.json'; a.click();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                alert('Falha ao exportar estatísticas.');
+            }
+        }
+
+        // Setup nav & action buttons
+        (function initExtras(){
+            setupNav();
+            const btnReset = document.getElementById('btnResetStats');
+            const btnExport = document.getElementById('btnExportStats');
+            if (btnReset) btnReset.addEventListener('click', resetStats);
+            if (btnExport) btnExport.addEventListener('click', exportStats);
+        })();
     </script>
 </body>
 </html>
