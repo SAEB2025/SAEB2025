@@ -1802,7 +1802,7 @@
                     <div id="stats-container">
                         <!-- Player Level Summary -->
                         <div class="stats-summary">
-                            <h4>🏆 SEU NÍVEL</h4>
+                            <h4>🏆 SUA PATENTE</h4>
                             <div class="level-badge" id="levelBadge">Iniciante</div>
                             <div class="xp-bar">
                                 <div class="xp-fill" id="xpFill" style="width: 0%"></div>
@@ -2459,45 +2459,37 @@
         }
 
         // CALCULATE LEVEL AND XP
-        function calculateLevel(totalScore) {
-            const levels = [
-                { min: 0, max: 99, name: 'Iniciante', color: '#888888' },
-                { min: 100, max: 299, name: 'Aprendiz', color: '#00FF88' },
-                { min: 300, max: 599, name: 'Estudante', color: '#00BFFF' },
-                { min: 600, max: 999, name: 'Competente', color: '#FFFF00' },
-                { min: 1000, max: 1499, name: 'Avançado', color: '#FF6B35' },
-                { min: 1500, max: 2499, name: 'Expert', color: '#FF0080' },
-                { min: 2500, max: 3999, name: 'Mestre', color: '#9400D3' },
-                { min: 4000, max: 5999, name: 'Grão-Mestre', color: '#FFD700' },
-                { min: 6000, max: 9999, name: 'Lendário', color: '#FF1493' },
-                { min: 10000, max: Infinity, name: 'Mítico', color: '#00FFFF' }
-            ];
-            
-            for (let level of levels) {
-                if (totalScore >= level.min && totalScore <= level.max) {
-                    const xpInLevel = totalScore - level.min;
-                    const xpNeeded = level.max - level.min + 1;
-                    const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
-                    
-                    return {
-                        name: level.name,
-                        color: level.color,
-                        xp: xpInLevel,
-                        xpNeeded: xpNeeded,
-                        progress: progress,
-                        totalScore: totalScore
-                    };
-                }
-            }
-            
-            return {
-                name: 'Iniciante',
-                color: '#888888',
-                xp: 0,
-                xpNeeded: 100,
-                progress: 0,
-                totalScore: 0
-            };
+        // Free Fire ranks mapping (rank up every 100 XP)
+        const FREE_FIRE_RANKS = [
+            { name: 'Bronze I', color: '#9E7B4F' },
+            { name: 'Bronze II', color: '#9E7B4F' },
+            { name: 'Bronze III', color: '#9E7B4F' },
+            { name: 'Prata I', color: '#C0C0C0' },
+            { name: 'Prata II', color: '#C0C0C0' },
+            { name: 'Prata III', color: '#C0C0C0' },
+            { name: 'Ouro I', color: '#FFD700' },
+            { name: 'Ouro II', color: '#FFD700' },
+            { name: 'Ouro III', color: '#FFD700' },
+            { name: 'Ouro IV', color: '#FFD700' },
+            { name: 'Platina I', color: '#00BFFF' },
+            { name: 'Platina II', color: '#00BFFF' },
+            { name: 'Platina III', color: '#00BFFF' },
+            { name: 'Platina IV', color: '#00BFFF' },
+            { name: 'Diamante I', color: '#7DF9FF' },
+            { name: 'Diamante II', color: '#7DF9FF' },
+            { name: 'Diamante III', color: '#7DF9FF' },
+            { name: 'Diamante IV', color: '#7DF9FF' },
+            { name: 'Mestre', color: '#FF6B35' },
+            { name: 'Desafiante', color: '#FF1493' }
+        ];
+
+        function calculateLevelFromXP(xp) {
+            const rankIndex = Math.min(Math.floor((xp || 0) / 100), FREE_FIRE_RANKS.length - 1);
+            const rank = FREE_FIRE_RANKS[rankIndex];
+            const xpInLevel = (xp || 0) % 100;
+            const xpNeeded = 100;
+            const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
+            return { name: rank.name, color: rank.color, xp: xpInLevel, xpNeeded, progress, totalScore: xp || 0 };
         }
 
         // CHECK FOR ACHIEVEMENTS
@@ -2592,7 +2584,8 @@
                 }
 
                 // Update Level and XP
-                const levelInfo = calculateLevel(data.totalScore || 0);
+                // Prefer stats.xp, fallback to totalScore for backward compatibility
+                const levelInfo = calculateLevelFromXP((data.xp != null ? data.xp : (data.totalScore || 0)));
                 const levelBadge = document.getElementById('levelBadge');
                 const xpFill = document.getElementById('xpFill');
                 const xpText = document.getElementById('xpText');

@@ -249,6 +249,30 @@
             try { const raw = localStorage.getItem('saebStats'); return raw ? JSON.parse(raw) : {}; } catch(e){ return {}; }
         }
         function saveStats(stats) { try { localStorage.setItem('saebStats', JSON.stringify(stats)); } catch(e){} }
+
+        // Free Fire ranks and XP management
+        const FREE_FIRE_RANKS = [
+            'Bronze I','Bronze II','Bronze III',
+            'Prata I','Prata II','Prata III',
+            'Ouro I','Ouro II','Ouro III','Ouro IV',
+            'Platina I','Platina II','Platina III','Platina IV',
+            'Diamante I','Diamante II','Diamante III','Diamante IV',
+            'Mestre','Desafiante'
+        ];
+
+        function updateRankingByXP(stats) {
+            const currentXP = stats.xp || 0;
+            const rankIndex = Math.min(Math.floor(currentXP / 100), FREE_FIRE_RANKS.length - 1);
+            stats.ranking = FREE_FIRE_RANKS[rankIndex];
+        }
+
+        function addXP(amount) {
+            const stats = loadStats();
+            stats.xp = (stats.xp || 0) + amount;
+            stats.totalScore = (stats.totalScore || 0) + amount; // compatibilidade
+            updateRankingByXP(stats);
+            saveStats(stats);
+        }
         function updateStatsAfterQuiz(finalCorrect, totalQuestions, elapsedMinutes) {
             const stats = loadStats();
             stats.quizzesCompleted = (stats.quizzesCompleted || 0) + 1;
@@ -262,11 +286,7 @@
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
             stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
 
-            const overallPct = Math.round((stats.overallCorrect || 0) / Math.max(1, (stats.overallTotal || 0)) * 100);
-            if (overallPct >= 90) stats.ranking = 'Lendário';
-            else if (overallPct >= 75) stats.ranking = 'Pro';
-            else if (overallPct >= 50) stats.ranking = 'Intermediário';
-            else stats.ranking = 'Iniciante';
+            updateRankingByXP(stats);
 
             saveStats(stats);
         }
@@ -274,7 +294,13 @@
         function goToLobby() { window.location.href = '/index.html#lobby'; }
 
         function initQuiz() {
-            selectedQuestions = getRandomQuestions(questions, 10);
+            // Filtrar questões que dependem de texto base
+            const TEXT_BASED_REGEX = /(texto|tirinha)/i;
+            let pool = questions.filter(q => !TEXT_BASED_REGEX.test(q.question || ''));
+            if (pool.length < 10) {
+                pool = questions.slice();
+            }
+            selectedQuestions = getRandomQuestions(pool, 10);
             currentQuestionIndex = 0; score = 0; selectedAnswer = null; startTime = Date.now(); answered = false;
             createParticles();
             showQuestion();
@@ -338,7 +364,7 @@
                 if (idx === q.correct) alt.classList.add('correct');
                 else if (idx === selectedAnswer && !isCorrect) alt.classList.add('incorrect');
             });
-            if (isCorrect) { score++; document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`; }
+            if (isCorrect) { score++; document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`; addXP(50); }
             setTimeout(() => showFeedbackModal(isCorrect, q), 900);
         }
 
