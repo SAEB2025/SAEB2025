@@ -55,6 +55,13 @@
         .question-counter { background: var(--gradient-secondary); color: #000; padding: 0.4rem 1rem; border-radius: 999px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .score { color: var(--neon-cyan); font-weight: 900; }
 
+        /* PREMIUM HEADER STATUS */
+        .header-progress { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 1rem; }
+        .progress-bar-quiz { flex: 1; height: 8px; background: rgba(255,255,255,.12); border-radius: 999px; overflow: hidden; position: relative; }
+        .progress-bar-quiz .fill { height: 100%; width: 0%; background: var(--gradient-main); transition: width .3s ease; box-shadow: 0 0 18px rgba(0,229,255,.35); }
+        .timer { color: var(--neon-yellow); font-weight: 900; font-variant-numeric: tabular-nums; }
+        .remaining-counter { color: var(--text-secondary); font-weight: 900; }
+
         .quiz-container { margin-top: 110px; min-height: calc(100vh - 110px); position: relative; z-index: 10; }
         .question-container { max-width: 900px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; min-height: calc(100vh - 160px); }
         .question-card { background: var(--card-bg); border: 2px solid var(--neon-cyan); border-radius: 20px; padding: clamp(1.5rem,4vw,2.5rem); margin-bottom: 1.5rem; position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(0,229,255,0.25); }
@@ -82,6 +89,8 @@
         .action-btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; transform: none; }
         .action-btn::before { content: ''; position: absolute; inset: 0; left: -100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transition: left .6s; }
         .action-btn:hover::before { left: 100%; }
+        .action-btn.secondary { background: transparent; color: var(--text-primary); border: 2px solid rgba(255,255,255,.25); box-shadow: none; }
+        .action-btn.secondary:hover { border-color: var(--neon-cyan); box-shadow: 0 5px 20px rgba(0,229,255,.35); }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(10px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all .25s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -94,6 +103,8 @@
         .speech-bubble { background: var(--darker-bg); border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 1rem 1.2rem; margin: 1rem 0; }
         .correct-answer { color: var(--text-primary); font-size: clamp(1rem,2.5vw,1.15rem); margin-bottom: .5rem; }
         .explanation { color: var(--text-secondary); font-style: italic; font-size: clamp(.9rem,2.2vw,1rem); }
+        .support-links { margin-top: 1rem; display: grid; gap: .5rem; text-align: left; }
+        .support-links a { color: var(--neon-cyan); text-decoration: underline; font-size: clamp(.85rem,2vw,.95rem); }
         .continue-btn { background: var(--gradient-secondary); color: #000; padding: .9rem 2rem; border: none; border-radius: 16px; font-family: 'Oswald', sans-serif; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: transform .2s; margin-top: 1.2rem; }
         .continue-btn:hover { transform: translateY(-2px) scale(1.03); }
 
@@ -117,6 +128,10 @@
 
         .hidden { display: none !important; }
 
+        /* ACCESSIBILITY & ORIENTATION */
+        .alternative:focus { outline: 3px solid var(--neon-cyan); outline-offset: 2px; }
+        @media (orientation: landscape) and (max-height: 500px) { .quiz-container { margin-top: 90px; } }
+        @media (prefers-reduced-motion: reduce) { .progress-bar-quiz .fill { transition: none; } }
         @media (max-width: 768px) {
             .header-content { flex-direction: column; text-align: center; }
             .quiz-info { flex-direction: column; gap: .6rem; }
@@ -147,6 +162,13 @@
                 <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                 <div class="score" id="scoreDisplay">ACERTOS: 0</div>
             </div>
+            <div class="header-progress" aria-label="Progresso do quiz">
+                <div class="progress-bar-quiz" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso">
+                    <div class="fill" id="progressFillHeader"></div>
+                </div>
+                <div class="timer" id="timerDisplay" aria-live="polite" aria-label="Tempo">00:00</div>
+                <div class="remaining-counter" id="remainingDisplay" aria-live="polite" aria-label="Questões restantes">Restantes: 9</div>
+            </div>
         </div>
     </header>
 
@@ -160,6 +182,8 @@
             <div class="alternatives-container" id="alternativesContainer"></div>
 
             <div class="quiz-actions">
+                <button class="action-btn secondary" id="hintBtn" onclick="showHint()">💡 DICA</button>
+                <button class="action-btn secondary" id="skipBtn" onclick="skipQuestion()">⏭️ PULAR</button>
                 <button class="action-btn" id="confirmBtn" onclick="confirmAnswer()" disabled>📝 CONFIRMAR RESPOSTA</button>
             </div>
         </div>
@@ -243,6 +267,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let timerIntervalId = null;
 
         // Persistência compartilhada com homepage (estatísticas)
         function loadStats() {
@@ -276,6 +301,7 @@
         function initQuiz() {
             selectedQuestions = getRandomQuestions(questions, 10);
             currentQuestionIndex = 0; score = 0; selectedAnswer = null; startTime = Date.now(); answered = false;
+            startTimer();
             createParticles();
             showQuestion();
         }
@@ -302,13 +328,19 @@
             document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/10`;
             document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
+            updateHeaderStatus();
             document.getElementById('questionText').textContent = q.question;
             const container = document.getElementById('alternativesContainer');
             container.innerHTML = '';
+            container.setAttribute('role','radiogroup');
+            container.setAttribute('aria-label','Alternativas');
             q.alternatives.forEach((alt, idx) => {
                 const div = document.createElement('div');
                 div.className = 'alternative';
                 div.onclick = () => selectAnswer(idx);
+                div.setAttribute('role','radio');
+                div.setAttribute('aria-checked','false');
+                div.setAttribute('tabindex','0');
                 div.innerHTML = `<div class="alternative-letter">${String.fromCharCode(65 + idx)}</div><div class="alternative-text">${alt}</div>`;
                 container.appendChild(div);
             });
@@ -316,15 +348,18 @@
             const btn = document.getElementById('confirmBtn');
             btn.disabled = true;
             btn.textContent = '📝 CONFIRMAR RESPOSTA';
+            const hint = document.getElementById('hintBtn'); if (hint) hint.disabled = false;
         }
 
         function selectAnswer(index) {
             if (answered) return;
             document.querySelectorAll('.alternative').forEach(a => a.classList.remove('selected'));
+            document.querySelectorAll('.alternative').forEach(a => a.setAttribute('aria-checked','false'));
             const target = document.querySelectorAll('.alternative')[index];
-            if (target) target.classList.add('selected');
+            if (target) { target.classList.add('selected'); target.setAttribute('aria-checked','true'); target.focus(); }
             selectedAnswer = index;
             document.getElementById('confirmBtn').disabled = false;
+            const hint = document.getElementById('hintBtn'); if (hint) hint.disabled = false;
         }
 
         function confirmAnswer() {
@@ -352,6 +387,7 @@
                     <div style="font-size:4rem;margin:1rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
                     <div class="explanation">${q.explanation}</div>
+                    <div class="support-links">${getComplementaryLinksHTML(q.question)}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
             } else {
@@ -365,6 +401,7 @@
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctLetter}</strong>.</div>
                         <div class="explanation">${q.explanation}</div>
                     </div>
+                    <div class="support-links">${getComplementaryLinksHTML(q.question)}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
             }
@@ -388,6 +425,7 @@
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             const elapsed = Math.floor((Date.now() - startTime) / 60000);
+            stopTimer();
             const pct = Math.round((score / selectedQuestions.length) * 100);
             document.getElementById('finalScore').textContent = `${score}/${selectedQuestions.length}`;
             document.getElementById('percentageScore').textContent = `${pct}%`;
@@ -437,7 +475,119 @@
         document.getElementById('feedbackModal').onclick = function(e) { if (e.target === this) { /* não fecha */ } };
         document.addEventListener('touchstart', function(e){ if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         window.addEventListener('error', e => console.error('Erro no quiz:', e));
-        window.addEventListener('load', initQuiz);
+        window.addEventListener('load', function() { initQuiz(); initAccessibilityAndShortcuts(); initTouchGestures(); });
+
+        /* PREMIUM JS */
+        function formatTime(ms) {
+            const total = Math.floor(ms / 1000);
+            const m = Math.floor(total / 60).toString().padStart(2, '0');
+            const s = (total % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+        function startTimer() {
+            const timer = document.getElementById('timerDisplay');
+            if (timerIntervalId) clearInterval(timerIntervalId);
+            timerIntervalId = setInterval(() => { timer.textContent = formatTime(Date.now() - startTime); }, 1000);
+        }
+        function stopTimer() { if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; } }
+        function updateHeaderStatus() {
+            const fill = document.getElementById('progressFillHeader');
+            const bar = fill && fill.parentElement;
+            const total = selectedQuestions.length;
+            const current = Math.min(total, currentQuestionIndex + 1);
+            const pct = Math.round((current / Math.max(1, total)) * 100);
+            if (fill) fill.style.width = `${pct}%`;
+            if (bar) bar.setAttribute('aria-valuenow', String(pct));
+            const remainingEl = document.getElementById('remainingDisplay');
+            if (remainingEl) remainingEl.textContent = `Restantes: ${Math.max(0, total - current)}`;
+        }
+        function getComplementaryLinksHTML(questionText) {
+            const text = (questionText || '').toLowerCase();
+            const links = [];
+            if (text.includes('linguagem') || text.includes('coloquial') || text.includes('formal')) {
+                links.push({ label: 'Registros formal e informal', href: 'https://www.todamateria.com.br/linguagem-formal-e-informal/' });
+            }
+            if (text.includes('conjun') || text.includes('porém') || text.includes('além disso')) {
+                links.push({ label: 'Conjunções e relações lógicas', href: 'https://www.todamateria.com.br/conjuncoes/' });
+            }
+            if (text.includes('finalidade') || text.includes('campanha') || text.includes('divulgação científica')) {
+                links.push({ label: 'Gêneros: finalidade e características', href: 'https://brasilescola.uol.com.br/gramatica/generos-textuais.htm' });
+            }
+            if (text.includes('humor') || text.includes('charge') || text.includes('tirinha') || text.includes('duplo sentido')) {
+                links.push({ label: 'Humor e ironia em textos', href: 'https://www.todamateria.com.br/figuras-de-linguagem/' });
+            }
+            if (text.includes('travessão') || text.includes('aposto')) {
+                links.push({ label: 'Uso de travessão e aposto', href: 'https://www.todamateria.com.br/travessao/' });
+            }
+            if (!links.length) {
+                links.push({ label: 'Interpretação de texto', href: 'https://www.todamateria.com.br/interpretacao-de-texto/' });
+            }
+            return `<div class="improvement-title" style="text-align:left;margin:1rem 0 .5rem 0;">📚 Conteúdo complementar</div>${links.map(l => `<a href="${l.href}" target="_blank" rel="noopener noreferrer">${l.label}</a>`).join('')}`;
+        }
+        function getHintForQuestion(q) {
+            const t = (q.question || '').toLowerCase();
+            if (t.includes('linguagem') || t.includes('coloquial') || t.includes('formal')) return 'Observe o vocabulário e a construção: informalidade usa gírias e contrações; formal prefere norma culta.';
+            if (t.includes('finalidade')) return 'Identifique se o texto busca informar, instruir, convencer, divertir ou vender uma ideia.';
+            if (t.includes('travessão') || t.includes('aposto')) return 'Veja se o trecho entre travessões acrescenta informação explicativa (aposto).';
+            if (t.includes('humor') || t.includes('tirinha') || t.includes('charge')) return 'Procure o duplo sentido e a relação entre texto e imagem.';
+            if (t.includes('conjun') || t.includes('porém') || t.includes('além disso')) return 'Relacione a conjunção à ideia: adição, oposição, explicação, conclusão etc.';
+            return 'Leia o enunciado com calma, destaque pistas do gênero textual e palavras-chave.';
+        }
+        function showHint() {
+            if (answered) return;
+            const q = selectedQuestions[currentQuestionIndex];
+            const modal = document.getElementById('feedbackModal');
+            const content = document.getElementById('feedbackContent');
+            content.className = 'feedback-modal';
+            content.innerHTML = `
+                <div class="feedback-title">DICA</div>
+                <div class="speech-bubble"><div class="explanation">${getHintForQuestion(q)}</div></div>
+                <button class="continue-btn" onclick="closeModal()">VOLTAR</button>
+            `;
+            modal.classList.add('active');
+        }
+        function closeModal() { document.getElementById('feedbackModal').classList.remove('active'); }
+        function skipQuestion() {
+            if (answered) { nextQuestion(); return; }
+            const moved = selectedQuestions.splice(currentQuestionIndex, 1)[0];
+            selectedQuestions.push(moved);
+            showQuestion();
+        }
+        function initAccessibilityAndShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                const modalOpen = document.getElementById('feedbackModal').classList.contains('active');
+                if (modalOpen) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key.toLowerCase() === 'n') { nextQuestion(); e.preventDefault(); }
+                    if (e.key === 'Escape') { closeModal(); e.preventDefault(); }
+                    return;
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    const alts = Array.from(document.querySelectorAll('.alternative'));
+                    if (!alts.length) return;
+                    const next = selectedAnswer === null ? 0 : Math.min(alts.length - 1, selectedAnswer + 1);
+                    selectAnswer(next); e.preventDefault();
+                }
+                if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    const alts = Array.from(document.querySelectorAll('.alternative'));
+                    if (!alts.length) return;
+                    const prev = selectedAnswer === null ? 0 : Math.max(0, selectedAnswer - 1);
+                    selectAnswer(prev); e.preventDefault();
+                }
+                if (e.key === 'Enter') { if (selectedAnswer !== null && !answered) { confirmAnswer(); e.preventDefault(); } }
+                if (e.key.toLowerCase() === 'h') { showHint(); e.preventDefault(); }
+                if (e.key.toLowerCase() === 's') { skipQuestion(); e.preventDefault(); }
+            });
+        }
+        function initTouchGestures() {
+            const container = document.getElementById('questionScreen');
+            let sx = 0, sy = 0;
+            container.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+            container.addEventListener('touchend', e => {
+                const t = e.changedTouches[0];
+                const dx = t.clientX - sx; const dy = t.clientY - sy;
+                if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) { if (answered) nextQuestion(); else showHint(); }
+            });
+        }
     </script>
 </body>
 </html>

@@ -1482,6 +1482,12 @@
             color: var(--neon-green);
             font-weight: 700;
         }
+        /* PREMIUM HEADER STATUS */
+        .header-progress { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 1rem; }
+        .progress-bar-quiz { flex: 1; height: 8px; background: rgba(255, 255, 255, 0.12); border-radius: 999px; overflow: hidden; position: relative; }
+        .progress-bar-quiz .fill { height: 100%; width: 0%; background: var(--gradient-main); transition: width 0.3s ease; box-shadow: 0 0 20px rgba(0, 255, 136, 0.4); }
+        .timer { color: var(--neon-yellow); font-weight: 700; font-variant-numeric: tabular-nums; }
+        .remaining-counter { color: var(--text-secondary); font-weight: 700; }
 
         /* MAIN CONTAINER */
         .quiz-container {
@@ -1682,6 +1688,8 @@
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
         }
+        .action-btn.secondary { background: transparent; color: var(--text-primary); border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: none; }
+        .action-btn.secondary:hover { border-color: var(--neon-blue); box-shadow: 0 5px 20px rgba(0, 191, 255, 0.3); }
 
         .action-btn:disabled {
             opacity: 0.5;
@@ -1823,6 +1831,8 @@
             color: var(--text-secondary);
             font-style: italic;
         }
+        .support-links { margin-top: 1rem; display: grid; gap: 0.5rem; text-align: left; }
+        .support-links a { color: var(--neon-blue); text-decoration: underline; font-size: clamp(0.85rem, 2vw, 0.95rem); }
 
         .continue-btn {
             background: var(--gradient-secondary);
@@ -2129,6 +2139,10 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--neon-green);
         }
+        /* ACCESSIBILITY & ORIENTATION */
+        .alternative:focus { outline: 3px solid var(--neon-blue); outline-offset: 2px; }
+        @media (orientation: landscape) and (max-height: 500px) { .quiz-container { margin-top: 90px; } }
+        @media (prefers-reduced-motion: reduce) { .progress-bar-quiz .fill { transition: none; } }
     </style>
 </head>
 <body>
@@ -2145,6 +2159,13 @@
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
                 </div>
+            </div>
+            <div class="header-progress" aria-label="Progresso do quiz">
+                <div class="progress-bar-quiz" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso">
+                    <div class="fill" id="progressFillHeader"></div>
+                </div>
+                <div class="timer" id="timerDisplay" aria-live="polite" aria-label="Tempo">00:00</div>
+                <div class="remaining-counter" id="remainingDisplay" aria-live="polite" aria-label="Questões restantes">Restantes: 9</div>
             </div>
         </div>
     </header>
@@ -2163,6 +2184,8 @@
             </div>
             
             <div class="quiz-actions">
+                <button class="action-btn secondary" id="hintBtn" onclick="showHint()">💡 DICA</button>
+                <button class="action-btn secondary" id="skipBtn" onclick="skipQuestion()">⏭️ PULAR</button>
                 <button class="action-btn" id="confirmBtn" onclick="confirmAnswer()" disabled>
                     🎯 CONFIRMAR RESPOSTA
                 </button>
@@ -2375,6 +2398,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let timerIntervalId = null;
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -2431,6 +2455,7 @@
             selectedAnswer = null;
             startTime = Date.now();
             answered = false;
+            startTimer();
             
             // Criar partículas de fundo
             createParticles();
@@ -2474,6 +2499,7 @@
             document.getElementById('questionCounter').textContent = `QUESTÃO ${currentQuestionIndex + 1}/10`;
             document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
+            updateHeaderStatus();
             
             // Mostrar texto da questão
             document.getElementById('questionText').textContent = question.question;
@@ -2481,11 +2507,16 @@
             // Criar alternativas
             const alternativesContainer = document.getElementById('alternativesContainer');
             alternativesContainer.innerHTML = '';
+            alternativesContainer.setAttribute('role','radiogroup');
+            alternativesContainer.setAttribute('aria-label','Alternativas');
             
             question.alternatives.forEach((alternative, index) => {
                 const alternativeDiv = document.createElement('div');
                 alternativeDiv.className = 'alternative';
                 alternativeDiv.onclick = () => selectAnswer(index);
+                alternativeDiv.setAttribute('role','radio');
+                alternativeDiv.setAttribute('aria-checked','false');
+                alternativeDiv.setAttribute('tabindex','0');
                 
                 alternativeDiv.innerHTML = `
                     <div class="alternative-letter">${String.fromCharCode(65 + index)}</div>
@@ -2508,13 +2539,16 @@
             // Remover seleção anterior
             document.querySelectorAll('.alternative').forEach(alt => {
                 alt.classList.remove('selected');
+                alt.setAttribute('aria-checked','false');
             });
             
             // Adicionar seleção atual
-            document.querySelectorAll('.alternative')[index].classList.add('selected');
+            const targetAlt = document.querySelectorAll('.alternative')[index];
+            if (targetAlt) { targetAlt.classList.add('selected'); targetAlt.setAttribute('aria-checked','true'); targetAlt.focus(); }
             
             selectedAnswer = index;
             document.getElementById('confirmBtn').disabled = false;
+            const hint = document.getElementById('hintBtn'); if (hint) hint.disabled = false;
         }
 
         // Confirmar resposta
@@ -2561,6 +2595,7 @@
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
                     <div class="explanation">${question.explanation}</div>
+                    <div class="support-links">${getComplementaryLinksHTML(question.question)}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
                 content.className = 'feedback-modal';
@@ -2576,6 +2611,7 @@
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
                     </div>
+                    <div class="support-links">${getComplementaryLinksHTML(question.question)}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
                 content.className = 'feedback-modal error';
@@ -2613,6 +2649,7 @@
             
             const finalTime = Math.floor((Date.now() - startTime) / 60000);
             const percentage = Math.round((score / 10) * 100);
+            stopTimer();
             
             // Atualizar dados na tela de resultados
             document.getElementById('finalScore').textContent = `${score}/10`;
@@ -2682,14 +2719,108 @@
         });
 
         // Inicializar quando a página carregar
-        window.addEventListener('load', function() {
-            initQuiz();
-        });
+        window.addEventListener('load', function() { initQuiz(); initAccessibilityAndShortcuts(); initTouchGestures(); });
 
         // Tratamento de erros
         window.addEventListener('error', function(e) {
             console.error('Erro no quiz:', e);
         });
+
+        /* PREMIUM JS */
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${seconds}`;
+        }
+        function startTimer() {
+            const timer = document.getElementById('timerDisplay');
+            if (timerIntervalId) clearInterval(timerIntervalId);
+            timerIntervalId = setInterval(() => { timer.textContent = formatTime(Date.now() - startTime); }, 1000);
+        }
+        function stopTimer() { if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; } }
+        function updateHeaderStatus() {
+            const fill = document.getElementById('progressFillHeader');
+            const bar = fill && fill.parentElement;
+            const total = selectedQuestions.length;
+            const current = Math.min(total, currentQuestionIndex + 1);
+            const pct = Math.round((current / Math.max(1, total)) * 100);
+            if (fill) fill.style.width = `${pct}%`;
+            if (bar) bar.setAttribute('aria-valuenow', String(pct));
+            const remainingEl = document.getElementById('remainingDisplay');
+            if (remainingEl) remainingEl.textContent = `Restantes: ${Math.max(0, total - current)}`;
+        }
+        function getComplementaryLinksHTML(questionText) {
+            const text = (questionText || '').toLowerCase();
+            const links = [];
+            if (text.includes('porcent')) { links.push({ label: 'Revisar porcentagem (Khan Academy)', href: 'https://pt.khanacademy.org/math/arithmetic/arith-review-percent' }); }
+            if (text.includes('fraç') || text.includes('fração') || text.includes('frac')) { links.push({ label: 'Frações na prática (Khan Academy)', href: 'https://pt.khanacademy.org/math/arithmetic/fraction-arithmetic' }); }
+            if (text.includes('parábola') || text.includes('vértice') || text.includes('quadrát') || text.includes('x²')) { links.push({ label: 'Função quadrática e vértice', href: 'https://pt.khanacademy.org/math/algebra/quadratics' }); }
+            if (text.includes('polinômio')) { links.push({ label: 'Polinômios', href: 'https://pt.khanacademy.org/math/algebra/polynomials' }); }
+            if (text.includes('raiz') || text.includes('√')) { links.push({ label: 'Radiciação e raízes', href: 'https://pt.khanacademy.org/math/algebra/x2f8bb11595b61c86:radicals' }); }
+            if (!links.length) { links.push({ label: 'Resolução de problemas matemáticos', href: 'https://pt.khanacademy.org/math' }); }
+            return `<div class=\"improvement-title\" style=\"text-align:left;margin:1rem 0 .5rem 0;\">📚 Conteúdo complementar</div>${links.map(l => `<a href=\"${l.href}\" target=\"_blank\" rel=\"noopener noreferrer\">${l.label}</a>`).join('')}`;
+        }
+        function getHintForQuestion(question) {
+            const text = (question.question || '').toLowerCase();
+            if (text.includes('porcent')) return 'Converta a porcentagem em fração/decimal e use regra de três simples.';
+            if (text.includes('fraç')) return 'Torne os denominadores comparáveis ou converta para decimais para facilitar.';
+            if (text.includes('parábola') || text.includes('quadrát') || text.includes('vértice')) return 'Para y = ax² + bx + c, o x do vértice é −b/(2a).';
+            if (text.includes('polinômio')) return 'As raízes são os valores de x que zeram cada fator.';
+            if (text.includes('aproximad') || text.includes('√')) return 'Aproxime raízes com valores conhecidos: √10≈3,16; √2≈1,41; √17≈4,12.';
+            if (text.includes('propor') || text.includes('regra')) return 'Monte a proporção e resolva cruzando os termos.';
+            return 'Leia com atenção, destaque dados e monte uma expressão/igualdade antes de calcular.';
+        }
+        function showHint() {
+            if (answered) return;
+            const q = selectedQuestions[currentQuestionIndex];
+            const modal = document.getElementById('feedbackModal');
+            const content = document.getElementById('feedbackContent');
+            content.className = 'feedback-modal';
+            content.innerHTML = `
+                <div class=\"feedback-title\">DICA</div>
+                <div class=\"speech-bubble\"><div class=\"explanation\">${getHintForQuestion(q)}</div></div>
+                <button class=\"continue-btn\" onclick=\"closeModal()\">VOLTAR</button>
+            `;
+            modal.classList.add('active');
+        }
+        function closeModal() { document.getElementById('feedbackModal').classList.remove('active'); }
+        function skipQuestion() { if (answered) { nextQuestion(); return; } const moved = selectedQuestions.splice(currentQuestionIndex, 1)[0]; selectedQuestions.push(moved); showQuestion(); }
+        function initAccessibilityAndShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                const modalOpen = document.getElementById('feedbackModal').classList.contains('active');
+                if (modalOpen) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key.toLowerCase() === 'n') { nextQuestion(); e.preventDefault(); }
+                    if (e.key === 'Escape') { closeModal(); e.preventDefault(); }
+                    return;
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    const alts = Array.from(document.querySelectorAll('.alternative'));
+                    if (!alts.length) return;
+                    const next = selectedAnswer === null ? 0 : Math.min(alts.length - 1, selectedAnswer + 1);
+                    selectAnswer(next); e.preventDefault();
+                }
+                if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    const alts = Array.from(document.querySelectorAll('.alternative'));
+                    if (!alts.length) return;
+                    const prev = selectedAnswer === null ? 0 : Math.max(0, selectedAnswer - 1);
+                    selectAnswer(prev); e.preventDefault();
+                }
+                if (e.key === 'Enter') { if (selectedAnswer !== null && !answered) { confirmAnswer(); e.preventDefault(); } }
+                if (e.key.toLowerCase() === 'h') { showHint(); e.preventDefault(); }
+                if (e.key.toLowerCase() === 's') { skipQuestion(); e.preventDefault(); }
+            });
+        }
+        function initTouchGestures() {
+            const container = document.getElementById('questionScreen');
+            let startX = 0, startY = 0;
+            container.addEventListener('touchstart', (e) => { const t = e.touches[0]; startX = t.clientX; startY = t.clientY; }, { passive: true });
+            container.addEventListener('touchend', (e) => {
+                const t = e.changedTouches[0];
+                const dx = t.clientX - startX; const dy = t.clientY - startY;
+                if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) { if (answered) nextQuestion(); else showHint(); }
+            });
+        }
     </script>
 </body>
 </html>
