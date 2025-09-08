@@ -905,6 +905,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 📚 PORTUGUÊS</div>
             </div>
@@ -982,34 +985,10 @@
     </div>
 
     <script>
-        // QUESTÕES DO QUIZ DE PORTUGUÊS (25 questões do SAEB)
+        // QUESTÕES DO QUIZ DE PORTUGUÊS (questões independentes de texto)
         const questions = [
             {
-                question: "No texto 'Eu te amo não diz tudo!', a expressão 'tempestade em copo d'água' significa:",
-                alternatives: ["alerta", "ilusão", "exagero", "deboche", "tamanho"],
-                correct: 2,
-                explanation: "A expressão 'tempestade em copo d'água' é uma metáfora que significa fazer muito alarde ou drama por algo pequeno, ou seja, um exagero."
-            },
-            {
-                question: "O trecho 'O cara diz que te ama, então tá!' mostra linguagem:",
-                alternatives: ["formal", "técnica", "regional", "coloquial", "jornalística"],
-                correct: 3,
-                explanation: "O uso de 'cara', 'tá' e a estrutura informal da frase caracterizam a linguagem coloquial, típica da fala cotidiana."
-            },
-            {
-                question: "A finalidade do texto 'Eu te amo não diz tudo!' é:",
-                alternatives: ["descrever sentimentos", "enfatizar atitudes", "valorizar dizer 'eu te amo'", "incentivar reconciliação", "definir tipos de amor"],
-                correct: 1,
-                explanation: "O texto enfatiza que mais importante que palavras são as atitudes concretas que demonstram amor no dia a dia."
-            },
-            {
-                question: "Segundo o texto, o que mais demonstra amor é:",
-                alternatives: ["presentes caros", "surpresas", "dizer 'eu te amo'", "interesse real", "declarações em redes"],
-                correct: 3,
-                explanation: "O texto destaca que o interesse real e genuíno pela pessoa, demonstrado através de ações, é o que verdadeiramente mostra amor."
-            },
-            {
-                question: "A palavra 'candidez' no poema significa:",
+                question: "A palavra 'candidez' significa:",
                 alternatives: ["pureza", "leveza", "beleza", "sutileza", "grandeza"],
                 correct: 0,
                 explanation: "Candidez significa pureza, inocência, sinceridade desprovida de malícia ou artifício."
@@ -1021,64 +1000,10 @@
                 explanation: "A locução conjuntiva 'Além disso' adiciona uma nova informação que complementa o que foi dito anteriormente."
             },
             {
-                question: "O efeito de humor de 'Vendo o saldo do banco depois de pagar as contas' é gerado por:",
-                alternatives: ["expressão do rosto", "palavra contas", "relação verbal e não verbal", "sentido contraditório", "ideia de jovens sem contas"],
-                correct: 2,
-                explanation: "O humor surge da relação entre o texto (verbal) e a expressão facial de desespero (não verbal), criando uma situação cômica reconhecível."
-            },
-            {
-                question: "O travessão em 'O dr. Argemiro, advogado, — dos mais distintos...' serve para:",
-                alternatives: ["indicar fala", "iniciar fala", "separar termo", "acrescentar informação", "isolar palavra"],
-                correct: 3,
-                explanation: "Neste caso, o travessão introduz uma informação adicional sobre o dr. Argemiro, funcionando como um aposto explicativo."
-            },
-            {
-                question: "No texto 'O voluntário', o elemento predominante é:",
-                alternatives: ["descrição da personagem", "ambientação", "tempo", "desfecho", "clímax"],
-                correct: 0,
-                explanation: "O texto foca principalmente na descrição detalhada das características físicas e psicológicas da personagem principal."
-            },
-            {
-                question: "Para Godard, 'cultura' tem caráter:",
-                alternatives: ["sem arte", "conservador", "disputa ideológica", "transgressivo", "engloba linguagens"],
-                correct: 3,
-                explanation: "Godard via a cultura como algo transgressivo, que desafia normas estabelecidas e provoca mudanças."
-            },
-            {
-                question: "O efeito de humor na tirinha é causado por:",
-                alternatives: ["susto do pai", "TV quebrada", "martelo", "surpresa da mãe", "duplo sentido da fala"],
-                correct: 4,
-                explanation: "O humor vem do duplo sentido da fala, que pode significar tanto consertar quanto quebrar ainda mais a TV."
-            },
-            {
-                question: "O tema do texto do DETRAN é:",
-                alternatives: ["boas decisões", "segurança", "álcool e direção", "consumo de álcool", "semana de segurança"],
-                correct: 2,
-                explanation: "O tema central é a combinação perigosa entre álcool e direção, alertando sobre os riscos dessa prática."
-            },
-            {
                 question: "O travessão pode ser usado para:",
                 alternatives: ["indicar mudança de fala", "iniciar fala", "separar termos", "acrescentar informação", "todas as anteriores"],
                 correct: 4,
                 explanation: "O travessão tem múltiplas funções: indicar diálogos, separar termos explicativos e acrescentar informações."
-            },
-            {
-                question: "O tema do texto 'Rádio Senado começa a operar em Teresina' é:",
-                alternatives: ["Teresina", "programação da rádio", "chegada da Rádio Senado a Teresina", "expansão", "parceria"],
-                correct: 2,
-                explanation: "O tema principal é o início das operações da Rádio Senado em Teresina, marcando sua chegada à cidade."
-            },
-            {
-                question: "A informação principal no texto sobre enciclopédia é:",
-                alternatives: ["uso em bibliotecas", "obsoleta como pesquisa", "hábito antigo", "primeira enciclopédia em 1772", "internet facilitou"],
-                correct: 1,
-                explanation: "O texto destaca que a enciclopédia se tornou obsoleta como ferramenta de pesquisa devido ao surgimento da internet."
-            },
-            {
-                question: "Nos textos sobre envelhecimento, a diferença é que apresentam:",
-                alternatives: ["fim da vida", "desvalorizado", "fraqueza", "diferentes perspectivas", "impede mudanças"],
-                correct: 3,
-                explanation: "Os textos apresentam diferentes perspectivas sobre o envelhecimento, mostrando visões variadas sobre o tema."
             },
             {
                 question: "A finalidade de textos de divulgação científica é:",
@@ -1093,34 +1018,16 @@
                 explanation: "Campanhas contra dengue visam instruir a população sobre prevenção e combate ao mosquito transmissor."
             },
             {
-                question: "Nos dois textos sobre Aedes aegypti, a relação é que são:",
-                alternatives: ["contrários", "diferentes", "divergentes", "antagônicos", "semelhantes"],
-                correct: 4,
-                explanation: "Os textos são semelhantes pois ambos tratam do mesmo tema: o mosquito Aedes aegypti e sua relação com doenças."
-            },
-            {
                 question: "O interlocutor ideal de um manual de iPhone é:",
                 alternatives: ["novos usuários", "desenvolvedores", "técnicos", "usuários avançados", "engenheiros"],
                 correct: 0,
                 explanation: "Manuais de produtos são escritos principalmente para novos usuários que precisam aprender a usar o dispositivo."
             },
             {
-                question: "O termo 'interessado', em contexto de doação de órgãos, refere-se a:",
-                alternatives: ["paciente", "cadáver", "corpo", "doador", "receptor"],
-                correct: 3,
-                explanation: "No contexto de doação de órgãos, 'interessado' refere-se ao doador, a pessoa que manifesta interesse em doar."
-            },
-            {
                 question: "Em uma narrativa, quando o autor descreve espaço e tempo, está utilizando o recurso de:",
                 alternatives: ["descrição", "ambientação", "narração", "dissertação", "clímax"],
                 correct: 1,
                 explanation: "A ambientação é o recurso narrativo usado para situar a história no espaço e no tempo."
-            },
-            {
-                question: "O termo 'antigamente' em 'Enciclopédia: de antigamente' remete a:",
-                alternatives: ["tempo presente", "tempo passado", "comparação", "futuro", "contradição"],
-                correct: 1,
-                explanation: "O advérbio 'antigamente' indica tempo passado, referindo-se a uma época anterior."
             },
             {
                 question: "A linguagem usada em charges costuma ser:",
@@ -1159,7 +1066,134 @@
         let startTime = Date.now();
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
+        let playerXP = 0; // XP do jogador
+        let playerRank = 0; // Índice da patente atual
+        
+        // Sistema de Patentes do Free Fire
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
 
+        // Funções do Sistema de XP e Patentes
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    playerXP = parsed.xp || 0;
+                    updateRank();
+                } else {
+                    playerXP = 0;
+                    playerRank = 0;
+                }
+            } catch (e) {
+                playerXP = 0;
+                playerRank = 0;
+            }
+        }
+        
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({
+                    xp: playerXP,
+                    rank: playerRank
+                }));
+            } catch (e) {}
+        }
+        
+        function addXP(amount) {
+            const previousRank = playerRank;
+            playerXP += amount;
+            updateRank();
+            savePlayerData();
+            
+            // Verificar se subiu de patente
+            if (playerRank > previousRank) {
+                showRankUpModal();
+            }
+        }
+        
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+        
+        function getCurrentRank() {
+            return ranks[playerRank];
+        }
+        
+        function getNextRank() {
+            if (playerRank < ranks.length - 1) {
+                return ranks[playerRank + 1];
+            }
+            return null;
+        }
+        
+        function getXPProgress() {
+            const currentRank = getCurrentRank();
+            const nextRank = getNextRank();
+            
+            if (!nextRank) {
+                return { current: playerXP, needed: 0, percentage: 100 };
+            }
+            
+            const xpInCurrentRank = playerXP - currentRank.minXP;
+            const xpNeededForNext = nextRank.minXP - currentRank.minXP;
+            const percentage = Math.round((xpInCurrentRank / xpNeededForNext) * 100);
+            
+            return {
+                current: xpInCurrentRank,
+                needed: xpNeededForNext,
+                percentage: percentage,
+                toNext: nextRank.minXP - playerXP
+            };
+        }
+        
+        function showRankUpModal() {
+            const rank = getCurrentRank();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '30000';
+            modal.innerHTML = `
+                <div class="feedback-modal" style="border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+                    <div style="font-size: 4rem; margin: 1rem 0;">${rank.icon}</div>
+                    <div class="feedback-title" style="color: var(--neon-yellow);">PATENTE AUMENTADA!</div>
+                    <div style="font-size: 2rem; color: var(--neon-cyan); margin: 1rem 0; font-family: 'Oswald', sans-serif; font-weight: 700;">
+                        ${rank.name}
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Parabéns! Você alcançou uma nova patente!
+                    </div>
+                    <button class="continue-btn" onclick="this.closest('.modal-overlay').remove()">CONTINUAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
         // Persistência local de estatísticas gerais
         function loadStats() {
             try {
@@ -1391,6 +1425,9 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                // Adicionar 50 XP por acerto
+                addXP(50);
+                updateXPDisplay();
             }
             setTimeout(() => {
                 showFeedbackModal(isCorrect, question);
@@ -1398,16 +1435,39 @@
             saveProgress();
         }
 
+        // Função para atualizar exibição do XP
+        function updateXPDisplay() {
+            const rank = getCurrentRank();
+            const progress = getXPProgress();
+            
+            document.getElementById('rankIcon').textContent = rank.icon;
+            document.getElementById('rankName').textContent = rank.name;
+            document.getElementById('xpAmount').textContent = `${playerXP} XP`;
+        }
+        
         // Mostrar modal de feedback
         function showFeedbackModal(isCorrect, question) {
             const modal = document.getElementById('feedbackModal');
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                const rank = getCurrentRank();
+                const progress = getXPProgress();
+                const nextRank = getNextRank();
+                
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
+                    <div style="background: var(--gradient-main); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;">
+                        +50 XP GANHOS!
+                    </div>
+                    <div style="color: var(--neon-cyan); margin: 0.5rem 0;">
+                        ${rank.icon} ${rank.name} - ${playerXP} XP
+                    </div>
+                    ${nextRank ? `<div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Faltam ${progress.toNext} XP para ${nextRank.icon} ${nextRank.name}
+                    </div>` : ''}
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1423,6 +1483,9 @@
                     <div class="speech-bubble">
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Nenhum XP ganho desta vez. Continue tentando!
                     </div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1467,11 +1530,44 @@
             
             const finalTime = Math.floor((Date.now() - startTime) / 60000);
             const percentage = Math.round((score / 10) * 100);
+            const xpGained = score * 50;
+            const rank = getCurrentRank();
             
             document.getElementById('finalScore').textContent = `${score}/10`;
             document.getElementById('percentageScore').textContent = `${percentage}%`;
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
+            
+            // Adicionar seção de XP ganho
+            const statsContainer = document.querySelector('.performance-stats');
+            if (statsContainer) {
+                // Adicionar card de XP ganho
+                const xpCard = document.createElement('div');
+                xpCard.className = 'stat-item';
+                xpCard.innerHTML = `
+                    <div class="stat-label">⭐ XP GANHO</div>
+                    <div class="stat-value" style="color: var(--neon-yellow);">+${xpGained} XP</div>
+                `;
+                statsContainer.appendChild(xpCard);
+                
+                // Adicionar card de patente atual
+                const rankCard = document.createElement('div');
+                rankCard.className = 'stat-item';
+                rankCard.innerHTML = `
+                    <div class="stat-label">${rank.icon} PATENTE</div>
+                    <div class="stat-value" style="color: var(--neon-cyan);">${rank.name}</div>
+                `;
+                statsContainer.appendChild(rankCard);
+                
+                // Adicionar card de XP total
+                const totalXPCard = document.createElement('div');
+                totalXPCard.className = 'stat-item';
+                totalXPCard.innerHTML = `
+                    <div class="stat-label">💰 XP TOTAL</div>
+                    <div class="stat-value" style="color: var(--neon-purple);">${playerXP} XP</div>
+                `;
+                statsContainer.appendChild(totalXPCard);
+            }
             
             // Persistir resultados gerais
             updateStatsAfterQuiz(score, 10, finalTime);
@@ -1531,6 +1627,10 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
+            // Carregar dados do jogador (XP e patente)
+            loadPlayerData();
+            updateXPDisplay();
+            
             createParticles();
             // Tenta retomar progresso, senão inicia novo
             if (!tryResumeProgress()) {
