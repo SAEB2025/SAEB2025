@@ -1085,6 +1085,10 @@
                 <h1 class="results-title">RESULTADO FINAL</h1>
                 <div class="score-display" id="finalScore">0/10</div>
                 
+                <div class="xp-gained-display" id="xpGainedDisplay" style="font-size: 1.5rem; color: var(--neon-yellow); margin: 1rem 0; font-weight: bold;">
+                    +0 XP
+                </div>
+                
                 <div class="performance-stats">
                     <div class="stat-item">
                         <div class="stat-label">📊 APROVEITAMENTO</div>
@@ -1097,6 +1101,10 @@
                     <div class="stat-item">
                         <div class="stat-label">❌ ERROS</div>
                         <div class="stat-value" id="incorrectAnswers">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">⚡ XP GANHO</div>
+                        <div class="stat-value" id="xpGainedStat">0 XP</div>
                     </div>
                 </div>
 
@@ -1362,16 +1370,33 @@
             stats.overallTotal = (stats.overallTotal || 0) + totalQuestions;
             stats.portCorrect = (stats.portCorrect || 0) + finalCorrect;
             stats.portTotal = (stats.portTotal || 0) + totalQuestions;
+            stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
+
+            // Sistema de XP - 50 XP por pergunta acertada
+            const xpGained = finalCorrect * 50;
+            stats.totalScore = (stats.totalScore || 0) + xpGained;
+            
+            // Mostrar XP ganho
+            const xpMessage = `+${xpGained} XP`;
+            console.log('XP Ganho:', xpMessage);
 
             const passed = finalCorrect >= Math.ceil(totalQuestions * 0.7);
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
             stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
 
-            const overallPct = Math.round((stats.overallCorrect || 0) / Math.max(1, (stats.overallTotal || 0)) * 100);
-            if (overallPct >= 90) stats.ranking = 'Lendário';
-            else if (overallPct >= 75) stats.ranking = 'Pro';
-            else if (overallPct >= 50) stats.ranking = 'Intermediário';
-            else stats.ranking = 'Iniciante';
+            // Sistema de patentes baseado no XP total
+            const totalXP = stats.totalScore || 0;
+            if (totalXP >= 600) stats.ranking = 'Desafiante 🔥';
+            else if (totalXP >= 500) stats.ranking = 'Mestre 👑';
+            else if (totalXP >= 400) stats.ranking = 'Diamante 💎';
+            else if (totalXP >= 300) stats.ranking = 'Platina 💎';
+            else if (totalXP >= 200) stats.ranking = 'Ouro 🥇';
+            else if (totalXP >= 100) stats.ranking = 'Prata 🥈';
+            else stats.ranking = 'Bronze 🥉';
+
+            // Salvar dados de última partida
+            stats.lastQuizScore = (finalCorrect / totalQuestions) * 100;
+            stats.lastQuizTime = elapsedMinutes;
 
             saveStats(stats);
         }
@@ -1680,36 +1705,17 @@
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
             
-            // Adicionar seção de XP ganho
-            const statsContainer = document.querySelector('.performance-stats');
-            if (statsContainer) {
-                // Adicionar card de XP ganho
-                const xpCard = document.createElement('div');
-                xpCard.className = 'stat-item';
-                xpCard.innerHTML = `
-                    <div class="stat-label">⭐ XP GANHO</div>
-                    <div class="stat-value" style="color: var(--neon-yellow);">+${xpGained} XP</div>
-                `;
-                statsContainer.appendChild(xpCard);
-                
-                // Adicionar card de patente atual
-                const rankCard = document.createElement('div');
-                rankCard.className = 'stat-item';
-                rankCard.innerHTML = `
-                    <div class="stat-label">${rank.icon} PATENTE</div>
-                    <div class="stat-value" style="color: var(--neon-cyan);">${rank.name}</div>
-                `;
-                statsContainer.appendChild(rankCard);
-                
-                // Adicionar card de XP total
-                const totalXPCard = document.createElement('div');
-                totalXPCard.className = 'stat-item';
-                totalXPCard.innerHTML = `
-                    <div class="stat-label">💰 XP TOTAL</div>
-                    <div class="stat-value" style="color: var(--neon-purple);">${playerXP} XP</div>
-                `;
-                statsContainer.appendChild(totalXPCard);
-            }
+            // Mostrar XP ganho
+            document.getElementById('xpGainedDisplay').textContent = `+${xpGained} XP`;
+            document.getElementById('xpGainedStat').textContent = `${xpGained} XP`;
+            
+            // Animar XP ganho
+            setTimeout(() => {
+                const xpDisplay = document.getElementById('xpGainedDisplay');
+                if (xpDisplay) {
+                    xpDisplay.style.animation = 'pulse 1s ease-in-out infinite';
+                }
+            }, 500);
             
             // Persistir resultados gerais
             updateStatsAfterQuiz(score, 10, finalTime);
