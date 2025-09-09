@@ -818,7 +818,21 @@
             }
 
             .quiz-info {
-                display: none;
+                width: 100%;
+                order: 3;
+                margin-top: 0.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .progress-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .xp-display {
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem !important;
             }
             
             .nav-controls {
@@ -912,6 +926,21 @@
                 font-size: 0.75rem;
             }
             
+            .quiz-info {
+                font-size: 0.8rem;
+            }
+            
+            .question-counter,
+            .score {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem;
+            }
+            
+            .xp-display {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem !important;
+            }
+            
             .quiz-container {
                 margin-top: 70px;
             }
@@ -975,11 +1004,15 @@
             }
             
             .quiz-container {
-                margin-top: 60px;
+                margin-top: 120px;
             }
             
             .question-container {
-                min-height: calc(100vh - 70px);
+                min-height: calc(100vh - 130px);
+            }
+            
+            .quiz-info {
+                display: none;
             }
             
             .question-card {
@@ -1004,6 +1037,30 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--neon-green);
         }
+
+        /* ENHANCED ANIMATIONS */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+        }
+
+        .xp-display {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .question-card {
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 60px rgba(0, 191, 255, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -1025,6 +1082,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 🔢 MATEMÁTICA</div>
             </div>
@@ -1145,7 +1205,12 @@
             { question: "Qual é o valor de 2³ + 3²?", alternatives: ["13", "15", "17", "19", "21"], correct: 2, explanation: "2³ = 8 e 3² = 9. Soma: 8 + 9 = 17" },
             { question: "Uma piscina tem 8m de comprimento, 4m de largura e 2m de profundidade. Qual é seu volume?", alternatives: ["14 m³", "32 m³", "48 m³", "64 m³", "96 m³"], correct: 3, explanation: "Volume = comprimento × largura × profundidade = 8 × 4 × 2 = 64 m³" },
             { question: "Se log₂(x) = 5, qual é o valor de x?", alternatives: ["10", "16", "25", "32", "64"], correct: 3, explanation: "log₂(x) = 5 significa que 2⁵ = x. Portanto, x = 32" },
-            { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" }
+            { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" },
+            { question: "Uma escola tem 480 alunos. Se 35% são meninas, quantos meninos há na escola?", alternatives: ["168", "312", "335", "145", "280"], correct: 1, explanation: "Meninas: 480 × 0,35 = 168. Meninos: 480 - 168 = 312 alunos." },
+            { question: "Qual é o valor de x na equação 4x - 12 = 20?", alternatives: ["2", "4", "6", "8", "10"], correct: 3, explanation: "4x - 12 = 20 → 4x = 32 → x = 8" },
+            { question: "Um retângulo tem 15 cm de comprimento e 8 cm de largura. Qual é sua área?", alternatives: ["23 cm²", "46 cm²", "120 cm²", "240 cm²", "60 cm²"], correct: 2, explanation: "Área = comprimento × largura = 15 × 8 = 120 cm²" },
+            { question: "Se 3/5 de um número é 24, qual é esse número?", alternatives: ["30", "35", "40", "45", "50"], correct: 2, explanation: "3/5 × x = 24 → x = 24 × 5/3 → x = 120/3 = 40" },
+            { question: "Uma mercadoria custa R$ 150,00 e teve aumento de 20%. Qual o novo preço?", alternatives: ["R$ 170,00", "R$ 180,00", "R$ 190,00", "R$ 200,00", "R$ 210,00"], correct: 1, explanation: "Aumento: 150 × 0,20 = 30. Novo preço: 150 + 30 = R$ 180,00" }
         ];
 
         // Personagens para feedback de erro (URLs corrigidas e novas)
@@ -1169,6 +1234,143 @@
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
         let wrongTopics = []; // Rastrear tópicos das questões erradas
+        let playerXP = 0; // XP do jogador
+        let playerRank = 0; // Índice da patente atual
+        
+        // Sistema de Patentes do Free Fire
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
+
+        // Funções do Sistema de XP e Patentes
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    playerXP = parsed.xp || 0;
+                    updateRank();
+                } else {
+                    playerXP = 0;
+                    playerRank = 0;
+                }
+            } catch (e) {
+                playerXP = 0;
+                playerRank = 0;
+            }
+        }
+        
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({
+                    xp: playerXP,
+                    rank: playerRank
+                }));
+            } catch (e) {}
+        }
+        
+        function addXP(amount) {
+            const previousRank = playerRank;
+            playerXP += amount;
+            updateRank();
+            savePlayerData();
+            
+            // Verificar se subiu de patente
+            if (playerRank > previousRank) {
+                showRankUpModal();
+            }
+        }
+        
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+        
+        function getCurrentRank() {
+            return ranks[playerRank];
+        }
+        
+        function getNextRank() {
+            if (playerRank < ranks.length - 1) {
+                return ranks[playerRank + 1];
+            }
+            return null;
+        }
+        
+        function getXPProgress() {
+            const currentRank = getCurrentRank();
+            const nextRank = getNextRank();
+            
+            if (!nextRank) {
+                return { current: playerXP, needed: 0, percentage: 100 };
+            }
+            
+            const xpInCurrentRank = playerXP - currentRank.minXP;
+            const xpNeededForNext = nextRank.minXP - currentRank.minXP;
+            const percentage = Math.round((xpInCurrentRank / xpNeededForNext) * 100);
+            
+            return {
+                current: xpInCurrentRank,
+                needed: xpNeededForNext,
+                percentage: percentage,
+                toNext: nextRank.minXP - playerXP
+            };
+        }
+        
+        function showRankUpModal() {
+            const rank = getCurrentRank();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '30000';
+            modal.innerHTML = `
+                <div class="feedback-modal" style="border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+                    <div style="font-size: 4rem; margin: 1rem 0;">${rank.icon}</div>
+                    <div class="feedback-title" style="color: var(--neon-yellow);">PATENTE AUMENTADA!</div>
+                    <div style="font-size: 2rem; color: var(--neon-green); margin: 1rem 0; font-family: 'Oswald', sans-serif; font-weight: 700;">
+                        ${rank.name}
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Parabéns! Você alcançou uma nova patente!
+                    </div>
+                    <button class="continue-btn" onclick="this.closest('.modal-overlay').remove()">CONTINUAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Função para atualizar exibição do XP
+        function updateXPDisplay() {
+            const rank = getCurrentRank();
+            const progress = getXPProgress();
+            
+            document.getElementById('rankIcon').textContent = rank.icon;
+            document.getElementById('rankName').textContent = rank.name;
+            document.getElementById('xpAmount').textContent = `${playerXP} XP`;
+        }
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1190,13 +1392,23 @@
 
         function updateStatsAfterQuiz(finalCorrect, totalQuestions, elapsedMinutes) {
             const stats = loadStats();
+            const accuracy = Math.round((finalCorrect / totalQuestions) * 10000) / 100; // Precisão de 2 casas decimais
+            const avgTimePerQuestion = Math.round((elapsedMinutes / totalQuestions) * 100) / 100;
+            
             stats.quizzesCompleted = (stats.quizzesCompleted || 0) + 1;
-            stats.totalMinutes = (stats.totalMinutes || 0) + (elapsedMinutes || 0);
+            stats.totalMinutes = Math.round(((stats.totalMinutes || 0) + (elapsedMinutes || 0)) * 100) / 100;
             stats.overallCorrect = (stats.overallCorrect || 0) + finalCorrect;
             stats.overallTotal = (stats.overallTotal || 0) + totalQuestions;
             stats.mathCorrect = (stats.mathCorrect || 0) + finalCorrect;
             stats.mathTotal = (stats.mathTotal || 0) + totalQuestions;
             stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
+            
+            // Estatísticas mais precisas
+            stats.mathAccuracy = Math.round((stats.mathCorrect / stats.mathTotal) * 10000) / 100;
+            stats.overallAccuracy = Math.round((stats.overallCorrect / stats.overallTotal) * 10000) / 100;
+            stats.averageTimePerQuestion = Math.round((stats.totalMinutes / stats.totalQuestions) * 100) / 100;
+            stats.lastSessionAccuracy = accuracy;
+            stats.lastSessionAvgTime = avgTimePerQuestion;
 
             // Sistema de XP - 50 XP por pergunta acertada
             const xpGained = finalCorrect * 50;
@@ -1485,6 +1697,9 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                // Adicionar 50 XP por acerto
+                addXP(50);
+                updateXPDisplay();
             } else {
                 // Analisar tópico da questão errada
                 analyzeWrongAnswer(question);
@@ -1537,10 +1752,23 @@
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                const rank = getCurrentRank();
+                const progress = getXPProgress();
+                const nextRank = getNextRank();
+                
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
+                    <div style="background: var(--gradient-main); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;">
+                        +50 XP GANHOS!
+                    </div>
+                    <div style="color: var(--neon-green); margin: 0.5rem 0;">
+                        ${rank.icon} ${rank.name} - ${playerXP} XP
+                    </div>
+                    ${nextRank ? `<div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Faltam ${progress.toNext} XP para ${nextRank.icon} ${nextRank.name}
+                    </div>` : ''}
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1557,6 +1785,9 @@
                     <div class="speech-bubble">
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Nenhum XP ganho desta vez. Continue tentando!
                     </div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1596,8 +1827,8 @@
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             
-            const finalTime = Math.floor((Date.now() - startTime) / 60000);
-            const percentage = Math.round((score / 10) * 100);
+            const finalTime = Math.round((Date.now() - startTime) / 60000 * 100) / 100; // Tempo mais preciso
+            const percentage = Math.round((score / 10) * 10000) / 100; // Precisão de 2 casas decimais
             
             // Atualizar dados na tela de resultados
             document.getElementById('finalScore').textContent = `${score}/10`;
@@ -1754,6 +1985,10 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
+            // Carregar dados do jogador (XP e patente)
+            loadPlayerData();
+            updateXPDisplay();
+            
             createParticles();
             if (!tryResumeProgress()) {
                 initQuiz();
