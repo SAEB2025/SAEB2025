@@ -36,6 +36,7 @@
             line-height: 1.4;
             overflow-x: hidden;
             min-height: 100vh;
+            scroll-behavior: smooth;
         }
 
         /* BACKGROUND EFFECTS */
@@ -406,19 +407,21 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: clamp(1rem, 3vw, 2rem);
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: clamp(0.8rem, 2.5vw, 1.5rem);
         }
 
         .stat-card {
             text-align: center;
             padding: clamp(1.5rem, 3vw, 2rem);
-            background: var(--darker-bg);
+            background: linear-gradient(135deg, var(--darker-bg), rgba(21, 21, 21, 0.9));
             border: 1px solid var(--neon-pink);
             border-radius: 15px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .stat-card::before {
@@ -434,13 +437,24 @@
         }
 
         .stat-card:hover {
-            transform: translateY(-10px) rotate(2deg);
+            transform: translateY(-12px) rotate(1deg) scale(1.02);
             border-color: var(--neon-green);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            box-shadow: 
+                0 15px 40px rgba(0, 255, 136, 0.4),
+                0 5px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--darker-bg));
         }
 
         .stat-card:hover::before {
             transform: scaleX(1);
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
+            text-shadow: 
+                0 0 30px var(--neon-green),
+                0 0 60px rgba(0, 255, 136, 0.5);
         }
 
         .stat-number {
@@ -448,7 +462,10 @@
             font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 900;
             color: var(--neon-green);
-            text-shadow: 0 0 20px var(--neon-green);
+            text-shadow: 
+                0 0 20px var(--neon-green),
+                0 0 40px rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
         }
 
         .stat-label {
@@ -691,7 +708,7 @@
         }
 
         .quiz-card {
-            background: var(--card-bg);
+            background: linear-gradient(135deg, var(--card-bg), rgba(21, 21, 21, 0.9));
             border: 2px solid transparent;
             border-radius: 25px;
             padding: 3rem 2rem;
@@ -700,7 +717,10 @@
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .quiz-card::before {
@@ -1305,7 +1325,7 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 1rem;
             }
 
@@ -1425,6 +1445,21 @@
             }
         }
 
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+            
+            .stat-card {
+                padding: 1rem 0.8rem;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
+            }
+        }
+
         @media (max-width: 360px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -1433,6 +1468,34 @@
             .hero h1 {
                 font-size: 1.8rem;
             }
+        }
+
+        /* DESKTOP OPTIMIZATIONS */
+        @media (min-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr);
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            
+            .quiz-options {
+                max-width: 1200px;
+                margin: 0 auto 3rem;
+            }
+            
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+        }
 
             .quiz-options {
                 grid-template-columns: 1fr;
@@ -1709,20 +1772,28 @@
                 <section class="stats-section">
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number">2</div>
-                            <div class="stat-label">ÁREAS DO CONHECIMENTO</div>
+                            <div class="stat-number">2.847</div>
+                            <div class="stat-label">ESTUDANTES ATIVOS</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">3ª</div>
-                            <div class="stat-label">SÉRIE ENSINO MÉDIO</div>
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">ESCOLAS PARTICIPANTES</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">18.432</div>
+                            <div class="stat-label">QUESTÕES RESPONDIDAS</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">87.3%</div>
+                            <div class="stat-label">TAXA DE APROVAÇÃO</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">4.9★</div>
+                            <div class="stat-label">AVALIAÇÃO DOS USUÁRIOS</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">100%</div>
-                            <div class="stat-label">DE GRAÇA FAMÍLIA</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">∞</div>
-                            <div class="stat-label">TENTATIVAS</div>
+                            <div class="stat-label">GRATUITO SEMPRE</div>
                         </div>
                     </div>
                 </section>
@@ -2325,13 +2396,20 @@
             
             counters.forEach(counter => {
                 const target = counter.textContent;
-                const isInfinity = target === '∞';
                 const isPercentage = target.includes('%');
-                const isSeries = target.includes('ª');
+                const hasStar = target.includes('★');
+                const hasDecimal = target.includes('.');
+                const hasComma = target.includes(',');
                 
-                if (!isInfinity && !isPercentage && !isSeries && !isNaN(parseInt(target))) {
+                // Extract numeric value for animation
+                let numericValue = target.replace(/[^\d.,]/g, '');
+                if (hasComma) {
+                    numericValue = numericValue.replace(',', '');
+                }
+                const targetNum = parseFloat(numericValue);
+                
+                if (!isNaN(targetNum)) {
                     let count = 0;
-                    const targetNum = parseInt(target);
                     const increment = targetNum / 60;
                     
                     const observer = new IntersectionObserver((entries) => {
@@ -2340,7 +2418,20 @@
                                 const updateCounter = () => {
                                     if (count < targetNum) {
                                         count += increment;
-                                        counter.textContent = Math.floor(count);
+                                        let displayValue;
+                                        
+                                        if (hasDecimal) {
+                                            displayValue = count.toFixed(1);
+                                        } else if (hasComma) {
+                                            displayValue = Math.floor(count).toLocaleString('pt-BR');
+                                        } else {
+                                            displayValue = Math.floor(count).toString();
+                                        }
+                                        
+                                        if (isPercentage) displayValue += '%';
+                                        if (hasStar) displayValue += '★';
+                                        
+                                        counter.textContent = displayValue;
                                         requestAnimationFrame(updateCounter);
                                     } else {
                                         counter.textContent = target;
