@@ -1031,6 +1031,30 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--neon-purple);
         }
+
+        /* ENHANCED ANIMATIONS */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(176, 0, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(176, 0, 255, 0.8); }
+        }
+
+        .xp-display {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .question-card {
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -1261,6 +1285,36 @@
                 alternatives: ["Dissertativo", "Descritivo", "Narrativo", "Argumentativo", "Expositivo"],
                 correct: 2,
                 explanation: "'Era uma vez' é uma expressão típica do início de narrativas, especialmente contos de fadas e histórias infantis."
+            },
+            {
+                question: "A palavra 'inexorável' significa:",
+                alternatives: ["Que se pode evitar", "Que não se pode evitar", "Que é duvidoso", "Que é flexível", "Que é temporário"],
+                correct: 1,
+                explanation: "Inexorável significa implacável, inflexível, que não se pode evitar ou impedir."
+            },
+            {
+                question: "Em 'As crianças brincavam alegremente', o advérbio 'alegremente' expressa:",
+                alternatives: ["Tempo", "Lugar", "Modo", "Intensidade", "Afirmação"],
+                correct: 2,
+                explanation: "O advérbio 'alegremente' indica o modo como as crianças brincavam."
+            },
+            {
+                question: "Qual é o feminino de 'sultão'?",
+                alternatives: ["Sultana", "Sultoa", "Sultã", "Sultaina", "Sultanesa"],
+                correct: 0,
+                explanation: "O feminino de sultão é sultana, seguindo a regra geral de formação do feminino."
+            },
+            {
+                question: "A oração 'Espero que você venha' contém uma oração subordinada:",
+                alternatives: ["Adverbial", "Adjetiva", "Substantiva", "Coordenada", "Principal"],
+                correct: 2,
+                explanation: "'Que você venha' é uma oração subordinada substantiva objetiva direta, pois funciona como objeto direto do verbo 'espero'."
+            },
+            {
+                question: "Qual figura de linguagem está presente em 'Suas palavras são punhais'?",
+                alternatives: ["Comparação", "Metáfora", "Metonímia", "Hipérbole", "Personificação"],
+                correct: 1,
+                explanation: "É uma metáfora, pois estabelece uma comparação implícita entre palavras e punhais, sem usar conectivos comparativos."
             }
         ];
 
@@ -1434,13 +1488,23 @@
 
         function updateStatsAfterQuiz(finalCorrect, totalQuestions, elapsedMinutes) {
             const stats = loadStats();
+            const accuracy = Math.round((finalCorrect / totalQuestions) * 10000) / 100; // Precisão de 2 casas decimais
+            const avgTimePerQuestion = Math.round((elapsedMinutes / totalQuestions) * 100) / 100;
+            
             stats.quizzesCompleted = (stats.quizzesCompleted || 0) + 1;
-            stats.totalMinutes = (stats.totalMinutes || 0) + (elapsedMinutes || 0);
+            stats.totalMinutes = Math.round(((stats.totalMinutes || 0) + (elapsedMinutes || 0)) * 100) / 100;
             stats.overallCorrect = (stats.overallCorrect || 0) + finalCorrect;
             stats.overallTotal = (stats.overallTotal || 0) + totalQuestions;
             stats.portCorrect = (stats.portCorrect || 0) + finalCorrect;
             stats.portTotal = (stats.portTotal || 0) + totalQuestions;
             stats.totalQuestions = (stats.totalQuestions || 0) + totalQuestions;
+            
+            // Estatísticas mais precisas
+            stats.portAccuracy = Math.round((stats.portCorrect / stats.portTotal) * 10000) / 100;
+            stats.overallAccuracy = Math.round((stats.overallCorrect / stats.overallTotal) * 10000) / 100;
+            stats.averageTimePerQuestion = Math.round((stats.totalMinutes / stats.totalQuestions) * 100) / 100;
+            stats.lastSessionAccuracy = accuracy;
+            stats.lastSessionAvgTime = avgTimePerQuestion;
 
             // Sistema de XP - 50 XP por pergunta acertada
             const xpGained = finalCorrect * 50;
@@ -1853,8 +1917,8 @@
             document.getElementById('questionScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             
-            const finalTime = Math.floor((Date.now() - startTime) / 60000);
-            const percentage = Math.round((score / 10) * 100);
+            const finalTime = Math.round((Date.now() - startTime) / 60000 * 100) / 100; // Tempo mais preciso
+            const percentage = Math.round((score / 10) * 10000) / 100; // Precisão de 2 casas decimais
             const xpGained = score * 50;
             const rank = getCurrentRank();
             
