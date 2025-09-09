@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Quiz Matemática - SAEB 2025 🔥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -791,23 +791,47 @@
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .header-content {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: left;
                 padding: 1rem;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .logo {
+                font-size: clamp(1.2rem, 4vw, 1.5rem);
+                letter-spacing: 1px;
             }
 
             .quiz-info {
-                flex-direction: column;
-                gap: 1rem;
+                display: none;
+            }
+            
+            .nav-controls {
+                display: flex;
+            }
+            
+            .back-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
             }
 
             .quiz-container {
-                margin-top: 160px;
+                margin-top: 80px;
             }
 
             .question-container {
                 padding: 1rem;
-                min-height: calc(100vh - 200px);
+                min-height: calc(100vh - 100px);
+            }
+            
+            .question-card {
+                padding: 1.5rem;
+            }
+            
+            .question-number {
+                font-size: 0.8rem;
+                padding: 0.4rem 1rem;
             }
 
             .alternatives-container {
@@ -816,6 +840,8 @@
 
             .alternative {
                 padding: 1rem;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
 
             .alternative-letter {
@@ -826,12 +852,14 @@
 
             .quiz-actions {
                 flex-direction: column;
-                align-items: center;
+                align-items: stretch;
+                padding-top: 1rem;
             }
 
             .action-btn {
                 width: 100%;
-                max-width: 300px;
+                max-width: none;
+                padding: 1rem 2rem;
             }
 
             .performance-stats {
@@ -842,6 +870,7 @@
             .feedback-modal {
                 margin: 1rem;
                 max-width: calc(100vw - 2rem);
+                padding: 1.5rem;
             }
 
             .alternative:hover {
@@ -851,20 +880,97 @@
             .alternative.selected {
                 transform: translateX(5px);
             }
+            
+            /* Melhorar scroll em iOS */
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
         @media (max-width: 480px) {
+            .logo {
+                font-size: clamp(1rem, 5vw, 1.3rem);
+                letter-spacing: 0.5px;
+            }
+            
+            .back-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+            
             .quiz-container {
-                margin-top: 180px;
+                margin-top: 70px;
             }
 
             .question-container {
-                min-height: calc(100vh - 220px);
+                min-height: calc(100vh - 80px);
+                padding: 0.5rem;
+            }
+            
+            .question-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .question-text {
+                font-size: 1rem;
+            }
+            
+            .alternative {
+                padding: 0.8rem;
+            }
+            
+            .alternative-text {
+                font-size: 0.9rem;
             }
 
             .feedback-character {
                 width: 120px;
                 height: 120px;
+            }
+            
+            .feedback-modal {
+                padding: 1rem;
+            }
+            
+            .results-card {
+                padding: 2rem 1rem;
+            }
+        }
+        
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .alternative {
+                min-height: 48px;
+                cursor: pointer;
+            }
+            
+            .alternative:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .action-btn:active {
+                transform: scale(0.98);
+            }
+        }
+        
+        /* Landscape mode adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            header {
+                padding: 0.5rem 0;
+            }
+            
+            .quiz-container {
+                margin-top: 60px;
+            }
+            
+            .question-container {
+                min-height: calc(100vh - 70px);
+            }
+            
+            .question-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
             }
         }
 
@@ -1416,7 +1522,29 @@
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
-        });
+        }, { passive: false });
+        
+        // Melhorar performance em dispositivos móveis
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+            
+            // Otimizar animações para mobile
+            const particles = document.getElementById('particles');
+            if (particles && window.innerWidth < 768) {
+                // Reduzir partículas em mobile
+                particles.style.display = 'none';
+            }
+        }
+        
+        // Prevenir double-tap zoom em iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
