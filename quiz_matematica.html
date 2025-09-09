@@ -1206,6 +1206,11 @@
             { question: "Uma piscina tem 8m de comprimento, 4m de largura e 2m de profundidade. Qual é seu volume?", alternatives: ["14 m³", "32 m³", "48 m³", "64 m³", "96 m³"], correct: 3, explanation: "Volume = comprimento × largura × profundidade = 8 × 4 × 2 = 64 m³" },
             { question: "Se log₂(x) = 5, qual é o valor de x?", alternatives: ["10", "16", "25", "32", "64"], correct: 3, explanation: "log₂(x) = 5 significa que 2⁵ = x. Portanto, x = 32" },
             { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" },
+            { question: "Qual é o resultado de 15 × 8?", alternatives: ["120", "125", "115", "130", "140"], correct: 0, explanation: "15 × 8 = 120. Multiplicação básica: 15 vezes 8 igual a 120." },
+            { question: "Se 2x - 5 = 15, qual o valor de x?", alternatives: ["5", "8", "10", "12", "15"], correct: 2, explanation: "2x - 5 = 15 → 2x = 20 → x = 10" },
+            { question: "Um quadrado tem lado de 6 cm. Qual é sua área?", alternatives: ["12 cm²", "24 cm²", "30 cm²", "36 cm²", "42 cm²"], correct: 3, explanation: "Área do quadrado = lado² = 6² = 36 cm²" },
+            { question: "Qual é 30% de 250?", alternatives: ["65", "70", "75", "80", "85"], correct: 2, explanation: "30% de 250 = 0,30 × 250 = 75" },
+            { question: "Em uma turma de 40 alunos, 60% são meninas. Quantos são os meninos?", alternatives: ["14", "16", "18", "20", "24"], correct: 1, explanation: "Meninas: 40 × 0,60 = 24. Meninos: 40 - 24 = 16 alunos." },
             { question: "Uma escola tem 480 alunos. Se 35% são meninas, quantos meninos há na escola?", alternatives: ["168", "312", "335", "145", "280"], correct: 1, explanation: "Meninas: 480 × 0,35 = 168. Meninos: 480 - 168 = 312 alunos." },
             { question: "Qual é o valor de x na equação 4x - 12 = 20?", alternatives: ["2", "4", "6", "8", "10"], correct: 3, explanation: "4x - 12 = 20 → 4x = 32 → x = 8" },
             { question: "Um retângulo tem 15 cm de comprimento e 8 cm de largura. Qual é sua área?", alternatives: ["23 cm²", "46 cm²", "120 cm²", "240 cm²", "60 cm²"], correct: 2, explanation: "Área = comprimento × largura = 15 × 8 = 120 cm²" },
@@ -1213,17 +1218,22 @@
             { question: "Uma mercadoria custa R$ 150,00 e teve aumento de 20%. Qual o novo preço?", alternatives: ["R$ 170,00", "R$ 180,00", "R$ 190,00", "R$ 200,00", "R$ 210,00"], correct: 1, explanation: "Aumento: 150 × 0,20 = 30. Novo preço: 150 + 30 = R$ 180,00" }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas e novas)
+        // Personagens para feedback de erro (novos personagens)
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
             "https://i.ibb.co/1th3w8bH/IMG-4361.png",
             "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
             "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
             "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
+
+        // Função para pré-carregar imagens
+        function preloadImages() {
+            errorCharacters.forEach(url => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = url;
+            });
+        }
 
         // Variáveis do jogo
         let currentQuestionIndex = 0;
@@ -1988,6 +1998,9 @@
             // Carregar dados do jogador (XP e patente)
             loadPlayerData();
             updateXPDisplay();
+            
+            // Pré-carregar imagens dos personagens
+            preloadImages();
             
             createParticles();
             if (!tryResumeProgress()) {
