@@ -300,14 +300,16 @@
             border-radius: 15px;
         }
 
-        .alternative:hover {
-            border-color: var(--neon-green);
-            transform: translateX(10px);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
-        }
+        @media (hover: hover) {
+            .alternative:hover {
+                border-color: var(--neon-green);
+                transform: translateX(10px);
+                box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
+            }
 
-        .alternative:hover::before {
-            opacity: 0.1;
+            .alternative:hover::before {
+                opacity: 0.1;
+            }
         }
 
         .alternative.selected {
@@ -788,6 +790,15 @@
             text-transform: uppercase;
         }
 
+        /* Adicionar estilos para melhorar toque em mobile */
+        @media (hover: hover) {
+            .alternative:hover {
+                border-color: var(--neon-green);
+                transform: translateX(10px);
+                box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
+            }
+        }
+        
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .header-content {
@@ -1096,7 +1107,7 @@
     </div>
 
     <script>
-        // QUESTÕES DO QUIZ (23 questões corrigidas do SAEB)
+        // QUESTÕES DO QUIZ (29 questões corrigidas do SAEB)
         const questions = [
             { question: "Anderson comprou 120 figurinhas, 72 eram repetidas. As repetidas representam qual porcentagem do total?", alternatives: ["72%", "60%", "48%", "40%", "30%"], correct: 1, explanation: "Para calcular a porcentagem: (72 ÷ 120) × 100 = 0,6 × 100 = 60%. As figurinhas repetidas representam 60% do total." },
             { question: "Festa: 20 pessoas → R$600; 24 → R$720; 28 → R$840. A expressão correta é:", alternatives: ["C=32n", "C=30n", "C=28n", "D=24n", "C=20n"], correct: 1, explanation: "Analisando a relação: R$600 ÷ 20 = R$30 por pessoa. Verificando: 24 × 30 = 720 ✓. A expressão é C = 30n." },
@@ -1121,12 +1132,17 @@
             { question: "Um terreno mede 9√2 por 5√2 metros. O perímetro é aproximadamente:", alternatives: ["153,25", "39,48", "63,4", "53,4", "52,4"], correct: 1, explanation: "√2 ≈ 1,41. Lados: 9×1,41 = 12,69m e 5×1,41 = 7,05m. Perímetro: 2×(12,69 + 7,05) = 2×19,74 = 39,48m." },
             { question: "O saldo de André era R$ 60.000. Ele retirou 7.350, depositou 1.830, retirou 46.690 e 12.500. O saldo final é:", alternatives: ["-9.760", "-8.370", "-7.850", "-5.550", "-4.710"], correct: 4, explanation: "Saldo inicial: 60.000. Operações: -7.350 +1.830 - 46.690 - 12.500. Cálculo: 60.000 - 7.350 + 1.830 - 46.690 - 12.500 = -4.710." },
             { question: "População de bactérias A(t)=25·2^t. Para atingir 400, o tempo necessário é:", alternatives: ["2 h", "6 h", "4 h", "8 h", "16 h"], correct: 2, explanation: "25·2^t = 400. 2^t = 400÷25 = 16. 2^t = 16 = 2^4. Portanto t = 4 horas." },
-            { question: "Carlos enche 40 litros de gasolina a R$ 5,10 por litro. Quanto gastará?", alternatives: ["45,10", "51,00", "200,40", "204,00", "214,00"], correct: 3, explanation: "Multiplicação simples: 40 litros × R$ 5,10 = R$ 204,00. Carlos gastará R$ 204,00." }
+            { question: "Carlos enche 40 litros de gasolina a R$ 5,10 por litro. Quanto gastará?", alternatives: ["45,10", "51,00", "200,40", "204,00", "214,00"], correct: 3, explanation: "Multiplicação simples: 40 litros × R$ 5,10 = R$ 204,00. Carlos gastará R$ 204,00." },
+            { question: "Um triângulo tem base de 12 cm e altura de 8 cm. Qual é sua área?", alternatives: ["96 cm²", "48 cm²", "20 cm²", "40 cm²", "24 cm²"], correct: 1, explanation: "Área do triângulo = (base × altura) ÷ 2 = (12 × 8) ÷ 2 = 96 ÷ 2 = 48 cm²" },
+            { question: "Se 3x + 7 = 22, qual o valor de x?", alternatives: ["3", "5", "7", "9", "15"], correct: 1, explanation: "3x + 7 = 22 → 3x = 22 - 7 → 3x = 15 → x = 15 ÷ 3 = 5" },
+            { question: "Um círculo tem raio de 5 cm. Qual é seu perímetro? (Use π = 3,14)", alternatives: ["15,7 cm", "31,4 cm", "78,5 cm", "25 cm", "10 cm"], correct: 1, explanation: "Perímetro = 2 × π × raio = 2 × 3,14 × 5 = 31,4 cm" },
+            { question: "Qual é o MDC de 24 e 36?", alternatives: ["6", "8", "12", "18", "4"], correct: 2, explanation: "Divisores de 24: 1,2,3,4,6,8,12,24. Divisores de 36: 1,2,3,4,6,9,12,18,36. MDC = 12" },
+            { question: "Uma loja oferece 25% de desconto em um produto de R$ 80,00. Qual o valor final?", alternatives: ["R$ 20,00", "R$ 55,00", "R$ 60,00", "R$ 65,00", "R$ 75,00"], correct: 2, explanation: "Desconto = 80 × 0,25 = 20. Valor final = 80 - 20 = R$ 60,00" }
         ];
 
         // Personagens para feedback de erro (URLs corrigidas)
         const errorCharacters = [
-            "https://i.ibb.co/Qj73wn6/IMG-4292.png",
+            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
             "https://i.ibb.co/kg63TCn/IMG-4287.png", 
             "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
             "https://i.ibb.co/Wp7smTf/IMG-4283.png"
@@ -1184,13 +1200,52 @@
 
             // Sistema de patentes baseado no XP total
             const totalXP = stats.totalScore || 0;
-            if (totalXP >= 600) stats.ranking = 'Desafiante 🔥';
-            else if (totalXP >= 500) stats.ranking = 'Mestre 👑';
-            else if (totalXP >= 400) stats.ranking = 'Diamante 💎';
-            else if (totalXP >= 300) stats.ranking = 'Platina 💎';
-            else if (totalXP >= 200) stats.ranking = 'Ouro 🥇';
-            else if (totalXP >= 100) stats.ranking = 'Prata 🥈';
-            else stats.ranking = 'Bronze 🥉';
+            let newRanking = '';
+            let nextRankXP = 0;
+            
+            if (totalXP >= 5000) {
+                newRanking = 'Lendário 🌟';
+                nextRankXP = 'Máximo';
+            } else if (totalXP >= 3000) {
+                newRanking = 'Grão-Mestre 🏆';
+                nextRankXP = 5000;
+            } else if (totalXP >= 2000) {
+                newRanking = 'Mestre 👑';
+                nextRankXP = 3000;
+            } else if (totalXP >= 1500) {
+                newRanking = 'Desafiante 🔥';
+                nextRankXP = 2000;
+            } else if (totalXP >= 1000) {
+                newRanking = 'Diamante 💎';
+                nextRankXP = 1500;
+            } else if (totalXP >= 700) {
+                newRanking = 'Platina ⚪';
+                nextRankXP = 1000;
+            } else if (totalXP >= 500) {
+                newRanking = 'Ouro 🥇';
+                nextRankXP = 700;
+            } else if (totalXP >= 300) {
+                newRanking = 'Prata 🥈';
+                nextRankXP = 500;
+            } else if (totalXP >= 150) {
+                newRanking = 'Bronze 🥉';
+                nextRankXP = 300;
+            } else {
+                newRanking = 'Iniciante 🌱';
+                nextRankXP = 150;
+            }
+            
+            stats.ranking = newRanking;
+            stats.nextRankXP = nextRankXP;
+            
+            // Verificar se subiu de patente
+            const oldRanking = stats.previousRanking || 'Iniciante 🌱';
+            if (oldRanking !== newRanking) {
+                stats.rankUp = true;
+                stats.previousRanking = newRanking;
+            } else {
+                stats.rankUp = false;
+            }
 
             // Salvar dados de última partida
             stats.lastQuizScore = (finalCorrect / totalQuestions) * 100;
@@ -1286,6 +1341,16 @@
             
             return selected;
         }
+        
+        // Embaralhar array (Fisher-Yates)
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
 
         // Criar partículas animadas
         function createParticles() {
@@ -1333,22 +1398,31 @@
             // Mostrar texto da questão
             document.getElementById('questionText').textContent = question.question;
             
-            // Criar alternativas
+            // Criar índices embaralhados para as alternativas
+            const shuffledIndices = shuffleArray([0, 1, 2, 3, 4]);
+            const correctShuffledIndex = shuffledIndices.indexOf(question.correct);
+            
+            // Criar alternativas embaralhadas
             const alternativesContainer = document.getElementById('alternativesContainer');
             alternativesContainer.innerHTML = '';
             
-            question.alternatives.forEach((alternative, index) => {
+            shuffledIndices.forEach((originalIndex, displayIndex) => {
                 const alternativeDiv = document.createElement('div');
                 alternativeDiv.className = 'alternative';
-                alternativeDiv.onclick = () => selectAnswer(index);
+                alternativeDiv.dataset.originalIndex = originalIndex;
+                alternativeDiv.onclick = () => selectAnswer(displayIndex);
                 
                 alternativeDiv.innerHTML = `
-                    <div class="alternative-letter">${String.fromCharCode(65 + index)}</div>
-                    <div class="alternative-text">${alternative}</div>
+                    <div class="alternative-letter">${String.fromCharCode(65 + displayIndex)}</div>
+                    <div class="alternative-text">${question.alternatives[originalIndex]}</div>
                 `;
                 
                 alternativesContainer.appendChild(alternativeDiv);
             });
+            
+            // Armazenar o índice correto embaralhado
+            question.shuffledCorrect = correctShuffledIndex;
+            question.shuffledIndices = shuffledIndices;
             
             // Resetar seleção
             selectedAnswer = null;
@@ -1378,7 +1452,7 @@
             
             answered = true;
             const question = selectedQuestions[currentQuestionIndex];
-            const isCorrect = selectedAnswer === question.correct;
+            const isCorrect = selectedAnswer === question.shuffledCorrect;
             
             // Desabilitar botão
             document.getElementById('confirmBtn').disabled = true;
@@ -1386,7 +1460,7 @@
             // Mostrar feedback visual nas alternativas
             document.querySelectorAll('.alternative').forEach((alt, index) => {
                 alt.onclick = null; // Desabilitar cliques
-                if (index === question.correct) {
+                if (index === question.shuffledCorrect) {
                     alt.classList.add('correct');
                 } else if (index === selectedAnswer && !isCorrect) {
                     alt.classList.add('incorrect');
@@ -1424,12 +1498,13 @@
                 content.className = 'feedback-modal';
             } else {
                 const randomCharacter = errorCharacters[Math.floor(Math.random() * errorCharacters.length)];
-                const correctOption = String.fromCharCode(65 + question.correct);
+                const correctOption = String.fromCharCode(65 + question.shuffledCorrect);
                 
                 content.innerHTML = `
                     <div class="feedback-title error">RESPOSTA INCORRETA</div>
                     <img src="${randomCharacter}" alt="Personagem" class="feedback-character error" 
-                         onerror="this.style.display='none'">
+                         onerror="this.onerror=null; this.style.display='none'; this.parentElement.querySelector('.speech-bubble').style.marginTop='0';" 
+                         crossorigin="anonymous">
                     <div class="speech-bubble">
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
@@ -1483,13 +1558,31 @@
             
             // Calcular e mostrar XP ganho
             const xpGained = score * 50;
-            document.getElementById('xpGainedDisplay').textContent = `+${xpGained} XP`;
+            const stats = loadStats();
+            const totalXP = stats.totalScore || 0;
+            const ranking = stats.ranking || 'Iniciante 🌱';
+            const nextRankXP = stats.nextRankXP;
+            
+            document.getElementById('xpGainedDisplay').innerHTML = `
+                <div style="font-size: 2rem; color: var(--neon-yellow); margin: 0.5rem 0;">+${xpGained} XP</div>
+                <div style="font-size: 1.2rem; color: var(--neon-purple); margin: 0.5rem 0;">Patente: ${ranking}</div>
+                <div style="font-size: 1rem; color: var(--text-secondary);">
+                    XP Total: ${totalXP} ${nextRankXP !== 'Máximo' ? `| Próxima: ${nextRankXP} XP` : '| Nível Máximo!'}
+                </div>
+            `;
             document.getElementById('xpGainedStat').textContent = `${xpGained} XP`;
             
             // Animar XP ganho
             setTimeout(() => {
                 const xpDisplay = document.getElementById('xpGainedDisplay');
                 xpDisplay.style.animation = 'pulse 1s ease-in-out infinite';
+                
+                // Se subiu de patente, mostrar notificação
+                if (stats.rankUp) {
+                    setTimeout(() => {
+                        alert(`🎉 PARABÉNS! Você subiu para a patente ${ranking}!`);
+                    }, 1000);
+                }
             }, 500);
             
             // Persistir resultados
