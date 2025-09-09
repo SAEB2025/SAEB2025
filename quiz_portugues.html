@@ -300,14 +300,16 @@
             border-radius: 15px;
         }
 
-        .alternative:hover {
-            border-color: var(--neon-purple);
-            transform: translateX(10px);
-            box-shadow: 0 5px 20px rgba(176, 0, 255, 0.3);
-        }
+        @media (hover: hover) {
+            .alternative:hover {
+                border-color: var(--neon-purple);
+                transform: translateX(10px);
+                box-shadow: 0 5px 20px rgba(176, 0, 255, 0.3);
+            }
 
-        .alternative:hover::before {
-            opacity: 0.1;
+            .alternative:hover::before {
+                opacity: 0.1;
+            }
         }
 
         .alternative.selected {
@@ -1135,7 +1137,7 @@
     </div>
 
     <script>
-        // QUESTÕES DO QUIZ DE PORTUGUÊS (questões independentes de texto)
+        // QUESTÕES DO QUIZ DE PORTUGUÊS (15 questões totais)
         const questions = [
             {
                 question: "A palavra 'candidez' significa:",
@@ -1196,12 +1198,42 @@
                 alternatives: ["narrar histórias", "descrever lugares", "instruir procedimentos", "argumentar ideias", "relatar fatos"],
                 correct: 2,
                 explanation: "Receitas culinárias são textos instrucionais que ensinam passo a passo como preparar um prato."
+            },
+            {
+                question: "A palavra 'obsoleto' significa:",
+                alternatives: ["moderno", "ultrapassado", "eficiente", "necessário", "complexo"],
+                correct: 1,
+                explanation: "Obsoleto significa algo que caiu em desuso, que está ultrapassado ou antiquado."
+            },
+            {
+                question: "Qual figura de linguagem está presente em 'O silêncio gritava'?",
+                alternatives: ["metáfora", "comparação", "paradoxo", "metonímia", "hipérbole"],
+                correct: 2,
+                explanation: "É um paradoxo, pois apresenta ideias contraditórias: silêncio não pode gritar."
+            },
+            {
+                question: "O plural de 'cidadão' é:",
+                alternatives: ["cidadões", "cidadãos", "cidadães", "cidadãs", "cidadões"],
+                correct: 1,
+                explanation: "O plural de cidadão é cidadãos, seguindo a regra dos substantivos terminados em -ão."
+            },
+            {
+                question: "A oração 'Quando chegar, me avise' é classificada como:",
+                alternatives: ["coordenada", "subordinada temporal", "subordinada causal", "subordinada condicional", "principal"],
+                correct: 1,
+                explanation: "'Quando chegar' é uma oração subordinada adverbial temporal, pois indica tempo."
+            },
+            {
+                question: "O pronome 'lhe' em 'Entreguei-lhe o documento' refere-se a:",
+                alternatives: ["objeto direto", "objeto indireto", "sujeito", "predicativo", "aposto"],
+                correct: 1,
+                explanation: "O pronome 'lhe' funciona como objeto indireto, indicando a quem foi entregue o documento."
             }
         ];
 
         // Personagens para feedback de erro (URLs corrigidas)
         const errorCharacters = [
-            "https://i.ibb.co/Qj73wn6/IMG-4292.png",
+            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
             "https://i.ibb.co/kg63TCn/IMG-4287.png", 
             "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
             "https://i.ibb.co/Wp7smTf/IMG-4283.png"
@@ -1384,15 +1416,45 @@
             stats.currentStreak = passed ? (stats.currentStreak || 0) + 1 : 0;
             stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
 
-            // Sistema de patentes baseado no XP total
+            // Sistema de patentes baseado no XP total (sincronizado com matemática)
             const totalXP = stats.totalScore || 0;
-            if (totalXP >= 600) stats.ranking = 'Desafiante 🔥';
-            else if (totalXP >= 500) stats.ranking = 'Mestre 👑';
-            else if (totalXP >= 400) stats.ranking = 'Diamante 💎';
-            else if (totalXP >= 300) stats.ranking = 'Platina 💎';
-            else if (totalXP >= 200) stats.ranking = 'Ouro 🥇';
-            else if (totalXP >= 100) stats.ranking = 'Prata 🥈';
-            else stats.ranking = 'Bronze 🥉';
+            let newRanking = '';
+            let nextRankXP = 0;
+            
+            if (totalXP >= 5000) {
+                newRanking = 'Lendário 🌟';
+                nextRankXP = 'Máximo';
+            } else if (totalXP >= 3000) {
+                newRanking = 'Grão-Mestre 🏆';
+                nextRankXP = 5000;
+            } else if (totalXP >= 2000) {
+                newRanking = 'Mestre 👑';
+                nextRankXP = 3000;
+            } else if (totalXP >= 1500) {
+                newRanking = 'Desafiante 🔥';
+                nextRankXP = 2000;
+            } else if (totalXP >= 1000) {
+                newRanking = 'Diamante 💎';
+                nextRankXP = 1500;
+            } else if (totalXP >= 700) {
+                newRanking = 'Platina ⚪';
+                nextRankXP = 1000;
+            } else if (totalXP >= 500) {
+                newRanking = 'Ouro 🥇';
+                nextRankXP = 700;
+            } else if (totalXP >= 300) {
+                newRanking = 'Prata 🥈';
+                nextRankXP = 500;
+            } else if (totalXP >= 150) {
+                newRanking = 'Bronze 🥉';
+                nextRankXP = 300;
+            } else {
+                newRanking = 'Iniciante 🌱';
+                nextRankXP = 150;
+            }
+            
+            stats.ranking = newRanking;
+            stats.nextRankXP = nextRankXP;
 
             // Salvar dados de última partida
             stats.lastQuizScore = (finalCorrect / totalQuestions) * 100;
@@ -1522,6 +1584,16 @@
             }
         }
 
+        // Embaralhar array (Fisher-Yates)
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
         // Mostrar questão atual
         function showQuestion() {
             if (currentQuestionIndex >= selectedQuestions.length) {
@@ -1540,22 +1612,31 @@
             // Mostrar texto da questão
             document.getElementById('questionText').textContent = question.question;
             
-            // Criar alternativas
+            // Criar índices embaralhados para as alternativas
+            const shuffledIndices = shuffleArray([0, 1, 2, 3, 4]);
+            const correctShuffledIndex = shuffledIndices.indexOf(question.correct);
+            
+            // Criar alternativas embaralhadas
             const alternativesContainer = document.getElementById('alternativesContainer');
             alternativesContainer.innerHTML = '';
             
-            question.alternatives.forEach((alternative, index) => {
+            shuffledIndices.forEach((originalIndex, displayIndex) => {
                 const alternativeDiv = document.createElement('div');
                 alternativeDiv.className = 'alternative';
-                alternativeDiv.onclick = () => selectAnswer(index);
+                alternativeDiv.dataset.originalIndex = originalIndex;
+                alternativeDiv.onclick = () => selectAnswer(displayIndex);
                 
                 alternativeDiv.innerHTML = `
-                    <div class="alternative-letter">${String.fromCharCode(65 + index)}</div>
-                    <div class="alternative-text">${alternative}</div>
+                    <div class="alternative-letter">${String.fromCharCode(65 + displayIndex)}</div>
+                    <div class="alternative-text">${question.alternatives[originalIndex]}</div>
                 `;
                 
                 alternativesContainer.appendChild(alternativeDiv);
             });
+            
+            // Armazenar o índice correto embaralhado
+            question.shuffledCorrect = correctShuffledIndex;
+            question.shuffledIndices = shuffledIndices;
             
             // Resetar seleção
             selectedAnswer = null;
@@ -1579,11 +1660,11 @@
             if (selectedAnswer === null || answered) return;
             answered = true;
             const question = selectedQuestions[currentQuestionIndex];
-            const isCorrect = selectedAnswer === question.correct;
+            const isCorrect = selectedAnswer === question.shuffledCorrect;
             document.getElementById('confirmBtn').disabled = true;
             document.querySelectorAll('.alternative').forEach((alt, index) => {
                 alt.onclick = null;
-                if (index === question.correct) {
+                if (index === question.shuffledCorrect) {
                     alt.classList.add('correct');
                 } else if (index === selectedAnswer && !isCorrect) {
                     alt.classList.add('incorrect');
@@ -1641,12 +1722,13 @@
                 content.className = 'feedback-modal';
             } else {
                 const randomCharacter = errorCharacters[Math.floor(Math.random() * errorCharacters.length)];
-                const correctOption = String.fromCharCode(65 + question.correct);
+                const correctOption = String.fromCharCode(65 + question.shuffledCorrect);
                 
                 content.innerHTML = `
                     <div class="feedback-title error">RESPOSTA INCORRETA</div>
                     <img src="${randomCharacter}" alt="Personagem" class="feedback-character error" 
-                         onerror="this.style.display='none'">
+                         onerror="this.onerror=null; this.style.display='none'; this.parentElement.querySelector('.speech-bubble').style.marginTop='0';" 
+                         crossorigin="anonymous">
                     <div class="speech-bubble">
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
