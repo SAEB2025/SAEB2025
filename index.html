@@ -109,6 +109,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            z-index: 1001;
         }
 
         .mobile-menu-toggle:hover {
@@ -149,8 +150,10 @@
             border-bottom: 2px solid var(--neon-green);
             padding: 1rem;
             z-index: 999;
-            transform: translateY(-100%);
+            transform: translateY(-120%);
             transition: transform 0.3s ease;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
         }
 
         .mobile-nav.active {
@@ -1246,11 +1249,19 @@
             }
 
             .nav-controls {
-                display: none;
+                display: none !important;
             }
 
             .mobile-nav {
                 display: block;
+            }
+            
+            .header-content {
+                gap: 0.5rem;
+            }
+            
+            .prototype-tag {
+                display: none !important;
             }
         }
 
@@ -1258,11 +1269,13 @@
             .header-content {
                 padding: 1rem;
                 justify-content: space-between;
+                flex-wrap: nowrap;
             }
 
             .logo {
-                font-size: 1.3rem;
+                font-size: clamp(1.2rem, 3.5vw, 1.5rem);
                 letter-spacing: 1px;
+                flex: 1;
             }
 
             .main-container {
@@ -1332,7 +1345,8 @@
             }
 
             .logo {
-                font-size: 1.1rem;
+                font-size: clamp(1rem, 4vw, 1.3rem);
+                letter-spacing: 0.5px;
             }
 
             .mobile-menu-toggle {
@@ -1495,19 +1509,20 @@
             .card:active,
             .stat-card:active,
             .creator-card:active {
-                transform: scale(0.95);
+                transform: scale(0.98);
             }
 
             .cta-main:active,
             .start-quiz-btn:active,
             .back-btn:active {
-                transform: scale(0.95);
+                transform: scale(0.98);
             }
 
             /* Aumentar área de toque em dispositivos móveis */
             button, a, .clickable {
                 min-height: 44px;
                 min-width: 44px;
+                touch-action: manipulation;
             }
 
             /* Desabilitar hover effects em touch devices */
@@ -1515,6 +1530,12 @@
             .quiz-card:hover,
             .stat-card:hover {
                 transform: none;
+                box-shadow: none;
+            }
+            
+            /* Melhorar toque em alternativas */
+            .alternative {
+                min-height: 48px;
             }
         }
 
@@ -1543,6 +1564,7 @@
         @media (max-height: 500px) and (orientation: landscape) {
             header {
                 padding: 0.5rem 0;
+                position: sticky;
             }
 
             .header-content {
@@ -1550,17 +1572,62 @@
             }
 
             .hero {
-                min-height: auto;
+                min-height: calc(100vh - 60px);
                 padding: 2rem 1rem;
             }
 
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: clamp(2rem, 5vw, 2.5rem);
             }
 
             .stats-section {
                 margin-top: 2rem;
             }
+            
+            .mobile-nav {
+                top: 60px;
+                max-height: calc(100vh - 60px);
+            }
+        }
+        
+        /* Fix para scroll em iOS */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-nav {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Melhorar foco visível para acessibilidade */
+        body:not(.using-mouse) *:focus {
+            outline: 3px solid var(--neon-green);
+            outline-offset: 2px;
+        }
+        
+        /* Remover outline quando usando mouse */
+        body.using-mouse *:focus {
+            outline: none;
+        }
+        
+        /* Skip to content link para acessibilidade */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--neon-green);
+            color: var(--dark-bg);
+            padding: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            z-index: 10001;
+            border-radius: 0 0 8px 0;
+        }
+        
+        .skip-to-content:focus {
+            top: 0;
         }
     </style>
 </head>
@@ -1575,24 +1642,24 @@
     </div>
 
     <!-- Header -->
-    <header id="header">
+    <header id="header" role="banner">
         <div class="header-content">
-            <div class="logo" onclick="showPage('home')">🔥 SAEB 2025</div>
+            <div class="logo" onclick="showPage('home')" role="button" tabindex="0" aria-label="Voltar ao início">🔥 SAEB 2025</div>
             <div class="nav-controls">
-                <div class="prototype-tag">BETA 2025</div>
-                <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
+                <div class="prototype-tag" aria-label="Versão beta 2025">BETA 2025</div>
+                <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;" aria-label="Voltar">⬅️ VOLTAR</button>
             </div>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu de navegação" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </div>
-        <nav class="mobile-nav" id="mobileNav">
-            <a href="#" class="mobile-nav-item" onclick="showPage('home'); toggleMobileMenu();">🏠 Início</a>
-            <a href="#" class="mobile-nav-item" onclick="showPage('lobby'); toggleMobileMenu();">🎮 Jogar Quiz</a>
-            <a href="#" class="mobile-nav-item" onclick="showStats(); toggleMobileMenu();">📊 Estatísticas</a>
-            <a href="#" class="mobile-nav-item" onclick="resetProgress(); toggleMobileMenu();">🔄 Resetar Progresso</a>
+        <nav class="mobile-nav" id="mobileNav" role="navigation" aria-label="Menu principal">
+            <a href="#" class="mobile-nav-item" onclick="showPage('home'); toggleMobileMenu();" aria-label="Ir para página inicial">🏠 Início</a>
+            <a href="#" class="mobile-nav-item" onclick="showPage('lobby'); toggleMobileMenu();" aria-label="Ir para lobby de quiz">🎮 Jogar Quiz</a>
+            <a href="#" class="mobile-nav-item" onclick="showStats(); toggleMobileMenu();" aria-label="Ver estatísticas">📊 Estatísticas</a>
+            <a href="#" class="mobile-nav-item" onclick="resetProgress(); toggleMobileMenu();" aria-label="Resetar todo o progresso">🔄 Resetar Progresso</a>
         </nav>
     </header>
 
@@ -2025,30 +2092,42 @@
             // Limpar partículas existentes
             container.innerHTML = '';
             
+            // Detectar dispositivo móvel ou performance reduzida
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            // Desabilitar partículas em mobile ou com motion reduzido
+            if (isMobile || reducedMotion) {
+                return;
+            }
+            
             // Ajustar quantidade baseada no tamanho da tela e performance
             let particleCount;
             if (window.innerWidth > 1200) {
-                particleCount = 25;
+                particleCount = 20;
             } else if (window.innerWidth > 768) {
-                particleCount = 15;
+                particleCount = 12;
             } else if (window.innerWidth > 480) {
-                particleCount = 8;
+                particleCount = 6;
             } else {
-                particleCount = 4;
+                particleCount = 3;
             }
             
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.cssText = `
-                    left: ${Math.random() * 100}%;
-                    animation-delay: ${Math.random() * 8}s;
-                    animation-duration: ${8 + Math.random() * 4}s;
-                    background: ${colors[Math.floor(Math.random() * colors.length)]};
-                    box-shadow: 0 0 10px currentColor;
-                `;
-                container.appendChild(particle);
-            }
+            // Usar requestAnimationFrame para melhor performance
+            requestAnimationFrame(() => {
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.cssText = `
+                        left: ${Math.random() * 100}%;
+                        animation-delay: ${Math.random() * 8}s;
+                        animation-duration: ${8 + Math.random() * 4}s;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        box-shadow: 0 0 10px currentColor;
+                    `;
+                    container.appendChild(particle);
+                }
+            });
         }
 
         // ANIMAÇÃO DE SCROLL REVEAL
@@ -2374,6 +2453,34 @@
             if ('ontouchstart' in window) {
                 document.body.classList.add('touch-device');
             }
+            
+            // Adicionar suporte para navegação por teclado
+            document.addEventListener('keydown', function(e) {
+                // Enter ou Space na logo para navegar
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('logo')) {
+                    e.preventDefault();
+                    showPage('home');
+                }
+                
+                // Escape para fechar menu mobile
+                if (e.key === 'Escape') {
+                    const mobileNav = document.getElementById('mobileNav');
+                    if (mobileNav && mobileNav.classList.contains('active')) {
+                        toggleMobileMenu();
+                    }
+                }
+            });
+            
+            // Melhorar foco visível
+            document.body.addEventListener('mousedown', () => {
+                document.body.classList.add('using-mouse');
+            });
+            
+            document.body.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    document.body.classList.remove('using-mouse');
+                }
+            });
         });
 
         // PREVENÇÃO DE BUGS DE ORIENTAÇÃO EM MOBILE
@@ -2407,8 +2514,31 @@
             if (mobileNav && menuToggle) {
                 mobileNav.classList.toggle('active');
                 menuToggle.classList.toggle('active');
+                
+                // Atualizar aria-expanded
+                const isExpanded = mobileNav.classList.contains('active');
+                menuToggle.setAttribute('aria-expanded', isExpanded);
+                
+                // Prevenir scroll do body quando menu estiver aberto
+                if (isExpanded) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
             }
         }
+        
+        // Fechar menu mobile ao clicar fora
+        document.addEventListener('click', function(e) {
+            const mobileNav = document.getElementById('mobileNav');
+            const menuToggle = document.getElementById('mobileMenuToggle');
+            
+            if (mobileNav && menuToggle && mobileNav.classList.contains('active')) {
+                if (!mobileNav.contains(e.target) && !menuToggle.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
 
         // SHOW STATS PAGE
         function showStats() {
