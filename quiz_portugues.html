@@ -1239,12 +1239,6 @@
                 explanation: "É um paradoxo, pois apresenta ideias contraditórias: silêncio não pode gritar."
             },
             {
-                question: "O plural de 'cidadão' é:",
-                alternatives: ["cidadões", "cidadãos", "cidadães", "cidadãs", "cidadões"],
-                correct: 1,
-                explanation: "O plural de cidadão é cidadãos, seguindo a regra dos substantivos terminados em -ão."
-            },
-            {
                 question: "A oração 'Quando chegar, me avise' é classificada como:",
                 alternatives: ["coordenada", "subordinada temporal", "subordinada causal", "subordinada condicional", "principal"],
                 correct: 1,
@@ -1315,20 +1309,55 @@
                 alternatives: ["Comparação", "Metáfora", "Metonímia", "Hipérbole", "Personificação"],
                 correct: 1,
                 explanation: "É uma metáfora, pois estabelece uma comparação implícita entre palavras e punhais, sem usar conectivos comparativos."
+            },
+            {
+                question: "Qual é o plural correto de 'cidadão'?",
+                alternatives: ["cidadões", "cidadãos", "cidadans", "cidadãos", "cidadões"],
+                correct: 1,
+                explanation: "O plural de 'cidadão' é 'cidadãos', seguindo a regra dos substantivos terminados em -ão."
+            },
+            {
+                question: "A palavra 'anticonstitucional' é formada por:",
+                alternatives: ["Composição", "Derivação prefixal", "Derivação sufixal", "Derivação parassintética", "Derivação regressiva"],
+                correct: 1,
+                explanation: "A palavra é formada por derivação prefixal: anti + constitucional."
+            },
+            {
+                question: "Em 'Chegou ontem à noite', o acento grave indica:",
+                alternatives: ["Crase", "Acento tônico", "Hiato", "Ditongo", "Encontro consonantal"],
+                correct: 0,
+                explanation: "O acento grave em 'à' indica crase, que é a fusão da preposição 'a' com o artigo 'a'."
+            },
+            {
+                question: "Qual função sintática exerce 'muito cansado' em 'O menino chegou muito cansado'?",
+                alternatives: ["Objeto direto", "Predicativo do sujeito", "Adjunto adnominal", "Complemento nominal", "Aposto"],
+                correct: 1,
+                explanation: "'Muito cansado' é predicativo do sujeito, pois qualifica o sujeito 'o menino' através do verbo de ligação."
+            },
+            {
+                question: "A oração 'Embora estudasse muito, não passou' expressa:",
+                alternatives: ["Causa", "Consequência", "Concessão", "Finalidade", "Condição"],
+                correct: 2,
+                explanation: "A oração iniciada por 'embora' expressa concessão, indicando uma ideia contrária ao que se esperaria."
             }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas e novas)
+        // Personagens para feedback de erro (novos personagens)
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
             "https://i.ibb.co/1th3w8bH/IMG-4361.png",
             "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
             "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
             "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
+
+        // Função para pré-carregar imagens
+        function preloadImages() {
+            errorCharacters.forEach(url => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = url;
+            });
+        }
 
         // Variáveis do jogo
         let currentQuestionIndex = 0;
@@ -2036,6 +2065,9 @@
             // Carregar dados do jogador (XP e patente)
             loadPlayerData();
             updateXPDisplay();
+            
+            // Pré-carregar imagens dos personagens
+            preloadImages();
             
             createParticles();
             // Tenta retomar progresso, senão inicia novo
