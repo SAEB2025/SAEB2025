@@ -313,9 +313,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 0.9;
-            letter-spacing: -2px;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
             animation: glitchText 3s ease-in-out infinite;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         @keyframes glitchText {
@@ -1284,10 +1287,20 @@
 
             .hero {
                 margin-top: 0;
+                min-height: auto;
+                padding: 3rem 1rem 2rem;
+            }
+            
+            .hero h1 {
+                margin-bottom: 0.5rem;
+            }
+            
+            .hero .subtitle {
+                margin-bottom: 1.5rem;
             }
 
             .stats-section {
-                margin: -2rem 1rem 2rem;
+                margin: 1rem 1rem 2rem;
                 padding: 1.5rem;
             }
 
@@ -1356,16 +1369,19 @@
 
             .hero h1 {
                 font-size: 2rem;
-                letter-spacing: -1px;
+                letter-spacing: 0.5px;
+                line-height: 1.2;
             }
 
             .hero .subtitle {
                 font-size: 0.9rem;
+                margin-bottom: 1.5rem;
             }
 
             .cta-main {
                 padding: 1rem 2rem;
                 font-size: 1rem;
+                margin-bottom: 1rem;
             }
 
             .stats-grid {
@@ -1806,6 +1822,10 @@
                         <div class="creator-name">JOÃO MARCELO</div>
                         <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: var(--text-secondary); margin-top: 0.5rem;">INNOVATION EXPERT</div>
                     </div>
+                    <div class="creator-card">
+                        <div class="creator-name">GERSON TORRE</div>
+                        <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: var(--text-secondary); margin-top: 0.5rem;">STRATEGY MASTER</div>
+                    </div>
                 </div>
                 <p style="margin-top: 2rem; color: var(--text-secondary); font-size: clamp(0.9rem, 2vw, 1rem);">
                     EU I US KARA
@@ -1869,8 +1889,8 @@
                     <div id="stats-container">
                         <!-- Player Level Summary -->
                         <div class="stats-summary">
-                            <h4>🏆 SEU NÍVEL</h4>
-                            <div class="level-badge" id="levelBadge">Iniciante</div>
+                            <h4>🏆 SUA PATENTE</h4>
+                            <div class="level-badge" id="levelBadge">🥉 Bronze</div>
                             <div class="xp-bar">
                                 <div class="xp-fill" id="xpFill" style="width: 0%"></div>
                             </div>
@@ -2588,19 +2608,16 @@
             }
         }
 
-        // CALCULATE LEVEL AND XP
+        // CALCULATE LEVEL AND XP - Sistema de Patentes
         function calculateLevel(totalScore) {
             const levels = [
-                { min: 0, max: 99, name: 'Iniciante', color: '#888888' },
-                { min: 100, max: 299, name: 'Aprendiz', color: '#00FF88' },
-                { min: 300, max: 599, name: 'Estudante', color: '#00BFFF' },
-                { min: 600, max: 999, name: 'Competente', color: '#FFFF00' },
-                { min: 1000, max: 1499, name: 'Avançado', color: '#FF6B35' },
-                { min: 1500, max: 2499, name: 'Expert', color: '#FF0080' },
-                { min: 2500, max: 3999, name: 'Mestre', color: '#9400D3' },
-                { min: 4000, max: 5999, name: 'Grão-Mestre', color: '#FFD700' },
-                { min: 6000, max: 9999, name: 'Lendário', color: '#FF1493' },
-                { min: 10000, max: Infinity, name: 'Mítico', color: '#00FFFF' }
+                { min: 0, max: 99, name: 'Bronze', color: '#CD7F32', icon: '🥉' },
+                { min: 100, max: 199, name: 'Prata', color: '#C0C0C0', icon: '🥈' },
+                { min: 200, max: 299, name: 'Ouro', color: '#FFD700', icon: '🥇' },
+                { min: 300, max: 399, name: 'Platina', color: '#E5E4E2', icon: '💎' },
+                { min: 400, max: 499, name: 'Diamante', color: '#00FFFF', icon: '💎' },
+                { min: 500, max: 599, name: 'Mestre', color: '#9400D3', icon: '👑' },
+                { min: 600, max: Infinity, name: 'Desafiante', color: '#FF0080', icon: '🔥' }
             ];
             
             for (let level of levels) {
@@ -2612,6 +2629,7 @@
                     return {
                         name: level.name,
                         color: level.color,
+                        icon: level.icon,
                         xp: xpInLevel,
                         xpNeeded: xpNeeded,
                         progress: progress,
@@ -2621,8 +2639,9 @@
             }
             
             return {
-                name: 'Iniciante',
-                color: '#888888',
+                name: 'Bronze',
+                color: '#CD7F32',
+                icon: '🥉',
                 xp: 0,
                 xpNeeded: 100,
                 progress: 0,
@@ -2728,7 +2747,7 @@
                 const xpText = document.getElementById('xpText');
                 
                 if (levelBadge) {
-                    levelBadge.textContent = levelInfo.name;
+                    levelBadge.textContent = `${levelInfo.icon || ''} ${levelInfo.name}`;
                     levelBadge.style.background = `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}88)`;
                 }
                 if (xpFill) {
