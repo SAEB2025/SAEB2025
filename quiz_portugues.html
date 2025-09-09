@@ -997,12 +997,16 @@
                 padding: 0.5rem 0;
             }
             
+            .quiz-info {
+                display: none;
+            }
+            
             .quiz-container {
-                margin-top: 100px;
+                margin-top: 80px;
             }
             
             .question-container {
-                min-height: calc(100vh - 110px);
+                min-height: calc(100vh - 90px);
             }
             
             .question-card {
@@ -1010,8 +1014,12 @@
                 margin-bottom: 1rem;
             }
             
-            .quiz-info {
-                display: none;
+            .alternatives-container {
+                gap: 0.5rem;
+            }
+            
+            .alternative {
+                padding: 0.8rem;
             }
         }
 
@@ -1106,6 +1114,14 @@
                     <div class="stat-item">
                         <div class="stat-label">❌ ERROS</div>
                         <div class="stat-value" id="incorrectAnswers">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">⏱️ TEMPO MÉDIO</div>
+                        <div class="stat-value" id="averageTime">0s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">🔥 SEQUÊNCIA MÁXIMA</div>
+                        <div class="stat-value" id="maxStreak">0</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">⚡ XP GANHO</div>
@@ -1261,15 +1277,41 @@
                 alternatives: ["Dissertativo", "Descritivo", "Narrativo", "Argumentativo", "Expositivo"],
                 correct: 2,
                 explanation: "'Era uma vez' é uma expressão típica do início de narrativas, especialmente contos de fadas e histórias infantis."
+            },
+            {
+                question: "Qual é o plural correto de 'cidadão'?",
+                alternatives: ["cidadãos", "cidadões", "cidadans", "cidadões", "cidadãos"],
+                correct: 0,
+                explanation: "O plural de 'cidadão' é 'cidadãos', seguindo a regra dos substantivos terminados em -ão."
+            },
+            {
+                question: "A palavra 'infelizmente' é formada por:",
+                alternatives: ["Derivação sufixal", "Derivação prefixal", "Composição", "Derivação prefixal e sufixal", "Derivação regressiva"],
+                correct: 3,
+                explanation: "Infelizmente = in (prefixo) + feliz (radical) + mente (sufixo). É formada por derivação prefixal e sufixal."
+            },
+            {
+                question: "Em 'Espero que você venha cedo', a oração subordinada é:",
+                alternatives: ["Adverbial temporal", "Substantiva objetiva direta", "Adjetiva restritiva", "Substantiva subjetiva", "Adverbial condicional"],
+                correct: 1,
+                explanation: "'que você venha cedo' é oração subordinada substantiva objetiva direta, pois complementa o verbo 'espero'."
+            },
+            {
+                question: "O acento em 'médico' é:",
+                alternatives: ["Agudo", "Circunflexo", "Grave", "Til", "Trema"],
+                correct: 0,
+                explanation: "A palavra 'médico' recebe acento agudo na vogal 'é', pois é proparoxítona."
+            },
+            {
+                question: "Em 'Vendi o carro para João', o termo 'para João' é:",
+                alternatives: ["Objeto direto", "Objeto indireto", "Complemento nominal", "Adjunto adverbial", "Aposto"],
+                correct: 1,
+                explanation: "'para João' é objeto indireto, pois indica o destinatário da ação de vender."
             }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas e novas)
+        // Novos personagens das URLs fornecidas
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
             "https://i.ibb.co/1th3w8bH/IMG-4361.png",
             "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
             "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
@@ -1288,6 +1330,13 @@
         let playerXP = 0; // XP do jogador
         let wrongTopics = []; // Rastrear tópicos das questões erradas
         let playerRank = 0; // Índice da patente atual
+        let detailedStats = {
+            questionsAnswered: [],
+            timePerQuestion: [],
+            topicAccuracy: {},
+            streak: 0,
+            maxStreak: 0
+        };
         
         // Sistema de Patentes do Free Fire
         const ranks = [
@@ -1320,15 +1369,27 @@
                 const data = localStorage.getItem('playerData');
                 if (data) {
                     const parsed = JSON.parse(data);
-                    playerXP = parsed.xp || 0;
-                    updateRank();
+                    // Validar dados antes de usar
+                    if (typeof parsed.xp === 'number' && parsed.xp >= 0) {
+                        playerXP = parsed.xp;
+                        updateRank();
+                    } else {
+                        throw new Error('Dados corrompidos');
+                    }
                 } else {
                     playerXP = 0;
                     playerRank = 0;
                 }
             } catch (e) {
+                console.warn('Dados corrompidos detectados, resetando:', e);
                 playerXP = 0;
                 playerRank = 0;
+                // Limpar dados corrompidos
+                try {
+                    localStorage.removeItem('playerData');
+                } catch (cleanupError) {
+                    console.warn('Erro ao limpar dados:', cleanupError);
+                }
             }
         }
         
@@ -1338,7 +1399,9 @@
                     xp: playerXP,
                     rank: playerRank
                 }));
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Não foi possível salvar dados do jogador:', e);
+            }
         }
         
         function addXP(amount) {
@@ -1596,6 +1659,15 @@
             answered = false;
             wrongTopics = []; // Resetar tópicos errados
             
+            // Resetar estatísticas detalhadas
+            detailedStats = {
+                questionsAnswered: [],
+                timePerQuestion: [],
+                topicAccuracy: {},
+                streak: 0,
+                maxStreak: 0
+            };
+            
             // Criar partículas de fundo
             createParticles();
             
@@ -1612,8 +1684,14 @@
         // Criar partículas animadas
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return; // Verificação de segurança
+            
             particlesContainer.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
+            
+            // Reduzir partículas em dispositivos móveis
+            const particleCount = window.innerWidth < 768 ? 10 : 20;
+            
+            for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
@@ -1694,12 +1772,66 @@
             document.getElementById('confirmBtn').disabled = false;
         }
 
+        // Identificar tópico da questão
+        function getQuestionTopic(question) {
+            const questionText = question.question.toLowerCase();
+            
+            if (questionText.includes('vírgula') || questionText.includes('pontuação')) {
+                return "Pontuação";
+            } else if (questionText.includes('plural') || questionText.includes('singular')) {
+                return "Morfologia - Plural e Singular";
+            } else if (questionText.includes('conjunção') || questionText.includes('conectivo')) {
+                return "Conjunções e Conectivos";
+            } else if (questionText.includes('oração') || questionText.includes('subordinada')) {
+                return "Sintaxe - Orações";
+            } else if (questionText.includes('pronome')) {
+                return "Pronomes";
+            } else if (questionText.includes('figura de linguagem') || questionText.includes('metáfora') || questionText.includes('paradoxo')) {
+                return "Figuras de Linguagem";
+            } else if (questionText.includes('gênero textual') || questionText.includes('tipo de texto')) {
+                return "Gêneros e Tipos Textuais";
+            } else if (questionText.includes('aposto') || questionText.includes('vocativo')) {
+                return "Termos Acessórios da Oração";
+            } else if (questionText.includes('derivação') || questionText.includes('formação')) {
+                return "Formação de Palavras";
+            } else if (questionText.includes('discurso') || questionText.includes('narrativa')) {
+                return "Tipos de Discurso";
+            } else if (questionText.includes('interpretação') || questionText.includes('finalidade')) {
+                return "Interpretação de Texto";
+            } else if (questionText.includes('acento') || questionText.includes('acentuação')) {
+                return "Acentuação";
+            } else if (questionText.includes('objeto direto') || questionText.includes('objeto indireto')) {
+                return "Complementos Verbais";
+            }
+            
+            return "Língua Portuguesa Geral";
+        }
+
         // Confirmar resposta
         function confirmAnswer() {
             if (selectedAnswer === null || answered) return;
             answered = true;
             const question = selectedQuestions[currentQuestionIndex];
             const isCorrect = selectedAnswer === question.shuffledCorrect;
+            const questionTime = Date.now() - startTime;
+            
+            // Coletar estatísticas detalhadas
+            detailedStats.questionsAnswered.push({
+                question: question.question,
+                correct: isCorrect,
+                timeSpent: questionTime - (detailedStats.timePerQuestion.reduce((a, b) => a + b, 0) || 0),
+                topic: getQuestionTopic(question)
+            });
+            
+            detailedStats.timePerQuestion.push(questionTime);
+            
+            if (isCorrect) {
+                detailedStats.streak++;
+                detailedStats.maxStreak = Math.max(detailedStats.maxStreak, detailedStats.streak);
+            } else {
+                detailedStats.streak = 0;
+            }
+            
             document.getElementById('confirmBtn').disabled = true;
             document.querySelectorAll('.alternative').forEach((alt, index) => {
                 alt.onclick = null;
@@ -1769,6 +1901,7 @@
                 content.innerHTML = `
                     <div class="feedback-title error">RESPOSTA INCORRETA</div>
                     <img src="${randomCharacter}" alt="Personagem" class="feedback-character error" 
+                         loading="lazy"
                          onerror="this.onerror=null; this.style.display='none'; this.parentElement.querySelector('.speech-bubble').style.marginTop='0';" 
                          crossorigin="anonymous">
                     <div class="speech-bubble">
@@ -1816,32 +1949,7 @@
 
         // Analisar resposta errada para identificar tópicos
         function analyzeWrongAnswer(question) {
-            const questionText = question.question.toLowerCase();
-            let topic = "Língua Portuguesa Geral";
-            
-            if (questionText.includes('vírgula') || questionText.includes('pontuação')) {
-                topic = "Pontuação";
-            } else if (questionText.includes('plural') || questionText.includes('singular')) {
-                topic = "Morfologia - Plural e Singular";
-            } else if (questionText.includes('conjunção') || questionText.includes('conectivo')) {
-                topic = "Conjunções e Conectivos";
-            } else if (questionText.includes('oração') || questionText.includes('subordinada')) {
-                topic = "Sintaxe - Orações";
-            } else if (questionText.includes('pronome')) {
-                topic = "Pronomes";
-            } else if (questionText.includes('figura de linguagem') || questionText.includes('metáfora') || questionText.includes('paradoxo')) {
-                topic = "Figuras de Linguagem";
-            } else if (questionText.includes('gênero textual') || questionText.includes('tipo de texto')) {
-                topic = "Gêneros e Tipos Textuais";
-            } else if (questionText.includes('aposto') || questionText.includes('vocativo')) {
-                topic = "Termos Acessórios da Oração";
-            } else if (questionText.includes('derivação') || questionText.includes('formação')) {
-                topic = "Formação de Palavras";
-            } else if (questionText.includes('discurso') || questionText.includes('narrativa')) {
-                topic = "Tipos de Discurso";
-            } else if (questionText.includes('interpretação') || questionText.includes('finalidade')) {
-                topic = "Interpretação de Texto";
-            }
+            const topic = getQuestionTopic(question);
             
             if (!wrongTopics.includes(topic)) {
                 wrongTopics.push(topic);
@@ -1858,10 +1966,17 @@
             const xpGained = score * 50;
             const rank = getCurrentRank();
             
+            // Calcular estatísticas detalhadas
+            const averageTimePerQuestion = detailedStats.timePerQuestion.length > 0 
+                ? Math.round(detailedStats.timePerQuestion.reduce((a, b) => a + b, 0) / detailedStats.timePerQuestion.length / 1000) 
+                : 0;
+            
             document.getElementById('finalScore').textContent = `${score}/10`;
             document.getElementById('percentageScore').textContent = `${percentage}%`;
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
+            document.getElementById('averageTime').textContent = `${averageTimePerQuestion}s`;
+            document.getElementById('maxStreak').textContent = detailedStats.maxStreak;
             
             // Mostrar XP ganho
             document.getElementById('xpGainedDisplay').textContent = `+${xpGained} XP`;
@@ -1934,6 +2049,28 @@
             if (particles && window.innerWidth < 768) {
                 // Reduzir partículas em mobile
                 particles.style.display = 'none';
+            }
+            
+            // Desabilitar animações complexas em dispositivos menos potentes
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                document.documentElement.style.setProperty('--animation-duration', '0.1s');
+            }
+        }
+        
+        // Otimizar scroll suave
+        if ('scrollBehavior' in document.documentElement.style) {
+            document.documentElement.style.scrollBehavior = 'smooth';
+        }
+        
+        // Detectar conexão lenta e otimizar
+        if ('connection' in navigator) {
+            const connection = navigator.connection;
+            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                // Desabilitar animações em conexões lentas
+                document.documentElement.style.setProperty('--animation-duration', '0.1s');
+                // Reduzir partículas
+                const particles = document.getElementById('particles');
+                if (particles) particles.style.display = 'none';
             }
         }
         

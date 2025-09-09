@@ -818,11 +818,26 @@
             }
 
             .quiz-info {
-                display: none;
+                width: 100%;
+                order: 3;
+                margin-top: 0.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .progress-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .xp-display {
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem !important;
             }
             
             .nav-controls {
                 display: flex;
+                order: 2;
             }
             
             .back-btn {
@@ -831,12 +846,12 @@
             }
 
             .quiz-container {
-                margin-top: 80px;
+                margin-top: 140px;
             }
 
             .question-container {
                 padding: 1rem;
-                min-height: calc(100vh - 100px);
+                min-height: calc(100vh - 150px);
             }
             
             .question-card {
@@ -912,12 +927,27 @@
                 font-size: 0.75rem;
             }
             
+            .quiz-info {
+                font-size: 0.8rem;
+            }
+            
+            .question-counter,
+            .score {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem;
+            }
+            
+            .xp-display {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem !important;
+            }
+            
             .quiz-container {
-                margin-top: 70px;
+                margin-top: 160px;
             }
 
             .question-container {
-                min-height: calc(100vh - 80px);
+                min-height: calc(100vh - 170px);
                 padding: 0.5rem;
             }
             
@@ -974,17 +1004,29 @@
                 padding: 0.5rem 0;
             }
             
+            .quiz-info {
+                display: none;
+            }
+            
             .quiz-container {
-                margin-top: 60px;
+                margin-top: 80px;
             }
             
             .question-container {
-                min-height: calc(100vh - 70px);
+                min-height: calc(100vh - 90px);
             }
             
             .question-card {
                 padding: 1rem;
                 margin-bottom: 1rem;
+            }
+            
+            .alternatives-container {
+                gap: 0.5rem;
+            }
+            
+            .alternative {
+                padding: 0.8rem;
             }
         }
 
@@ -1025,6 +1067,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 🔢 MATEMÁTICA</div>
             </div>
@@ -1076,6 +1121,14 @@
                     <div class="stat-item">
                         <div class="stat-label">❌ ERROS</div>
                         <div class="stat-value" id="incorrectAnswers">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">⏱️ TEMPO MÉDIO</div>
+                        <div class="stat-value" id="averageTime">0s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">🔥 SEQUÊNCIA MÁXIMA</div>
+                        <div class="stat-value" id="maxStreak">0</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">⚡ XP GANHO</div>
@@ -1145,15 +1198,16 @@
             { question: "Qual é o valor de 2³ + 3²?", alternatives: ["13", "15", "17", "19", "21"], correct: 2, explanation: "2³ = 8 e 3² = 9. Soma: 8 + 9 = 17" },
             { question: "Uma piscina tem 8m de comprimento, 4m de largura e 2m de profundidade. Qual é seu volume?", alternatives: ["14 m³", "32 m³", "48 m³", "64 m³", "96 m³"], correct: 3, explanation: "Volume = comprimento × largura × profundidade = 8 × 4 × 2 = 64 m³" },
             { question: "Se log₂(x) = 5, qual é o valor de x?", alternatives: ["10", "16", "25", "32", "64"], correct: 3, explanation: "log₂(x) = 5 significa que 2⁵ = x. Portanto, x = 32" },
-            { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" }
+            { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" },
+            { question: "Qual é o resultado de 15 × 8?", alternatives: ["120", "125", "115", "130", "140"], correct: 0, explanation: "15 × 8 = 120. Multiplicação básica: 15 vezes 8 igual a 120." },
+            { question: "Um retângulo tem 12 cm de comprimento e 8 cm de largura. Qual é seu perímetro?", alternatives: ["20 cm", "40 cm", "96 cm", "48 cm", "32 cm"], correct: 1, explanation: "Perímetro = 2 × (comprimento + largura) = 2 × (12 + 8) = 2 × 20 = 40 cm" },
+            { question: "Se 4x - 12 = 20, qual é o valor de x?", alternatives: ["2", "4", "6", "8", "10"], correct: 3, explanation: "4x - 12 = 20 → 4x = 20 + 12 → 4x = 32 → x = 32 ÷ 4 = 8" },
+            { question: "Um produto custava R$ 200,00 e teve um aumento de 15%. Qual é o novo preço?", alternatives: ["R$ 215,00", "R$ 230,00", "R$ 225,00", "R$ 235,00", "R$ 220,00"], correct: 1, explanation: "Aumento = 200 × 0,15 = 30. Novo preço = 200 + 30 = R$ 230,00" },
+            { question: "Quantos minutos há em 2,5 horas?", alternatives: ["125 minutos", "130 minutos", "150 minutos", "140 minutos", "160 minutos"], correct: 2, explanation: "2,5 horas = 2 horas e 30 minutos = 2 × 60 + 30 = 120 + 30 = 150 minutos" }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas e novas)
+        // Novos personagens das URLs fornecidas
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
             "https://i.ibb.co/1th3w8bH/IMG-4361.png",
             "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
             "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
@@ -1169,6 +1223,164 @@
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
         let wrongTopics = []; // Rastrear tópicos das questões erradas
+        let playerXP = 0; // XP do jogador
+        let playerRank = 0; // Índice da patente atual
+        let detailedStats = {
+            questionsAnswered: [],
+            timePerQuestion: [],
+            topicAccuracy: {},
+            streak: 0,
+            maxStreak: 0
+        };
+        
+        // Sistema de Patentes do Free Fire
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
+
+        // Funções do Sistema de XP e Patentes
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    // Validar dados antes de usar
+                    if (typeof parsed.xp === 'number' && parsed.xp >= 0) {
+                        playerXP = parsed.xp;
+                        updateRank();
+                    } else {
+                        throw new Error('Dados corrompidos');
+                    }
+                } else {
+                    playerXP = 0;
+                    playerRank = 0;
+                }
+            } catch (e) {
+                console.warn('Dados corrompidos detectados, resetando:', e);
+                playerXP = 0;
+                playerRank = 0;
+                // Limpar dados corrompidos
+                try {
+                    localStorage.removeItem('playerData');
+                } catch (cleanupError) {
+                    console.warn('Erro ao limpar dados:', cleanupError);
+                }
+            }
+        }
+        
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({
+                    xp: playerXP,
+                    rank: playerRank
+                }));
+            } catch (e) {
+                console.warn('Não foi possível salvar dados do jogador:', e);
+            }
+        }
+        
+        function addXP(amount) {
+            const previousRank = playerRank;
+            playerXP += amount;
+            updateRank();
+            savePlayerData();
+            
+            // Verificar se subiu de patente
+            if (playerRank > previousRank) {
+                showRankUpModal();
+            }
+        }
+        
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+        
+        function getCurrentRank() {
+            return ranks[playerRank];
+        }
+        
+        function getNextRank() {
+            if (playerRank < ranks.length - 1) {
+                return ranks[playerRank + 1];
+            }
+            return null;
+        }
+        
+        function getXPProgress() {
+            const currentRank = getCurrentRank();
+            const nextRank = getNextRank();
+            
+            if (!nextRank) {
+                return { current: playerXP, needed: 0, percentage: 100 };
+            }
+            
+            const xpInCurrentRank = playerXP - currentRank.minXP;
+            const xpNeededForNext = nextRank.minXP - currentRank.minXP;
+            const percentage = Math.round((xpInCurrentRank / xpNeededForNext) * 100);
+            
+            return {
+                current: xpInCurrentRank,
+                needed: xpNeededForNext,
+                percentage: percentage,
+                toNext: nextRank.minXP - playerXP
+            };
+        }
+        
+        function showRankUpModal() {
+            const rank = getCurrentRank();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '30000';
+            modal.innerHTML = `
+                <div class="feedback-modal" style="border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+                    <div style="font-size: 4rem; margin: 1rem 0;">${rank.icon}</div>
+                    <div class="feedback-title" style="color: var(--neon-yellow);">PATENTE AUMENTADA!</div>
+                    <div style="font-size: 2rem; color: var(--neon-green); margin: 1rem 0; font-family: 'Oswald', sans-serif; font-weight: 700;">
+                        ${rank.name}
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Parabéns! Você alcançou uma nova patente!
+                    </div>
+                    <button class="continue-btn" onclick="this.closest('.modal-overlay').remove()">CONTINUAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Função para atualizar exibição do XP
+        function updateXPDisplay() {
+            const rank = getCurrentRank();
+            const progress = getXPProgress();
+            
+            document.getElementById('rankIcon').textContent = rank.icon;
+            document.getElementById('rankName').textContent = rank.name;
+            document.getElementById('xpAmount').textContent = `${playerXP} XP`;
+        }
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1368,9 +1580,14 @@
         // Criar partículas animadas
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return; // Verificação de segurança
+            
             particlesContainer.innerHTML = ''; // Limpar partículas existentes
             
-            for (let i = 0; i < 20; i++) {
+            // Reduzir partículas em dispositivos móveis
+            const particleCount = window.innerWidth < 768 ? 10 : 20;
+            
+            for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
@@ -1382,13 +1599,41 @@
 
         // Inicializar o quiz
         function initQuiz() {
-            selectedQuestions = getRandomQuestions(questions, 10);
+            // Se já usamos muitas questões, resetar para permitir novas combinações
+            if (usedQuestionIndices.length >= questions.length - 10) {
+                usedQuestionIndices = [];
+            }
+            
+            // Filtrar questões não usadas
+            const availableQuestions = questions.filter((_, index) => 
+                !usedQuestionIndices.includes(index)
+            );
+            
+            // Selecionar 10 questões aleatórias das disponíveis
+            const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 10);
+            
+            // Rastrear índices das questões selecionadas
+            selectedQuestions.forEach(q => {
+                const index = questions.indexOf(q);
+                if (index !== -1) usedQuestionIndices.push(index);
+            });
+            
             currentQuestionIndex = 0;
             score = 0;
             selectedAnswer = null;
             startTime = Date.now();
             answered = false;
             wrongTopics = []; // Resetar tópicos errados
+            
+            // Resetar estatísticas detalhadas
+            detailedStats = {
+                questionsAnswered: [],
+                timePerQuestion: [],
+                topicAccuracy: {},
+                streak: 0,
+                maxStreak: 0
+            };
             
             createParticles();
             showQuestion();
@@ -1467,6 +1712,24 @@
             answered = true;
             const question = selectedQuestions[currentQuestionIndex];
             const isCorrect = selectedAnswer === question.shuffledCorrect;
+            const questionTime = Date.now() - startTime;
+            
+            // Coletar estatísticas detalhadas
+            detailedStats.questionsAnswered.push({
+                question: question.question,
+                correct: isCorrect,
+                timeSpent: questionTime - (detailedStats.timePerQuestion.reduce((a, b) => a + b, 0) || 0),
+                topic: getQuestionTopic(question)
+            });
+            
+            detailedStats.timePerQuestion.push(questionTime);
+            
+            if (isCorrect) {
+                detailedStats.streak++;
+                detailedStats.maxStreak = Math.max(detailedStats.maxStreak, detailedStats.streak);
+            } else {
+                detailedStats.streak = 0;
+            }
             
             // Desabilitar botão
             document.getElementById('confirmBtn').disabled = true;
@@ -1485,6 +1748,9 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                // Adicionar 50 XP por acerto
+                addXP(50);
+                updateXPDisplay();
             } else {
                 // Analisar tópico da questão errada
                 analyzeWrongAnswer(question);
@@ -1499,32 +1765,38 @@
             saveProgress();
         }
 
-        // Analisar resposta errada para identificar tópicos
-        function analyzeWrongAnswer(question) {
+        // Identificar tópico da questão
+        function getQuestionTopic(question) {
             const questionText = question.question.toLowerCase();
-            let topic = "Matemática Geral";
             
             if (questionText.includes('porcentagem') || questionText.includes('%')) {
-                topic = "Porcentagem e Proporções";
+                return "Porcentagem e Proporções";
             } else if (questionText.includes('área') || questionText.includes('perímetro') || questionText.includes('volume')) {
-                topic = "Geometria e Medidas";
+                return "Geometria e Medidas";
             } else if (questionText.includes('expressão') || questionText.includes('equação') || questionText.includes('x')) {
-                topic = "Álgebra e Equações";
+                return "Álgebra e Equações";
             } else if (questionText.includes('fração') || questionText.includes('decimal')) {
-                topic = "Frações e Decimais";
+                return "Frações e Decimais";
             } else if (questionText.includes('mdc') || questionText.includes('mmc')) {
-                topic = "Divisibilidade e Fatores";
+                return "Divisibilidade e Fatores";
             } else if (questionText.includes('velocidade') || questionText.includes('tempo') || questionText.includes('distância')) {
-                topic = "Problemas de Movimento";
+                return "Problemas de Movimento";
             } else if (questionText.includes('desconto') || questionText.includes('juros') || questionText.includes('investimento')) {
-                topic = "Matemática Financeira";
+                return "Matemática Financeira";
             } else if (questionText.includes('√') || questionText.includes('raiz')) {
-                topic = "Raízes e Potências";
+                return "Raízes e Potências";
             } else if (questionText.includes('log') || questionText.includes('exponencial')) {
-                topic = "Logaritmos e Exponenciais";
+                return "Logaritmos e Exponenciais";
             } else if (questionText.includes('parábola') || questionText.includes('função')) {
-                topic = "Funções e Gráficos";
+                return "Funções e Gráficos";
             }
+            
+            return "Matemática Geral";
+        }
+
+        // Analisar resposta errada para identificar tópicos
+        function analyzeWrongAnswer(question) {
+            const topic = getQuestionTopic(question);
             
             if (!wrongTopics.includes(topic)) {
                 wrongTopics.push(topic);
@@ -1537,10 +1809,23 @@
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                const rank = getCurrentRank();
+                const progress = getXPProgress();
+                const nextRank = getNextRank();
+                
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
+                    <div style="background: var(--gradient-main); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;">
+                        +50 XP GANHOS!
+                    </div>
+                    <div style="color: var(--neon-green); margin: 0.5rem 0;">
+                        ${rank.icon} ${rank.name} - ${playerXP} XP
+                    </div>
+                    ${nextRank ? `<div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Faltam ${progress.toNext} XP para ${nextRank.icon} ${nextRank.name}
+                    </div>` : ''}
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1552,11 +1837,15 @@
                 content.innerHTML = `
                     <div class="feedback-title error">RESPOSTA INCORRETA</div>
                     <img src="${randomCharacter}" alt="Personagem" class="feedback-character error" 
+                         loading="lazy"
                          onerror="this.onerror=null; this.style.display='none'; this.parentElement.querySelector('.speech-bubble').style.marginTop='0';" 
                          crossorigin="anonymous">
                     <div class="speech-bubble">
                         <div class="correct-answer">A resposta correta é a alternativa <strong>${correctOption}</strong>!</div>
                         <div class="explanation">${question.explanation}</div>
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">
+                        Nenhum XP ganho desta vez. Continue tentando!
                     </div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1599,11 +1888,18 @@
             const finalTime = Math.floor((Date.now() - startTime) / 60000);
             const percentage = Math.round((score / 10) * 100);
             
+            // Calcular estatísticas detalhadas
+            const averageTimePerQuestion = detailedStats.timePerQuestion.length > 0 
+                ? Math.round(detailedStats.timePerQuestion.reduce((a, b) => a + b, 0) / detailedStats.timePerQuestion.length / 1000) 
+                : 0;
+            
             // Atualizar dados na tela de resultados
             document.getElementById('finalScore').textContent = `${score}/10`;
             document.getElementById('percentageScore').textContent = `${percentage}%`;
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
+            document.getElementById('averageTime').textContent = `${averageTimePerQuestion}s`;
+            document.getElementById('maxStreak').textContent = detailedStats.maxStreak;
             
             // Calcular e mostrar XP ganho com sistema de patentes
             const xpGained = score * 50;
@@ -1740,6 +2036,28 @@
                 // Reduzir partículas em mobile
                 particles.style.display = 'none';
             }
+            
+            // Desabilitar animações complexas em dispositivos menos potentes
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                document.documentElement.style.setProperty('--animation-duration', '0.1s');
+            }
+        }
+        
+        // Otimizar scroll suave
+        if ('scrollBehavior' in document.documentElement.style) {
+            document.documentElement.style.scrollBehavior = 'smooth';
+        }
+        
+        // Detectar conexão lenta e otimizar
+        if ('connection' in navigator) {
+            const connection = navigator.connection;
+            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                // Desabilitar animações em conexões lentas
+                document.documentElement.style.setProperty('--animation-duration', '0.1s');
+                // Reduzir partículas
+                const particles = document.getElementById('particles');
+                if (particles) particles.style.display = 'none';
+            }
         }
         
         // Prevenir double-tap zoom em iOS
@@ -1754,6 +2072,10 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
+            // Carregar dados do jogador (XP e patente)
+            loadPlayerData();
+            updateXPDisplay();
+            
             createParticles();
             if (!tryResumeProgress()) {
                 initQuiz();
