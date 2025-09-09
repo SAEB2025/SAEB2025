@@ -1976,6 +1976,14 @@
                                 <span class="stat-label">Pontuação Total:</span>
                                 <span class="stat-value" id="statTotalScore">0</span>
                             </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Último Aproveitamento:</span>
+                                <span class="stat-value" id="statLastAccuracy">--</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Último Tempo:</span>
+                                <span class="stat-value" id="statLastTime">--</span>
+                            </div>
                         </div>
 
                         <div class="swipe-indicator">
@@ -2626,42 +2634,54 @@
 
         // CALCULATE LEVEL AND XP - Sistema de Patentes
         function calculateLevel(totalScore) {
+            // Unificado com os quizzes (Iniciante → Lendário)
             const levels = [
-                { min: 0, max: 99, name: 'Bronze', color: '#CD7F32', icon: '🥉' },
-                { min: 100, max: 199, name: 'Prata', color: '#C0C0C0', icon: '🥈' },
-                { min: 200, max: 299, name: 'Ouro', color: '#FFD700', icon: '🥇' },
-                { min: 300, max: 399, name: 'Platina', color: '#E5E4E2', icon: '💎' },
-                { min: 400, max: 499, name: 'Diamante', color: '#00FFFF', icon: '💎' },
-                { min: 500, max: 599, name: 'Mestre', color: '#9400D3', icon: '👑' },
-                { min: 600, max: Infinity, name: 'Desafiante', color: '#FF0080', icon: '🔥' }
+                { min: 0,    max: 149,  name: 'Iniciante',    color: '#9E9E9E', icon: '🌱' },
+                { min: 150,  max: 299,  name: 'Bronze',       color: '#CD7F32', icon: '🥉' },
+                { min: 300,  max: 499,  name: 'Prata',        color: '#C0C0C0', icon: '🥈' },
+                { min: 500,  max: 699,  name: 'Ouro',         color: '#FFD700', icon: '🥇' },
+                { min: 700,  max: 999,  name: 'Platina',      color: '#B0E0E6', icon: '⚪' },
+                { min: 1000, max: 1499, name: 'Diamante',     color: '#00FFFF', icon: '💎' },
+                { min: 1500, max: 1999, name: 'Desafiante',   color: '#FF0080', icon: '🔥' },
+                { min: 2000, max: 2999, name: 'Mestre',       color: '#9400D3', icon: '👑' },
+                { min: 3000, max: 4999, name: 'Grão-Mestre',  color: '#00FF88', icon: '🏆' },
+                { min: 5000, max: Infinity, name: 'Lendário', color: '#FFEB3B', icon: '🌟' }
             ];
-            
-            for (let level of levels) {
+
+            for (let i = 0; i < levels.length; i++) {
+                const level = levels[i];
                 if (totalScore >= level.min && totalScore <= level.max) {
-                    const xpInLevel = totalScore - level.min;
-                    const xpNeeded = level.max - level.min + 1;
-                    const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
-                    
+                    const nextLevel = levels[Math.min(i + 1, levels.length - 1)];
+                    const isMax = level.max === Infinity;
+                    const xpInLevel = isMax ? (totalScore - level.min) : (totalScore - level.min);
+                    const xpNeeded = isMax ? 0 : (level.max - level.min + 1);
+                    const progress = isMax ? 100 : Math.min(100, (xpInLevel / xpNeeded) * 100);
+
                     return {
                         name: level.name,
                         color: level.color,
                         icon: level.icon,
-                        xp: xpInLevel,
+                        xp: Math.max(0, xpInLevel),
                         xpNeeded: xpNeeded,
                         progress: progress,
-                        totalScore: totalScore
+                        totalScore: totalScore,
+                        isMax: isMax,
+                        nextMin: nextLevel ? nextLevel.min : null
                     };
                 }
             }
-            
+
+            // Fallback
             return {
-                name: 'Bronze',
-                color: '#CD7F32',
-                icon: '🥉',
+                name: 'Iniciante',
+                color: '#9E9E9E',
+                icon: '🌱',
                 xp: 0,
-                xpNeeded: 100,
+                xpNeeded: 150,
                 progress: 0,
-                totalScore: 0
+                totalScore: 0,
+                isMax: false,
+                nextMin: 150
             };
         }
 
@@ -2770,47 +2790,61 @@
                     xpFill.style.width = `${levelInfo.progress}%`;
                 }
                 if (xpText) {
-                    xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP`;
+                    if (levelInfo.isMax) {
+                        xpText.textContent = `Máximo`;
+                    } else {
+                        const toNext = Math.max(0, (levelInfo.nextMin || 0) - (data.totalScore || 0));
+                        xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP (faltam ${toNext} XP)`;
+                    }
                 }
 
                 // Overall Performance
-                const overall = Math.round((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100);
+                const overall = Math.round(((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100) * 100) / 100;
                 const overallValue = document.getElementById('overallPerformanceValue');
                 const overallFill = document.getElementById('overallPerformanceFill');
-                if (overallValue) overallValue.textContent = `${isFinite(overall) ? overall : 0}%`;
+                if (overallValue) overallValue.textContent = `${isFinite(overall) ? overall.toFixed(2) : '0.00'}%`;
                 if (overallFill) overallFill.style.width = `${isFinite(overall) ? overall : 0}%`;
 
                 // Matemática
                 if (data.mathTotal > 0) {
-                    const mathPct = Math.round((data.mathCorrect || 0) / data.mathTotal * 100);
+                    const mathPct = Math.round(((data.mathCorrect || 0) / data.mathTotal * 100) * 100) / 100;
                     const mathValue = document.getElementById('mathPerformanceValue');
                     const mathFill = document.getElementById('mathPerformanceFill');
-                    if (mathValue) mathValue.textContent = `${mathPct}%`;
+                    if (mathValue) mathValue.textContent = `${mathPct.toFixed(2)}%`;
                     if (mathFill) mathFill.style.width = `${mathPct}%`;
                 }
 
                 // Português
                 if (data.portTotal > 0) {
-                    const portPct = Math.round((data.portCorrect || 0) / data.portTotal * 100);
+                    const portPct = Math.round(((data.portCorrect || 0) / data.portTotal * 100) * 100) / 100;
                     const portValue = document.getElementById('portuguesePerformanceValue');
                     const portFill = document.getElementById('portuguesePerformanceFill');
-                    if (portValue) portValue.textContent = `${portPct}%`;
+                    if (portValue) portValue.textContent = `${portPct.toFixed(2)}%`;
                     if (portFill) portFill.style.width = `${portPct}%`;
                 }
 
                 // Detailed Statistics
+                const avgSeconds = data.totalQuestions > 0 
+                    ? Math.round(((data.totalMinutes || 0) * 60 / data.totalQuestions) * 100) / 100
+                    : null;
                 const statElements = {
                     statQuizzesCompleted: data.quizzesCompleted || 0,
                     statTotalQuestions: data.totalQuestions || 0,
                     statCorrectAnswers: data.overallCorrect || 0,
-                    statTotalTime: `${data.totalMinutes || 0}min`,
-                    statAvgTime: data.totalQuestions > 0 
-                        ? `${Math.round((data.totalMinutes * 60) / data.totalQuestions)}s` 
-                        : '--',
+                    statTotalTime: `${(Math.round((data.totalMinutes || 0) * 100) / 100).toFixed(2)}min`,
+                    statAvgTime: avgSeconds !== null ? `${avgSeconds.toFixed(2)}s` : '--',
                     statBestStreak: data.bestStreak || 0,
                     statCurrentStreak: data.currentStreak || 0,
                     statTotalScore: data.totalScore || 0
                 };
+
+                // Última sessão (se existir)
+                const lastAcc = typeof data.lastQuizScore === 'number' ? Math.round(data.lastQuizScore * 100) / 100 : null;
+                const lastTime = typeof data.lastQuizTime === 'number' ? Math.round(data.lastQuizTime * 100) / 100 : null;
+                const elLastAcc = document.getElementById('statLastAccuracy');
+                const elLastTime = document.getElementById('statLastTime');
+                if (elLastAcc) elLastAcc.textContent = lastAcc !== null ? `${lastAcc.toFixed(2)}%` : '--';
+                if (elLastTime) elLastTime.textContent = lastTime !== null ? `${lastTime.toFixed(2)}min` : '--';
 
                 for (const [id, value] of Object.entries(statElements)) {
                     const element = document.getElementById(id);
