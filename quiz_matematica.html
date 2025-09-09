@@ -1011,6 +1011,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 🔢 MATEMÁTICA</div>
             </div>
@@ -1126,10 +1129,10 @@
 
         // Personagens para feedback de erro (URLs corrigidas)
         const errorCharacters = [
-            "https://i.ibb.co/Qj73wn6/IMG-4292.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png"
+            "https://i.ibb.co/Cp7G0Y4N/IMG-4282.png",
+            "https://i.ibb.co/kg63TCng/IMG-4287.png",
+            "https://i.ibb.co/XkJ1Y9qx/IMG-4285.png",
+            "https://i.ibb.co/Wp7smTfG/IMG-4283.png"
         ];
 
         // Variáveis do jogo
@@ -1140,6 +1143,117 @@
         let startTime = Date.now();
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
+        let currentShuffledOrder = [];
+        let currentCorrectIndex = 0;
+
+        // Sistema de Patentes (XP) - Compartilhado com Português
+        let playerXP = 0; // XP do jogador
+        let playerRank = 0; // Índice da patente atual
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
+
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    playerXP = parsed.xp || 0;
+                    updateRank();
+                } else {
+                    playerXP = 0;
+                    playerRank = 0;
+                }
+            } catch (e) {
+                playerXP = 0;
+                playerRank = 0;
+            }
+        }
+
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({ xp: playerXP, rank: playerRank }));
+            } catch (e) {}
+        }
+
+        function addXP(amount) {
+            const previousRank = playerRank;
+            playerXP += amount;
+            updateRank();
+            savePlayerData();
+            if (playerRank > previousRank) {
+                showRankUpModal();
+            }
+        }
+
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+
+        function getCurrentRank() { return ranks[playerRank]; }
+        function getNextRank() { return playerRank < ranks.length - 1 ? ranks[playerRank + 1] : null; }
+        function getXPProgress() {
+            const currentRank = getCurrentRank();
+            const nextRank = getNextRank();
+            if (!nextRank) return { current: playerXP, needed: 0, percentage: 100, toNext: 0 };
+            const xpInCurrent = playerXP - currentRank.minXP;
+            const xpNeeded = nextRank.minXP - currentRank.minXP;
+            return { current: xpInCurrent, needed: xpNeeded, percentage: Math.round((xpInCurrent / xpNeeded) * 100), toNext: nextRank.minXP - playerXP };
+        }
+
+        function showRankUpModal() {
+            const rank = getCurrentRank();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '30000';
+            modal.innerHTML = `
+                <div class="feedback-modal" style="border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(255, 255, 0, 0.5);">
+                    <div style="font-size: 4rem; margin: 1rem 0;">${rank.icon}</div>
+                    <div class="feedback-title" style="color: var(--neon-yellow);">PATENTE AUMENTADA!</div>
+                    <div style="font-size: 2rem; color: var(--neon-blue); margin: 1rem 0; font-family: 'Oswald', sans-serif; font-weight: 700;">
+                        ${rank.name}
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">Parabéns! Você alcançou uma nova patente!</div>
+                    <button class="continue-btn" onclick="this.closest('.modal-overlay').remove()">CONTINUAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function updateXPDisplay() {
+            const rank = getCurrentRank();
+            const elIcon = document.getElementById('rankIcon');
+            const elName = document.getElementById('rankName');
+            const elXP = document.getElementById('xpAmount');
+            if (elIcon) elIcon.textContent = rank.icon;
+            if (elName) elName.textContent = rank.name;
+            if (elXP) elXP.textContent = `${playerXP} XP`;
+        }
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1333,20 +1447,21 @@
             // Mostrar texto da questão
             document.getElementById('questionText').textContent = question.question;
             
-            // Criar alternativas
+            // Embaralhar alternativas e criar elementos
             const alternativesContainer = document.getElementById('alternativesContainer');
             alternativesContainer.innerHTML = '';
-            
-            question.alternatives.forEach((alternative, index) => {
+            const indices = question.alternatives.map((_, i) => i);
+            currentShuffledOrder = indices.sort(() => 0.5 - Math.random());
+            currentCorrectIndex = currentShuffledOrder.indexOf(question.correct);
+
+            currentShuffledOrder.forEach((origIdx, displayIdx) => {
                 const alternativeDiv = document.createElement('div');
                 alternativeDiv.className = 'alternative';
-                alternativeDiv.onclick = () => selectAnswer(index);
-                
+                alternativeDiv.onclick = () => selectAnswer(displayIdx);
                 alternativeDiv.innerHTML = `
-                    <div class="alternative-letter">${String.fromCharCode(65 + index)}</div>
-                    <div class="alternative-text">${alternative}</div>
+                    <div class="alternative-letter">${String.fromCharCode(65 + displayIdx)}</div>
+                    <div class="alternative-text">${question.alternatives[origIdx]}</div>
                 `;
-                
                 alternativesContainer.appendChild(alternativeDiv);
             });
             
@@ -1378,7 +1493,7 @@
             
             answered = true;
             const question = selectedQuestions[currentQuestionIndex];
-            const isCorrect = selectedAnswer === question.correct;
+            const isCorrect = selectedAnswer === currentCorrectIndex;
             
             // Desabilitar botão
             document.getElementById('confirmBtn').disabled = true;
@@ -1386,7 +1501,7 @@
             // Mostrar feedback visual nas alternativas
             document.querySelectorAll('.alternative').forEach((alt, index) => {
                 alt.onclick = null; // Desabilitar cliques
-                if (index === question.correct) {
+                if (index === currentCorrectIndex) {
                     alt.classList.add('correct');
                 } else if (index === selectedAnswer && !isCorrect) {
                     alt.classList.add('incorrect');
@@ -1397,6 +1512,9 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                // 50 XP por acerto (sistema de patentes)
+                addXP(50);
+                updateXPDisplay();
             }
             
             // Mostrar modal de feedback após um pequeno delay
@@ -1414,17 +1532,25 @@
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                const rank = getCurrentRank();
+                const progress = getXPProgress();
+                const nextRank = getNextRank();
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
-                    <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
-                    <div class="correct-answer">Resposta correta!</div>
-                    <div class="explanation">${question.explanation}</div>
-                    <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
+                    <div style=\"font-size: 4rem; margin: 2rem 0;\">🎉</div>
+                    <div class=\"correct-answer\">Resposta correta!</div>
+                    <div style=\"background: var(--gradient-main); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;\">
+                        +50 XP GANHOS!
+                    </div>
+                    <div style=\"color: var(--neon-green); margin: 0.5rem 0;\">${rank.icon} ${rank.name} - ${playerXP} XP</div>
+                    ${nextRank ? `<div style=\"color: var(--text-secondary); font-size: 0.9rem;\">Faltam ${progress.toNext} XP para ${nextRank.icon} ${nextRank.name}</div>` : ''}
+                    <div class=\"explanation\">${question.explanation}</div>
+                    <button class=\"continue-btn\" onclick=\"nextQuestion()\">CONTINUAR</button>
                 `;
                 content.className = 'feedback-modal';
             } else {
                 const randomCharacter = errorCharacters[Math.floor(Math.random() * errorCharacters.length)];
-                const correctOption = String.fromCharCode(65 + question.correct);
+                const correctOption = String.fromCharCode(65 + currentCorrectIndex);
                 
                 content.innerHTML = `
                     <div class="feedback-title error">RESPOSTA INCORRETA</div>
@@ -1583,6 +1709,8 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
+            loadPlayerData();
+            updateXPDisplay();
             createParticles();
             if (!tryResumeProgress()) {
                 initQuiz();
