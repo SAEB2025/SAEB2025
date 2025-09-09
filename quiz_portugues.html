@@ -1231,12 +1231,12 @@
             }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas)
+        // Personagens para feedback de erro (novos personagens)
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png"
+            "https://i.ibb.co/1th3w8bH/IMG-4361.png",
+            "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
+            "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
+            "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
 
         // Variáveis do jogo
@@ -1247,6 +1247,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let wrongTopics = [];
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
         let playerXP = 0; // XP do jogador
         let playerRank = 0; // Índice da patente atual
@@ -1676,6 +1677,9 @@
                 // Adicionar 50 XP por acerto
                 addXP(50);
                 updateXPDisplay();
+            } else {
+                // Registrar tópico da questão errada para diagnóstico
+                wrongTopics.push(getPortugueseTopic(question));
             }
             setTimeout(() => {
                 showFeedbackModal(isCorrect, question);
@@ -1805,35 +1809,55 @@
             // Limpar progresso concluído
             clearProgress();
 
-            // Sugestões
+            // Sugestões baseadas nos tópicos errados
             const improvementList = document.getElementById('improvementList');
             improvementList.innerHTML = '';
-            if (percentage < 50) {
+            const uniqueTopics = [...new Set(wrongTopics.filter(Boolean))];
+            const suggestions = getPortugueseImprovementSuggestions(uniqueTopics);
+            if (suggestions.length === 0) {
                 improvementList.innerHTML = `
-                    <li>Revisar conceitos básicos de interpretação de texto</li>
-                    <li>Praticar leitura de diferentes gêneros textuais</li>
-                    <li>Estudar figuras de linguagem e recursos expressivos</li>
-                    <li>Fazer mais exercícios de compreensão textual</li>
-                `;
-            } else if (percentage < 70) {
-                improvementList.innerHTML = `
-                    <li>Aprimorar análise de elementos linguísticos</li>
-                    <li>Estudar funções da linguagem</li>
-                    <li>Revisar conectivos e coesão textual</li>
-                `;
-            } else if (percentage < 90) {
-                improvementList.innerHTML = `
-                    <li>Focar em questões mais complexas de interpretação</li>
-                    <li>Analisar textos multimodais</li>
-                    <li>Praticar intertextualidade</li>
+                    <li>Excelente desempenho! Mantenha a leitura diária.</li>
+                    <li>Explore diferentes gêneros textuais para ampliar repertório.</li>
                 `;
             } else {
-                improvementList.innerHTML = `
-                    <li>Excelente desempenho em língua portuguesa!</li>
-                    <li>Continue praticando para manter o nível</li>
-                    <li>Experimente análises literárias mais profundas</li>
-                `;
+                improvementList.innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
             }
+        }
+
+        // Classificação de tópicos (Português)
+        function getPortugueseTopic(q) {
+            if (q.topic) return q.topic;
+            return classifyPortugueseTopicByText(q.question || '');
+        }
+
+        function classifyPortugueseTopicByText(text) {
+            const t = text.toLowerCase();
+            if (t.includes('conjun') || t.includes('além disso') || t.includes('porém')) return 'Conectivos e coesão';
+            if (t.includes('travess') || t.includes('pontua')) return 'Pontuação e uso do travessão';
+            if (t.includes('divulga') || t.includes('campanha') || t.includes('manual') || t.includes('receita') || t.includes('editorial')) return 'Gêneros textuais';
+            if (t.includes('obsoleto') || t.includes('candidez') || t.includes('significa')) return 'Semântica e vocabulário';
+            if (t.includes('figura') || t.includes('metáfora') || t.includes('hipérbole') || t.includes('paradoxo')) return 'Figuras de linguagem';
+            if (t.includes('plural') || t.includes('cidadão') || t.includes('verbal') || t.includes('trouxeram')) return 'Morfologia e flexão';
+            if (t.includes('oração') || t.includes('subordinada') || t.includes('condicional') || t.includes('temporal')) return 'Sintaxe e orações subordinadas';
+            if (t.includes('pronome') || t.includes('lhe')) return 'Pronomes e regência';
+            if (t.includes('interpreta') || t.includes('linguagem') || t.includes('charges')) return 'Interpretação de texto';
+            return 'Competência leitora';
+        }
+
+        function getPortugueseImprovementSuggestions(topics) {
+            const tips = {
+                'Conectivos e coesão': 'Revisar usos de conjunções (adição, oposição, causa, consequência) e operadores argumentativos.',
+                'Pontuação e uso do travessão': 'Estudar regras de pontuação e funções do travessão em diálogos e apartes.',
+                'Gêneros textuais': 'Reconhecer finalidade, público e estrutura de gêneros (editorial, campanha, manual, receita).',
+                'Semântica e vocabulário': 'Ampliar vocabulário e estudar campos semânticos e sinonímia/antonímia.',
+                'Figuras de linguagem': 'Diferenciar metáfora, comparação, metonímia, hipérbole e paradoxo em exemplos práticos.',
+                'Morfologia e flexão': 'Revisar plural, conjugação verbal e classes gramaticais em contexto.',
+                'Sintaxe e orações subordinadas': 'Identificar tipos de orações adverbiais (condicional, temporal, causal) e suas funções.',
+                'Pronomes e regência': 'Praticar emprego de pronomes oblíquos (lhe/o/a) e regência verbal/nominal.',
+                'Interpretação de texto': 'Treinar leitura inferencial, relações lógico-discursivas e propósito comunicativo.',
+                'Competência leitora': 'Ler textos variados diariamente e responder questões de compreensão.'
+            };
+            return topics.map(topic => `${topic}: ${tips[topic] || 'Aprofundar estudo com exercícios sobre o tema.'}`);
         }
 
         // Fechar modal clicando fora dele (desabilitado)

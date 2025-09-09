@@ -1022,6 +1022,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 🔢 MATEMÁTICA</div>
             </div>
@@ -1140,13 +1143,123 @@
             { question: "Uma loja oferece 25% de desconto em um produto de R$ 80,00. Qual o valor final?", alternatives: ["R$ 20,00", "R$ 55,00", "R$ 60,00", "R$ 65,00", "R$ 75,00"], correct: 2, explanation: "Desconto = 80 × 0,25 = 20. Valor final = 80 - 20 = R$ 60,00" }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas)
+        // Personagens para feedback de erro (novos personagens)
         const errorCharacters = [
-            "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
-            "https://i.ibb.co/kg63TCn/IMG-4287.png", 
-            "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png"
+            "https://i.ibb.co/1th3w8bH/IMG-4361.png",
+            "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
+            "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
+            "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
+
+        // Sistema de Patentes (mesmo do Quiz de Português)
+        let playerXP = 0; // XP do jogador
+        let playerRank = 0; // Índice da patente atual
+        const ranks = [
+            { name: "Bronze I", minXP: 0, icon: "🥉" },
+            { name: "Bronze II", minXP: 100, icon: "🥉" },
+            { name: "Bronze III", minXP: 200, icon: "🥉" },
+            { name: "Prata I", minXP: 300, icon: "🥈" },
+            { name: "Prata II", minXP: 400, icon: "🥈" },
+            { name: "Prata III", minXP: 500, icon: "🥈" },
+            { name: "Ouro I", minXP: 600, icon: "🥇" },
+            { name: "Ouro II", minXP: 700, icon: "🥇" },
+            { name: "Ouro III", minXP: 800, icon: "🥇" },
+            { name: "Ouro IV", minXP: 900, icon: "🥇" },
+            { name: "Platina I", minXP: 1000, icon: "💎" },
+            { name: "Platina II", minXP: 1100, icon: "💎" },
+            { name: "Platina III", minXP: 1200, icon: "💎" },
+            { name: "Platina IV", minXP: 1300, icon: "💎" },
+            { name: "Diamante I", minXP: 1400, icon: "💠" },
+            { name: "Diamante II", minXP: 1500, icon: "💠" },
+            { name: "Diamante III", minXP: 1600, icon: "💠" },
+            { name: "Diamante IV", minXP: 1700, icon: "💠" },
+            { name: "Heroico", minXP: 1800, icon: "🏆" },
+            { name: "Mestre", minXP: 2000, icon: "👑" },
+            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+        ];
+
+        function loadPlayerData() {
+            try {
+                const data = localStorage.getItem('playerData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    playerXP = parsed.xp || 0;
+                    updateRank();
+                } else {
+                    playerXP = 0;
+                    playerRank = 0;
+                }
+            } catch (e) {
+                playerXP = 0;
+                playerRank = 0;
+            }
+        }
+
+        function savePlayerData() {
+            try {
+                localStorage.setItem('playerData', JSON.stringify({ xp: playerXP, rank: playerRank }));
+            } catch (e) {}
+        }
+
+        function addXP(amount) {
+            const previousRank = playerRank;
+            playerXP += amount;
+            updateRank();
+            savePlayerData();
+            if (playerRank > previousRank) {
+                showRankUpModal();
+            }
+        }
+
+        function updateRank() {
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (playerXP >= ranks[i].minXP) {
+                    playerRank = i;
+                    break;
+                }
+            }
+        }
+
+        function getCurrentRank() { return ranks[playerRank]; }
+        function getNextRank() { return playerRank < ranks.length - 1 ? ranks[playerRank + 1] : null; }
+        function getXPProgress() {
+            const currentRank = getCurrentRank();
+            const nextRank = getNextRank();
+            if (!nextRank) return { current: playerXP, needed: 0, percentage: 100, toNext: 0 };
+            const xpInCurrentRank = playerXP - currentRank.minXP;
+            const xpNeededForNext = nextRank.minXP - currentRank.minXP;
+            const percentage = Math.round((xpInCurrentRank / xpNeededForNext) * 100);
+            return { current: xpInCurrentRank, needed: xpNeededForNext, percentage, toNext: nextRank.minXP - playerXP };
+        }
+
+        function showRankUpModal() {
+            const rank = getCurrentRank();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '30000';
+            modal.innerHTML = `
+                <div class="feedback-modal" style="border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+                    <div style="font-size: 4rem; margin: 1rem 0;">${rank.icon}</div>
+                    <div class="feedback-title" style="color: var(--neon-yellow);">PATENTE AUMENTADA!</div>
+                    <div style="font-size: 2rem; color: var(--neon-blue); margin: 1rem 0; font-family: 'Oswald', sans-serif; font-weight: 700;">
+                        ${rank.name}
+                    </div>
+                    <div style="color: var(--text-secondary); margin: 1rem 0;">Parabéns! Você alcançou uma nova patente!</div>
+                    <button class="continue-btn" onclick="this.closest('.modal-overlay').remove()">CONTINUAR</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function updateXPDisplay() {
+            const rank = getCurrentRank();
+            const xpEl = document.getElementById('xpAmount');
+            const rankIconEl = document.getElementById('rankIcon');
+            const rankNameEl = document.getElementById('rankName');
+            if (xpEl) xpEl.textContent = `${playerXP} XP`;
+            if (rankIconEl) rankIconEl.textContent = rank.icon;
+            if (rankNameEl) rankNameEl.textContent = rank.name;
+        }
 
         // Variáveis do jogo
         let currentQuestionIndex = 0;
@@ -1155,6 +1268,7 @@
         let selectedAnswer = null;
         let startTime = Date.now();
         let answered = false;
+        let wrongTopics = [];
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
 
         // Persistência local de estatísticas
@@ -1471,6 +1585,12 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+                // Adicionar XP e atualizar patente (50 XP por acerto)
+                addXP(50);
+                updateXPDisplay();
+            } else {
+                // Registrar tópico da questão errada para diagnóstico
+                wrongTopics.push(getMathTopic(question));
             }
             
             // Mostrar modal de feedback após um pequeno delay
@@ -1488,10 +1608,20 @@
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                const rank = getCurrentRank();
+                const progress = getXPProgress();
+                const nextRank = getNextRank();
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
+                    <div style="background: var(--gradient-main); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;">
+                        +50 XP GANHOS!
+                    </div>
+                    <div style="color: var(--neon-blue); margin: 0.5rem 0;">
+                        ${rank.icon} ${rank.name} - ${playerXP} XP
+                    </div>
+                    ${nextRank ? `<div style=\"color: var(--text-secondary); font-size: 0.9rem;\">Faltam ${progress.toNext} XP para ${nextRank.icon} ${nextRank.name}</div>` : ''}
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1591,36 +1721,57 @@
             // Limpar progresso concluído
             clearProgress();
 
-            // Sugestões de melhoria baseadas na performance
+            // Sugestões de melhoria baseadas nos tópicos errados
             const improvementList = document.getElementById('improvementList');
             improvementList.innerHTML = '';
-            
-            if (percentage < 50) {
+            const uniqueTopics = [...new Set(wrongTopics.filter(Boolean))];
+            const suggestions = getMathImprovementSuggestions(uniqueTopics);
+            if (suggestions.length === 0) {
                 improvementList.innerHTML = `
-                    <li>Revisar conceitos básicos de matemática</li>
-                    <li>Praticar operações fundamentais</li>
-                    <li>Estudar resolução de problemas</li>
-                    <li>Fazer mais exercícios práticos</li>
-                `;
-            } else if (percentage < 70) {
-                improvementList.innerHTML = `
-                    <li>Aprimorar técnicas de cálculo</li>
-                    <li>Praticar interpretação de problemas</li>
-                    <li>Revisar tópicos específicos</li>
-                `;
-            } else if (percentage < 90) {
-                improvementList.innerHTML = `
-                    <li>Focar em questões mais complexas</li>
-                    <li>Melhorar velocidade de resolução</li>
-                    <li>Praticar questões avançadas</li>
+                    <li>Ótimo trabalho! Foque em manter o ritmo.</li>
+                    <li>Experimente questões de nível superior.</li>
                 `;
             } else {
-                improvementList.innerHTML = `
-                    <li>Excelente desempenho!</li>
-                    <li>Continue praticando para manter o nível</li>
-                    <li>Experimente questões de nível superior</li>
-                `;
+                improvementList.innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
             }
+        }
+
+        // Classificação de tópicos (Matemática)
+        function getMathTopic(q) {
+            if (q.topic) return q.topic;
+            return classifyMathTopicByText(q.question || '');
+        }
+
+        function classifyMathTopicByText(text) {
+            const t = text.toLowerCase();
+            if (t.includes('porcent')) return 'Porcentagem';
+            if (t.includes('fraç') || t.includes('fracao') || t.includes('1/')) return 'Frações e Números Racionais';
+            if (t.includes('mdc') || t.includes('máximo divisor comum')) return 'MDC e Divisibilidade';
+            if (t.includes('equação') || t.match(/\b3x\b|\b2x\b|\bx\b/)) return 'Equações e Álgebra';
+            if (t.includes('perímetro') || t.includes('área') || t.includes('triângulo') || t.includes('círculo') || t.includes('raio')) return 'Geometria Plana';
+            if (t.includes('desconto') || t.includes('juros') || t.includes('parcel')) return 'Aritmética Financeira';
+            if (t.includes('raiz') || t.includes('√')) return 'Radicais e Aproximações';
+            if (t.includes('função') || t.includes('parábola') || t.includes('vértice')) return 'Funções';
+            if (t.includes('propor') || t.includes('regra de três')) return 'Proporcionalidade';
+            if (t.includes('pesquisa') || t.includes('percent') && t.includes('pessoas')) return 'Estatística Básica';
+            return 'Raciocínio Matemático';
+        }
+
+        function getMathImprovementSuggestions(topics) {
+            const tips = {
+                'Porcentagem': 'Revisar cálculo de percentuais, aumentos e descontos sucessivos.',
+                'Frações e Números Racionais': 'Praticar operações com frações e conversão para decimais.',
+                'MDC e Divisibilidade': 'Estudar critérios de divisibilidade e fatoração.',
+                'Equações e Álgebra': 'Treinar resolução de equações lineares e manipulação algébrica.',
+                'Geometria Plana': 'Revisar fórmulas de área e perímetro de figuras planas.',
+                'Aritmética Financeira': 'Praticar descontos, parcelamentos e juros simples.',
+                'Radicais e Aproximações': 'Aprimorar técnicas de aproximação com raízes.',
+                'Funções': 'Relembrar propriedades de funções e análise de gráficos.',
+                'Proporcionalidade': 'Exercitar regra de três e escalas.',
+                'Estatística Básica': 'Revisar porcentagens, médias e interpretação de pesquisas.',
+                'Raciocínio Matemático': 'Resolver problemas diversos para fortalecer o raciocínio.'
+            };
+            return topics.map(topic => `${topic}: ${tips[topic] || 'Praticar exercícios adicionais sobre o tema.'}`);
         }
 
         // Voltar ao lobby
@@ -1676,6 +1827,8 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
+            loadPlayerData();
+            updateXPDisplay();
             createParticles();
             if (!tryResumeProgress()) {
                 initQuiz();
