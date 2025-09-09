@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>SAEB 2025 - QUIZ SAEB 2025 🔥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,6 +95,7 @@
             border-bottom: 2px solid var(--neon-green);
             z-index: 1000;
             transition: all 0.3s ease;
+            padding-top: env(safe-area-inset-top);
         }
 
         /* MOBILE MENU */
@@ -1582,13 +1583,13 @@
                 <div class="prototype-tag">BETA 2025</div>
                 <button class="back-btn" id="backBtn" onclick="showPage('home')" style="display: none;">⬅️ VOLTAR</button>
             </div>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-controls="mobileNav" aria-expanded="false" aria-label="Abrir menu" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </div>
-        <nav class="mobile-nav" id="mobileNav">
+        <nav class="mobile-nav" id="mobileNav" role="navigation" aria-hidden="true">
             <a href="#" class="mobile-nav-item" onclick="showPage('home'); toggleMobileMenu();">🏠 Início</a>
             <a href="#" class="mobile-nav-item" onclick="showPage('lobby'); toggleMobileMenu();">🎮 Jogar Quiz</a>
             <a href="#" class="mobile-nav-item" onclick="showStats(); toggleMobileMenu();">📊 Estatísticas</a>
@@ -1897,6 +1898,8 @@
         let currentPage = 'home';
 
         function showPage(pageName) {
+            // Fechar menu mobile, se aberto
+            try { closeMobileMenu(); } catch (e) {}
             // Esconder todas as páginas
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
@@ -1933,6 +1936,7 @@
         // FUNÇÃO PARA INICIAR QUIZ COM EFEITO ESPECIAL
         function iniciarQuiz(materia = null, ev = null) {
             const evt = ev || window.event;
+            try { closeMobileMenu(); } catch (e) {}
             const button = evt && evt.target ? evt.target.closest('.cta-main, .quiz-card') : null;
             
             if (button) {
@@ -2317,10 +2321,13 @@
             // Suavizar scroll em iOS
             document.body.style.webkitOverflowScrolling = 'touch';
             
-            // Ajustar viewport para mobile
+            // Garantir suporte a safe area sem desabilitar zoom
             const meta = document.querySelector('meta[name="viewport"]');
-            if (meta && window.innerWidth <= 768) {
-                meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            if (meta) {
+                const current = meta.getAttribute('content') || '';
+                if (!/viewport-fit=cover/.test(current)) {
+                    meta.setAttribute('content', current + ', viewport-fit=cover');
+                }
             }
         }
 
@@ -2357,6 +2364,7 @@
             window.addEventListener('resize', throttle(() => {
                 createNeonParticles();
                 optimizeForMobile();
+                if (window.innerWidth > 1024) { try { closeMobileMenu(); } catch (e) {} }
             }, 250));
             
             // Abrir lobby via hash, se presente
@@ -2374,6 +2382,21 @@
             if ('ontouchstart' in window) {
                 document.body.classList.add('touch-device');
             }
+
+            // Fechar menu ao clicar fora ou pressionar ESC
+            document.addEventListener('click', function(e) {
+                const mobileNav = document.getElementById('mobileNav');
+                const menuToggle = document.getElementById('mobileMenuToggle');
+                if (!mobileNav || !menuToggle) return;
+                const isOpen = menuToggle.classList.contains('active');
+                if (!isOpen) return;
+                const clickInside = mobileNav.contains(e.target) || menuToggle.contains(e.target);
+                if (!clickInside) { try { closeMobileMenu(); } catch (err) {} }
+            }, true);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') { try { closeMobileMenu(); } catch (err) {} }
+            });
         });
 
         // PREVENÇÃO DE BUGS DE ORIENTAÇÃO EM MOBILE
@@ -2407,6 +2430,22 @@
             if (mobileNav && menuToggle) {
                 mobileNav.classList.toggle('active');
                 menuToggle.classList.toggle('active');
+                const isOpen = menuToggle.classList.contains('active');
+                menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                menuToggle.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+                mobileNav.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            const menuToggle = document.getElementById('mobileMenuToggle');
+            if (mobileNav && menuToggle) {
+                mobileNav.classList.remove('active');
+                menuToggle.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                menuToggle.setAttribute('aria-label', 'Abrir menu');
+                mobileNav.setAttribute('aria-hidden', 'true');
             }
         }
 

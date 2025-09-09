@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Quiz Português - SAEB 2025 📝</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -271,7 +271,7 @@
             saveStats(stats);
         }
 
-        function goToLobby() { window.location.href = '/index.html#lobby'; }
+        function goToLobby() { window.location.href = '../../index.html#lobby'; }
 
         function initQuiz() {
             selectedQuestions = getRandomQuestions(questions, 10);
