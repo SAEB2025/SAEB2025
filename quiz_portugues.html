@@ -1211,29 +1211,15 @@
         let playerXP = 0; // XP do jogador
         let playerRank = 0; // Índice da patente atual
         
-        // Sistema de Patentes do Free Fire
+        // Sistema de Patentes (7 níveis): Bronze → Desafiante (100 XP por patente)
         const ranks = [
-            { name: "Bronze I", minXP: 0, icon: "🥉" },
-            { name: "Bronze II", minXP: 100, icon: "🥉" },
-            { name: "Bronze III", minXP: 200, icon: "🥉" },
-            { name: "Prata I", minXP: 300, icon: "🥈" },
-            { name: "Prata II", minXP: 400, icon: "🥈" },
-            { name: "Prata III", minXP: 500, icon: "🥈" },
-            { name: "Ouro I", minXP: 600, icon: "🥇" },
-            { name: "Ouro II", minXP: 700, icon: "🥇" },
-            { name: "Ouro III", minXP: 800, icon: "🥇" },
-            { name: "Ouro IV", minXP: 900, icon: "🥇" },
-            { name: "Platina I", minXP: 1000, icon: "💎" },
-            { name: "Platina II", minXP: 1100, icon: "💎" },
-            { name: "Platina III", minXP: 1200, icon: "💎" },
-            { name: "Platina IV", minXP: 1300, icon: "💎" },
-            { name: "Diamante I", minXP: 1400, icon: "💠" },
-            { name: "Diamante II", minXP: 1500, icon: "💠" },
-            { name: "Diamante III", minXP: 1600, icon: "💠" },
-            { name: "Diamante IV", minXP: 1700, icon: "💠" },
-            { name: "Heroico", minXP: 1800, icon: "🏆" },
-            { name: "Mestre", minXP: 2000, icon: "👑" },
-            { name: "Desafiante", minXP: 2500, icon: "⚔️" }
+            { name: "Bronze",      minXP: 0,   icon: "🥉" },
+            { name: "Prata",       minXP: 100, icon: "🥈" },
+            { name: "Ouro",        minXP: 200, icon: "🥇" },
+            { name: "Platina",     minXP: 300, icon: "💎" },
+            { name: "Diamante",    minXP: 400, icon: "💠" },
+            { name: "Mestre",      minXP: 500, icon: "👑" },
+            { name: "Desafiante",  minXP: 600, icon: "⚔️" }
         ];
 
         // Funções do Sistema de XP e Patentes
@@ -1263,11 +1249,22 @@
             } catch (e) {}
         }
         
+        // Persistir XP total também em saebStats.totalXP para homepage
+        function addXPToStats(amount) {
+            try {
+                const raw = localStorage.getItem('saebStats');
+                const stats = raw ? JSON.parse(raw) : {};
+                stats.totalXP = (stats.totalXP || 0) + (amount || 0);
+                localStorage.setItem('saebStats', JSON.stringify(stats));
+            } catch (e) {}
+        }
+
         function addXP(amount) {
             const previousRank = playerRank;
             playerXP += amount;
             updateRank();
             savePlayerData();
+            addXPToStats(amount);
             
             // Verificar se subiu de patente
             if (playerRank > previousRank) {
@@ -1710,6 +1707,14 @@
                 `;
                 statsContainer.appendChild(totalXPCard);
             }
+
+            // Atualizar totalXP global após o quiz (já foi somado por questão, mas evita inconsistências)
+            try {
+                const raw = localStorage.getItem('saebStats');
+                const stats = raw ? JSON.parse(raw) : {};
+                stats.totalXP = (stats.totalXP || 0); // já atualizado nas questões
+                localStorage.setItem('saebStats', JSON.stringify(stats));
+            } catch (e) {}
             
             // Persistir resultados gerais
             updateStatsAfterQuiz(score, 10, finalTime);

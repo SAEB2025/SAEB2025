@@ -1385,15 +1385,27 @@
         }
 
         // Mostrar modal de feedback
+        // XP: +50 por acerto, persistindo em saebStats.totalXP
+        function addXPToStats(amount) {
+            try {
+                const raw = localStorage.getItem('saebStats');
+                const stats = raw ? JSON.parse(raw) : {};
+                stats.totalXP = (stats.totalXP || 0) + (amount || 0);
+                localStorage.setItem('saebStats', JSON.stringify(stats));
+            } catch (e) {}
+        }
+
         function showFeedbackModal(isCorrect, question) {
             const modal = document.getElementById('feedbackModal');
             const content = document.getElementById('feedbackContent');
             
             if (isCorrect) {
+                addXPToStats(50);
                 content.innerHTML = `
                     <div class="feedback-title">PARABÉNS!</div>
                     <div style="font-size: 4rem; margin: 2rem 0;">🎉</div>
                     <div class="correct-answer">Resposta correta!</div>
+                    <div style="background: var(--gradient-secondary); color: var(--dark-bg); padding: 1rem; border-radius: 15px; margin: 1rem 0; font-weight: 700;">+50 XP GANHOS!</div>
                     <div class="explanation">${question.explanation}</div>
                     <button class="continue-btn" onclick="nextQuestion()">CONTINUAR</button>
                 `;
@@ -1450,6 +1462,7 @@
             
             const finalTime = Math.floor((Date.now() - startTime) / 60000);
             const percentage = Math.round((score / 10) * 100);
+            const xpGained = score * 50;
             
             // Atualizar dados na tela de resultados
             document.getElementById('finalScore').textContent = `${score}/10`;
@@ -1459,6 +1472,18 @@
             
             // Persistir resultados
             updateStatsAfterQuiz(score, 10, finalTime);
+
+            // Adicionar cartões de XP na tela de resultados
+            const statsGrid = document.querySelector('.performance-stats');
+            if (statsGrid) {
+                const xpCard = document.createElement('div');
+                xpCard.className = 'stat-item';
+                xpCard.innerHTML = `
+                    <div class="stat-label">⭐ XP GANHO</div>
+                    <div class="stat-value" style="color: var(--neon-yellow);">+${xpGained} XP</div>
+                `;
+                statsGrid.appendChild(xpCard);
+            }
 
             // Limpar progresso concluído
             clearProgress();
