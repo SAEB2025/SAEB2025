@@ -40,6 +40,9 @@
             min-height: 100vh;
             opacity: 0;
             animation: pageFadeIn 300ms ease-out forwards;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         @keyframes pageFadeIn {
@@ -1228,15 +1231,49 @@
                 alternatives: ["objeto direto", "objeto indireto", "sujeito", "predicativo", "aposto"],
                 correct: 1,
                 explanation: "O pronome 'lhe' funciona como objeto indireto, indicando a quem foi entregue o documento."
+            },
+            {
+                question: "Qual é a função da vírgula em 'Maria, a professora, chegou cedo'?",
+                alternatives: ["Separar sujeito do predicado", "Isolar aposto", "Separar orações", "Indicar vocativo", "Marcar enumeração"],
+                correct: 1,
+                explanation: "A vírgula está isolando o aposto 'a professora', que explica ou especifica quem é Maria."
+            },
+            {
+                question: "Em 'O livro que comprei é interessante', o 'que' é:",
+                alternatives: ["Conjunção integrante", "Pronome relativo", "Advérbio", "Preposição", "Interjeição"],
+                correct: 1,
+                explanation: "O 'que' é pronome relativo, pois retoma o termo 'livro' e introduz uma oração subordinada adjetiva."
+            },
+            {
+                question: "A palavra 'extraordinário' é formada por:",
+                alternatives: ["Derivação sufixal", "Derivação prefixal", "Composição", "Derivação parassintética", "Derivação prefixal e sufixal"],
+                correct: 4,
+                explanation: "Extraordinário = extra (prefixo) + ordin (radical) + ário (sufixo). É formada por derivação prefixal e sufixal."
+            },
+            {
+                question: "Qual figura de linguagem ocorre em 'O silêncio gritava'?",
+                alternatives: ["Metáfora", "Metonímia", "Paradoxo", "Hipérbole", "Personificação"],
+                correct: 2,
+                explanation: "É um paradoxo, pois apresenta ideias contraditórias: silêncio (ausência de som) e gritar (produzir som alto)."
+            },
+            {
+                question: "O texto 'Era uma vez...' indica qual tipo de discurso?",
+                alternatives: ["Dissertativo", "Descritivo", "Narrativo", "Argumentativo", "Expositivo"],
+                correct: 2,
+                explanation: "'Era uma vez' é uma expressão típica do início de narrativas, especialmente contos de fadas e histórias infantis."
             }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas)
+        // Personagens para feedback de erro (URLs corrigidas e novas)
         const errorCharacters = [
             "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
             "https://i.ibb.co/kg63TCn/IMG-4287.png", 
             "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png"
+            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
+            "https://i.ibb.co/1th3w8bH/IMG-4361.png",
+            "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
+            "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
+            "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
 
         // Variáveis do jogo
@@ -1249,6 +1286,7 @@
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
         let playerXP = 0; // XP do jogador
+        let wrongTopics = []; // Rastrear tópicos das questões erradas
         let playerRank = 0; // Índice da patente atual
         
         // Sistema de Patentes do Free Fire
@@ -1556,6 +1594,7 @@
             selectedAnswer = null;
             startTime = Date.now();
             answered = false;
+            wrongTopics = []; // Resetar tópicos errados
             
             // Criar partículas de fundo
             createParticles();
@@ -1676,6 +1715,9 @@
                 // Adicionar 50 XP por acerto
                 addXP(50);
                 updateXPDisplay();
+            } else {
+                // Analisar tópico da questão errada
+                analyzeWrongAnswer(question);
             }
             setTimeout(() => {
                 showFeedbackModal(isCorrect, question);
@@ -1772,6 +1814,40 @@
             initQuiz();
         }
 
+        // Analisar resposta errada para identificar tópicos
+        function analyzeWrongAnswer(question) {
+            const questionText = question.question.toLowerCase();
+            let topic = "Língua Portuguesa Geral";
+            
+            if (questionText.includes('vírgula') || questionText.includes('pontuação')) {
+                topic = "Pontuação";
+            } else if (questionText.includes('plural') || questionText.includes('singular')) {
+                topic = "Morfologia - Plural e Singular";
+            } else if (questionText.includes('conjunção') || questionText.includes('conectivo')) {
+                topic = "Conjunções e Conectivos";
+            } else if (questionText.includes('oração') || questionText.includes('subordinada')) {
+                topic = "Sintaxe - Orações";
+            } else if (questionText.includes('pronome')) {
+                topic = "Pronomes";
+            } else if (questionText.includes('figura de linguagem') || questionText.includes('metáfora') || questionText.includes('paradoxo')) {
+                topic = "Figuras de Linguagem";
+            } else if (questionText.includes('gênero textual') || questionText.includes('tipo de texto')) {
+                topic = "Gêneros e Tipos Textuais";
+            } else if (questionText.includes('aposto') || questionText.includes('vocativo')) {
+                topic = "Termos Acessórios da Oração";
+            } else if (questionText.includes('derivação') || questionText.includes('formação')) {
+                topic = "Formação de Palavras";
+            } else if (questionText.includes('discurso') || questionText.includes('narrativa')) {
+                topic = "Tipos de Discurso";
+            } else if (questionText.includes('interpretação') || questionText.includes('finalidade')) {
+                topic = "Interpretação de Texto";
+            }
+            
+            if (!wrongTopics.includes(topic)) {
+                wrongTopics.push(topic);
+            }
+        }
+
         // Mostrar resultados finais
         function showResults() {
             document.getElementById('questionScreen').classList.add('hidden');
@@ -1805,35 +1881,34 @@
             // Limpar progresso concluído
             clearProgress();
 
-            // Sugestões
+            // Sugestões de melhoria baseadas nos erros específicos
             const improvementList = document.getElementById('improvementList');
             improvementList.innerHTML = '';
-            if (percentage < 50) {
-                improvementList.innerHTML = `
-                    <li>Revisar conceitos básicos de interpretação de texto</li>
-                    <li>Praticar leitura de diferentes gêneros textuais</li>
-                    <li>Estudar figuras de linguagem e recursos expressivos</li>
-                    <li>Fazer mais exercícios de compreensão textual</li>
-                `;
-            } else if (percentage < 70) {
-                improvementList.innerHTML = `
-                    <li>Aprimorar análise de elementos linguísticos</li>
-                    <li>Estudar funções da linguagem</li>
-                    <li>Revisar conectivos e coesão textual</li>
-                `;
-            } else if (percentage < 90) {
-                improvementList.innerHTML = `
-                    <li>Focar em questões mais complexas de interpretação</li>
-                    <li>Analisar textos multimodais</li>
-                    <li>Praticar intertextualidade</li>
-                `;
+            
+            if (score === 10) {
+                improvementList.innerHTML = '<li style="color: var(--neon-green);">🎉 Perfeito! Você dominou todos os tópicos de português!</li>';
+            } else if (wrongTopics.length > 0) {
+                improvementList.innerHTML = '<li style="color: var(--neon-yellow); font-weight: bold; margin-bottom: 0.5rem;">📚 Tópicos para revisar:</li>';
+                wrongTopics.forEach(topic => {
+                    improvementList.innerHTML += `<li>• ${topic}</li>`;
+                });
+                if (score < 7) {
+                    improvementList.innerHTML += '<li style="margin-top: 0.5rem;">✏️ Pratique mais exercícios de interpretação</li>';
+                    improvementList.innerHTML += '<li>📖 Leia textos variados diariamente</li>';
+                }
+            } else if (percentage >= 70) {
+                improvementList.innerHTML = '<li>📚 Continue praticando para manter o excelente desempenho!</li>';
+                improvementList.innerHTML += '<li>🎯 Explore textos mais complexos e análises literárias</li>';
             } else {
                 improvementList.innerHTML = `
-                    <li>Excelente desempenho em língua portuguesa!</li>
-                    <li>Continue praticando para manter o nível</li>
-                    <li>Experimente análises literárias mais profundas</li>
+                    <li>📖 Revise os conceitos básicos de língua portuguesa</li>
+                    <li>✏️ Pratique interpretação de textos variados</li>
+                    <li>🎯 Estude gramática e figuras de linguagem</li>
                 `;
             }
+            
+            // Limpar lista de tópicos errados para próximo quiz
+            wrongTopics = [];
         }
 
         // Fechar modal clicando fora dele (desabilitado)

@@ -40,6 +40,9 @@
             min-height: 100vh;
             opacity: 0;
             animation: pageFadeIn 300ms ease-out forwards;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         @keyframes pageFadeIn {
@@ -1137,15 +1140,24 @@
             { question: "Se 3x + 7 = 22, qual o valor de x?", alternatives: ["3", "5", "7", "9", "15"], correct: 1, explanation: "3x + 7 = 22 → 3x = 22 - 7 → 3x = 15 → x = 15 ÷ 3 = 5" },
             { question: "Um círculo tem raio de 5 cm. Qual é seu perímetro? (Use π = 3,14)", alternatives: ["15,7 cm", "31,4 cm", "78,5 cm", "25 cm", "10 cm"], correct: 1, explanation: "Perímetro = 2 × π × raio = 2 × 3,14 × 5 = 31,4 cm" },
             { question: "Qual é o MDC de 24 e 36?", alternatives: ["6", "8", "12", "18", "4"], correct: 2, explanation: "Divisores de 24: 1,2,3,4,6,8,12,24. Divisores de 36: 1,2,3,4,6,9,12,18,36. MDC = 12" },
-            { question: "Uma loja oferece 25% de desconto em um produto de R$ 80,00. Qual o valor final?", alternatives: ["R$ 20,00", "R$ 55,00", "R$ 60,00", "R$ 65,00", "R$ 75,00"], correct: 2, explanation: "Desconto = 80 × 0,25 = 20. Valor final = 80 - 20 = R$ 60,00" }
+            { question: "Uma loja oferece 25% de desconto em um produto de R$ 80,00. Qual o valor final?", alternatives: ["R$ 20,00", "R$ 55,00", "R$ 60,00", "R$ 65,00", "R$ 75,00"], correct: 2, explanation: "Desconto = 80 × 0,25 = 20. Valor final = 80 - 20 = R$ 60,00" },
+            { question: "Um carro percorre 240 km em 3 horas. Qual é sua velocidade média?", alternatives: ["60 km/h", "70 km/h", "80 km/h", "90 km/h", "100 km/h"], correct: 2, explanation: "Velocidade média = distância ÷ tempo = 240 ÷ 3 = 80 km/h" },
+            { question: "Qual é o valor de 2³ + 3²?", alternatives: ["13", "15", "17", "19", "21"], correct: 2, explanation: "2³ = 8 e 3² = 9. Soma: 8 + 9 = 17" },
+            { question: "Uma piscina tem 8m de comprimento, 4m de largura e 2m de profundidade. Qual é seu volume?", alternatives: ["14 m³", "32 m³", "48 m³", "64 m³", "96 m³"], correct: 3, explanation: "Volume = comprimento × largura × profundidade = 8 × 4 × 2 = 64 m³" },
+            { question: "Se log₂(x) = 5, qual é o valor de x?", alternatives: ["10", "16", "25", "32", "64"], correct: 3, explanation: "log₂(x) = 5 significa que 2⁵ = x. Portanto, x = 32" },
+            { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" }
         ];
 
-        // Personagens para feedback de erro (URLs corrigidas)
+        // Personagens para feedback de erro (URLs corrigidas e novas)
         const errorCharacters = [
             "https://i.ibb.co/Cp7G0Y4/IMG-4282.png",
             "https://i.ibb.co/kg63TCn/IMG-4287.png", 
             "https://i.ibb.co/XkJ1Y9q/IMG-4285.png",
-            "https://i.ibb.co/Wp7smTf/IMG-4283.png"
+            "https://i.ibb.co/Wp7smTf/IMG-4283.png",
+            "https://i.ibb.co/1th3w8bH/IMG-4361.png",
+            "https://i.ibb.co/fYHM7qn1/IMG-4362.png",
+            "https://i.ibb.co/MDqgNP7J/IMG-4363.png",
+            "https://i.ibb.co/3ms9NkJF/IMG-4364.png"
         ];
 
         // Variáveis do jogo
@@ -1156,6 +1168,7 @@
         let startTime = Date.now();
         let answered = false;
         let usedQuestionIndices = []; // Rastrear questões já usadas nesta sessão
+        let wrongTopics = []; // Rastrear tópicos das questões erradas
 
         // Persistência local de estatísticas
         function loadStats() {
@@ -1375,6 +1388,7 @@
             selectedAnswer = null;
             startTime = Date.now();
             answered = false;
+            wrongTopics = []; // Resetar tópicos errados
             
             createParticles();
             showQuestion();
@@ -1471,6 +1485,9 @@
             if (isCorrect) {
                 score++;
                 document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
+            } else {
+                // Analisar tópico da questão errada
+                analyzeWrongAnswer(question);
             }
             
             // Mostrar modal de feedback após um pequeno delay
@@ -1480,6 +1497,38 @@
 
             // Salvar progresso após confirmar
             saveProgress();
+        }
+
+        // Analisar resposta errada para identificar tópicos
+        function analyzeWrongAnswer(question) {
+            const questionText = question.question.toLowerCase();
+            let topic = "Matemática Geral";
+            
+            if (questionText.includes('porcentagem') || questionText.includes('%')) {
+                topic = "Porcentagem e Proporções";
+            } else if (questionText.includes('área') || questionText.includes('perímetro') || questionText.includes('volume')) {
+                topic = "Geometria e Medidas";
+            } else if (questionText.includes('expressão') || questionText.includes('equação') || questionText.includes('x')) {
+                topic = "Álgebra e Equações";
+            } else if (questionText.includes('fração') || questionText.includes('decimal')) {
+                topic = "Frações e Decimais";
+            } else if (questionText.includes('mdc') || questionText.includes('mmc')) {
+                topic = "Divisibilidade e Fatores";
+            } else if (questionText.includes('velocidade') || questionText.includes('tempo') || questionText.includes('distância')) {
+                topic = "Problemas de Movimento";
+            } else if (questionText.includes('desconto') || questionText.includes('juros') || questionText.includes('investimento')) {
+                topic = "Matemática Financeira";
+            } else if (questionText.includes('√') || questionText.includes('raiz')) {
+                topic = "Raízes e Potências";
+            } else if (questionText.includes('log') || questionText.includes('exponencial')) {
+                topic = "Logaritmos e Exponenciais";
+            } else if (questionText.includes('parábola') || questionText.includes('função')) {
+                topic = "Funções e Gráficos";
+            }
+            
+            if (!wrongTopics.includes(topic)) {
+                wrongTopics.push(topic);
+            }
         }
 
         // Mostrar modal de feedback
@@ -1556,18 +1605,17 @@
             document.getElementById('correctAnswers').textContent = score;
             document.getElementById('incorrectAnswers').textContent = 10 - score;
             
-            // Calcular e mostrar XP ganho
+            // Calcular e mostrar XP ganho com sistema de patentes
             const xpGained = score * 50;
             const stats = loadStats();
             const totalXP = stats.totalScore || 0;
-            const ranking = stats.ranking || 'Iniciante 🌱';
-            const nextRankXP = stats.nextRankXP;
+            const patentInfo = calculateRank(totalXP);
             
             document.getElementById('xpGainedDisplay').innerHTML = `
                 <div style="font-size: 2rem; color: var(--neon-yellow); margin: 0.5rem 0;">+${xpGained} XP</div>
-                <div style="font-size: 1.2rem; color: var(--neon-purple); margin: 0.5rem 0;">Patente: ${ranking}</div>
+                <div style="font-size: 1.2rem; color: ${patentInfo.color}; margin: 0.5rem 0;">${patentInfo.icon} Patente: ${patentInfo.name}</div>
                 <div style="font-size: 1rem; color: var(--text-secondary);">
-                    XP Total: ${totalXP} ${nextRankXP !== 'Máximo' ? `| Próxima: ${nextRankXP} XP` : '| Nível Máximo!'}
+                    XP Total: ${totalXP} | Próxima: ${getNextRankXP(totalXP)} XP
                 </div>
             `;
             document.getElementById('xpGainedStat').textContent = `${xpGained} XP`;
@@ -1591,41 +1639,71 @@
             // Limpar progresso concluído
             clearProgress();
 
-            // Sugestões de melhoria baseadas na performance
+            // Sugestões de melhoria baseadas nos erros específicos
             const improvementList = document.getElementById('improvementList');
             improvementList.innerHTML = '';
             
-            if (percentage < 50) {
-                improvementList.innerHTML = `
-                    <li>Revisar conceitos básicos de matemática</li>
-                    <li>Praticar operações fundamentais</li>
-                    <li>Estudar resolução de problemas</li>
-                    <li>Fazer mais exercícios práticos</li>
-                `;
-            } else if (percentage < 70) {
-                improvementList.innerHTML = `
-                    <li>Aprimorar técnicas de cálculo</li>
-                    <li>Praticar interpretação de problemas</li>
-                    <li>Revisar tópicos específicos</li>
-                `;
-            } else if (percentage < 90) {
-                improvementList.innerHTML = `
-                    <li>Focar em questões mais complexas</li>
-                    <li>Melhorar velocidade de resolução</li>
-                    <li>Praticar questões avançadas</li>
-                `;
+            if (score === 10) {
+                improvementList.innerHTML = '<li style="color: var(--neon-green);">🎉 Perfeito! Você dominou todos os tópicos!</li>';
+            } else if (wrongTopics.length > 0) {
+                improvementList.innerHTML = '<li style="color: var(--neon-yellow); font-weight: bold; margin-bottom: 0.5rem;">📚 Tópicos para revisar:</li>';
+                wrongTopics.forEach(topic => {
+                    improvementList.innerHTML += `<li>• ${topic}</li>`;
+                });
+                if (score < 7) {
+                    improvementList.innerHTML += '<li style="margin-top: 0.5rem;">✏️ Pratique mais exercícios similares</li>';
+                    improvementList.innerHTML += '<li>🎯 Foque em resolver problemas passo a passo</li>';
+                }
+            } else if (percentage >= 70) {
+                improvementList.innerHTML = '<li>📚 Continue praticando para manter o excelente desempenho!</li>';
+                improvementList.innerHTML += '<li>🎯 Tente resolver questões mais complexas</li>';
             } else {
                 improvementList.innerHTML = `
-                    <li>Excelente desempenho!</li>
-                    <li>Continue praticando para manter o nível</li>
-                    <li>Experimente questões de nível superior</li>
+                    <li>📖 Revise os conceitos básicos de matemática</li>
+                    <li>✏️ Pratique mais exercícios similares</li>
+                    <li>🎯 Foque em resolver problemas passo a passo</li>
                 `;
             }
+            
+            // Limpar lista de tópicos errados para próximo quiz
+            wrongTopics = [];
         }
 
         // Voltar ao lobby
         function returnToLobby() {
             confirmExitToLobby();
+        }
+
+        // Calcular patente baseada no XP total
+        function calculateRank(totalXP) {
+            const ranks = [
+                { min: 0, max: 99, name: 'Bronze', color: '#CD7F32', icon: '🥉' },
+                { min: 100, max: 199, name: 'Prata', color: '#C0C0C0', icon: '🥈' },
+                { min: 200, max: 299, name: 'Ouro', color: '#FFD700', icon: '🥇' },
+                { min: 300, max: 399, name: 'Platina', color: '#E5E4E2', icon: '💎' },
+                { min: 400, max: 499, name: 'Diamante', color: '#00FFFF', icon: '💎' },
+                { min: 500, max: 599, name: 'Mestre', color: '#9400D3', icon: '👑' },
+                { min: 600, max: Infinity, name: 'Desafiante', color: '#FF0080', icon: '🔥' }
+            ];
+            
+            for (let rank of ranks) {
+                if (totalXP >= rank.min && totalXP <= rank.max) {
+                    return rank;
+                }
+            }
+            
+            return ranks[0];
+        }
+        
+        // Obter XP necessário para próxima patente
+        function getNextRankXP(currentXP) {
+            const ranks = [100, 200, 300, 400, 500, 600];
+            for (let rankXP of ranks) {
+                if (currentXP < rankXP) {
+                    return rankXP;
+                }
+            }
+            return 'Máximo';
         }
 
         // Reiniciar o quiz com novas perguntas
