@@ -1025,6 +1025,9 @@
                 <div class="progress-info">
                     <div class="question-counter" id="questionCounter">QUESTÃO 1/10</div>
                     <div class="score" id="scoreDisplay">ACERTOS: 0</div>
+                    <div class="xp-display" id="xpDisplay" style="background: var(--gradient-main); color: var(--dark-bg); padding: 0.5rem 1.5rem; border-radius: 25px; font-weight: 700;">
+                        <span id="rankIcon">🥉</span> <span id="rankName">Bronze I</span> | <span id="xpAmount">0 XP</span>
+                    </div>
                 </div>
                 <div class="breadcrumb">🏠 INÍCIO > 🔢 MATEMÁTICA</div>
             </div>
@@ -1146,6 +1149,13 @@
             { question: "Uma piscina tem 8m de comprimento, 4m de largura e 2m de profundidade. Qual é seu volume?", alternatives: ["14 m³", "32 m³", "48 m³", "64 m³", "96 m³"], correct: 3, explanation: "Volume = comprimento × largura × profundidade = 8 × 4 × 2 = 64 m³" },
             { question: "Se log₂(x) = 5, qual é o valor de x?", alternatives: ["10", "16", "25", "32", "64"], correct: 3, explanation: "log₂(x) = 5 significa que 2⁵ = x. Portanto, x = 32" },
             { question: "Um investimento de R$ 1.000 rende 10% ao mês. Qual será o valor após 2 meses?", alternatives: ["R$ 1.100", "R$ 1.200", "R$ 1.210", "R$ 1.220", "R$ 1.250"], correct: 2, explanation: "Mês 1: 1.000 × 1,10 = 1.100. Mês 2: 1.100 × 1,10 = 1.210. Total: R$ 1.210" }
+            
+            // Novas questões adicionadas
+            { question: "Qual é o resultado de 15 × 8?", alternatives: ["120", "125", "115", "130", "118"], correct: 0, explanation: "15 × 8 = 120." },
+            { question: "Calcule 7² + 5².", alternatives: ["49", "25", "74", "84", "54"], correct: 2, explanation: "7² = 49 e 5² = 25. Soma = 74." },
+            { question: "Qual é a área de um retângulo de 12 cm por 7 cm?", alternatives: ["84 cm²", "19 cm²", "24 cm²", "96 cm²", "64 cm²"], correct: 0, explanation: "Área = base × altura = 12 × 7 = 84 cm²." },
+            { question: "30% de 250 é:", alternatives: ["65", "70", "75", "80", "85"], correct: 2, explanation: "0,30 × 250 = 75." },
+            { question: "Qual é o MDC de 18 e 24?", alternatives: ["2", "3", "6", "12", "18"], correct: 2, explanation: "Divisores comuns: 1, 2, 3, 6. Maior é 6." }
         ];
 
         // Personagens para feedback de erro (URLs corrigidas e novas)
@@ -1263,6 +1273,33 @@
             // Salvar dados de última partida
             stats.lastQuizScore = (finalCorrect / totalQuestions) * 100;
             stats.lastQuizTime = elapsedMinutes;
+
+            // Fundir estatísticas por categoria
+            stats.categoryTotals = stats.categoryTotals || {};
+            stats.categoryCorrect = stats.categoryCorrect || {};
+            for (const [cat, total] of Object.entries(sessionCategoryTotals)) {
+                stats.categoryTotals[cat] = (stats.categoryTotals[cat] || 0) + total;
+            }
+            for (const [cat, correct] of Object.entries(sessionCategoryCorrect)) {
+                stats.categoryCorrect[cat] = (stats.categoryCorrect[cat] || 0) + correct;
+            }
+
+            // Questões mais erradas
+            stats.mostMissedQuestions = stats.mostMissedQuestions || {};
+            sessionWrongQuestions.forEach(q => {
+                stats.mostMissedQuestions[q] = (stats.mostMissedQuestions[q] || 0) + 1;
+            });
+
+            // Histórico de desempenho
+            stats.history = Array.isArray(stats.history) ? stats.history : [];
+            stats.history.push({
+                at: Date.now(),
+                subject: 'matematica',
+                correct: finalCorrect,
+                total: totalQuestions,
+                minutes: elapsedMinutes
+            });
+            if (stats.history.length > 30) { stats.history = stats.history.slice(-30); }
 
             saveStats(stats);
         }
