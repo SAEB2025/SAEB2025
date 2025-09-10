@@ -36,7 +36,6 @@
             line-height: 1.4;
             overflow-x: hidden;
             min-height: 100vh;
-            scroll-behavior: smooth;
         }
 
         /* BACKGROUND EFFECTS */
@@ -407,21 +406,19 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: clamp(0.8rem, 2.5vw, 1.5rem);
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
         }
 
         .stat-card {
             text-align: center;
             padding: clamp(1.5rem, 3vw, 2rem);
-            background: linear-gradient(135deg, var(--darker-bg), rgba(21, 21, 21, 0.9));
+            background: var(--darker-bg);
             border: 1px solid var(--neon-pink);
             border-radius: 15px;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .stat-card::before {
@@ -437,24 +434,13 @@
         }
 
         .stat-card:hover {
-            transform: translateY(-12px) rotate(1deg) scale(1.02);
+            transform: translateY(-10px) rotate(2deg);
             border-color: var(--neon-green);
-            box-shadow: 
-                0 15px 40px rgba(0, 255, 136, 0.4),
-                0 5px 15px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--darker-bg));
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
         }
 
         .stat-card:hover::before {
             transform: scaleX(1);
-        }
-
-        .stat-card:hover .stat-number {
-            transform: scale(1.1);
-            text-shadow: 
-                0 0 30px var(--neon-green),
-                0 0 60px rgba(0, 255, 136, 0.5);
         }
 
         .stat-number {
@@ -462,10 +448,7 @@
             font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 900;
             color: var(--neon-green);
-            text-shadow: 
-                0 0 20px var(--neon-green),
-                0 0 40px rgba(0, 255, 136, 0.3);
-            transition: all 0.3s ease;
+            text-shadow: 0 0 20px var(--neon-green);
         }
 
         .stat-label {
@@ -708,7 +691,7 @@
         }
 
         .quiz-card {
-            background: linear-gradient(135deg, var(--card-bg), rgba(21, 21, 21, 0.9));
+            background: var(--card-bg);
             border: 2px solid transparent;
             border-radius: 25px;
             padding: 3rem 2rem;
@@ -717,10 +700,7 @@
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .quiz-card::before {
@@ -1325,7 +1305,7 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 1rem;
             }
 
@@ -1445,21 +1425,6 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.6rem;
-            }
-            
-            .stat-card {
-                padding: 1rem 0.8rem;
-            }
-            
-            .stat-number {
-                font-size: 1.8rem;
-            }
-        }
-
         @media (max-width: 360px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -1468,34 +1433,6 @@
             .hero h1 {
                 font-size: 1.8rem;
             }
-        }
-
-        /* DESKTOP OPTIMIZATIONS */
-        @media (min-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(6, 1fr);
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-            
-            .quiz-options {
-                max-width: 1200px;
-                margin: 0 auto 3rem;
-            }
-            
-            .main-content {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 0 2rem;
-            }
-        }
-
-        @media (min-width: 1600px) {
-            .container {
-                max-width: 1600px;
-                margin: 0 auto;
-            }
-        }
 
             .quiz-options {
                 grid-template-columns: 1fr;
@@ -1772,28 +1709,20 @@
                 <section class="stats-section">
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number">2.847</div>
-                            <div class="stat-label">ESTUDANTES ATIVOS</div>
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">ÁREAS DO CONHECIMENTO</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">156</div>
-                            <div class="stat-label">ESCOLAS PARTICIPANTES</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">18.432</div>
-                            <div class="stat-label">QUESTÕES RESPONDIDAS</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">87.3%</div>
-                            <div class="stat-label">TAXA DE APROVAÇÃO</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">4.9★</div>
-                            <div class="stat-label">AVALIAÇÃO DOS USUÁRIOS</div>
+                            <div class="stat-number">3ª</div>
+                            <div class="stat-label">SÉRIE ENSINO MÉDIO</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">100%</div>
-                            <div class="stat-label">GRATUITO SEMPRE</div>
+                            <div class="stat-label">DE GRAÇA FAMÍLIA</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">TENTATIVAS</div>
                         </div>
                     </div>
                 </section>
@@ -2046,14 +1975,6 @@
                             <div class="stat-row">
                                 <span class="stat-label">Pontuação Total:</span>
                                 <span class="stat-value" id="statTotalScore">0</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Último Aproveitamento:</span>
-                                <span class="stat-value" id="statLastAccuracy">--</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Último Tempo:</span>
-                                <span class="stat-value" id="statLastTime">--</span>
                             </div>
                         </div>
 
@@ -2396,20 +2317,13 @@
             
             counters.forEach(counter => {
                 const target = counter.textContent;
+                const isInfinity = target === '∞';
                 const isPercentage = target.includes('%');
-                const hasStar = target.includes('★');
-                const hasDecimal = target.includes('.');
-                const hasComma = target.includes(',');
+                const isSeries = target.includes('ª');
                 
-                // Extract numeric value for animation
-                let numericValue = target.replace(/[^\d.,]/g, '');
-                if (hasComma) {
-                    numericValue = numericValue.replace(',', '');
-                }
-                const targetNum = parseFloat(numericValue);
-                
-                if (!isNaN(targetNum)) {
+                if (!isInfinity && !isPercentage && !isSeries && !isNaN(parseInt(target))) {
                     let count = 0;
+                    const targetNum = parseInt(target);
                     const increment = targetNum / 60;
                     
                     const observer = new IntersectionObserver((entries) => {
@@ -2418,20 +2332,7 @@
                                 const updateCounter = () => {
                                     if (count < targetNum) {
                                         count += increment;
-                                        let displayValue;
-                                        
-                                        if (hasDecimal) {
-                                            displayValue = count.toFixed(1);
-                                        } else if (hasComma) {
-                                            displayValue = Math.floor(count).toLocaleString('pt-BR');
-                                        } else {
-                                            displayValue = Math.floor(count).toString();
-                                        }
-                                        
-                                        if (isPercentage) displayValue += '%';
-                                        if (hasStar) displayValue += '★';
-                                        
-                                        counter.textContent = displayValue;
+                                        counter.textContent = Math.floor(count);
                                         requestAnimationFrame(updateCounter);
                                     } else {
                                         counter.textContent = target;
@@ -2725,54 +2626,42 @@
 
         // CALCULATE LEVEL AND XP - Sistema de Patentes
         function calculateLevel(totalScore) {
-            // Unificado com os quizzes (Iniciante → Lendário)
             const levels = [
-                { min: 0,    max: 149,  name: 'Iniciante',    color: '#9E9E9E', icon: '🌱' },
-                { min: 150,  max: 299,  name: 'Bronze',       color: '#CD7F32', icon: '🥉' },
-                { min: 300,  max: 499,  name: 'Prata',        color: '#C0C0C0', icon: '🥈' },
-                { min: 500,  max: 699,  name: 'Ouro',         color: '#FFD700', icon: '🥇' },
-                { min: 700,  max: 999,  name: 'Platina',      color: '#B0E0E6', icon: '⚪' },
-                { min: 1000, max: 1499, name: 'Diamante',     color: '#00FFFF', icon: '💎' },
-                { min: 1500, max: 1999, name: 'Desafiante',   color: '#FF0080', icon: '🔥' },
-                { min: 2000, max: 2999, name: 'Mestre',       color: '#9400D3', icon: '👑' },
-                { min: 3000, max: 4999, name: 'Grão-Mestre',  color: '#00FF88', icon: '🏆' },
-                { min: 5000, max: Infinity, name: 'Lendário', color: '#FFEB3B', icon: '🌟' }
+                { min: 0, max: 99, name: 'Bronze', color: '#CD7F32', icon: '🥉' },
+                { min: 100, max: 199, name: 'Prata', color: '#C0C0C0', icon: '🥈' },
+                { min: 200, max: 299, name: 'Ouro', color: '#FFD700', icon: '🥇' },
+                { min: 300, max: 399, name: 'Platina', color: '#E5E4E2', icon: '💎' },
+                { min: 400, max: 499, name: 'Diamante', color: '#00FFFF', icon: '💎' },
+                { min: 500, max: 599, name: 'Mestre', color: '#9400D3', icon: '👑' },
+                { min: 600, max: Infinity, name: 'Desafiante', color: '#FF0080', icon: '🔥' }
             ];
-
-            for (let i = 0; i < levels.length; i++) {
-                const level = levels[i];
+            
+            for (let level of levels) {
                 if (totalScore >= level.min && totalScore <= level.max) {
-                    const nextLevel = levels[Math.min(i + 1, levels.length - 1)];
-                    const isMax = level.max === Infinity;
-                    const xpInLevel = isMax ? (totalScore - level.min) : (totalScore - level.min);
-                    const xpNeeded = isMax ? 0 : (level.max - level.min + 1);
-                    const progress = isMax ? 100 : Math.min(100, (xpInLevel / xpNeeded) * 100);
-
+                    const xpInLevel = totalScore - level.min;
+                    const xpNeeded = level.max - level.min + 1;
+                    const progress = Math.min(100, (xpInLevel / xpNeeded) * 100);
+                    
                     return {
                         name: level.name,
                         color: level.color,
                         icon: level.icon,
-                        xp: Math.max(0, xpInLevel),
+                        xp: xpInLevel,
                         xpNeeded: xpNeeded,
                         progress: progress,
-                        totalScore: totalScore,
-                        isMax: isMax,
-                        nextMin: nextLevel ? nextLevel.min : null
+                        totalScore: totalScore
                     };
                 }
             }
-
-            // Fallback
+            
             return {
-                name: 'Iniciante',
-                color: '#9E9E9E',
-                icon: '🌱',
+                name: 'Bronze',
+                color: '#CD7F32',
+                icon: '🥉',
                 xp: 0,
-                xpNeeded: 150,
+                xpNeeded: 100,
                 progress: 0,
-                totalScore: 0,
-                isMax: false,
-                nextMin: 150
+                totalScore: 0
             };
         }
 
@@ -2881,61 +2770,47 @@
                     xpFill.style.width = `${levelInfo.progress}%`;
                 }
                 if (xpText) {
-                    if (levelInfo.isMax) {
-                        xpText.textContent = `Máximo`;
-                    } else {
-                        const toNext = Math.max(0, (levelInfo.nextMin || 0) - (data.totalScore || 0));
-                        xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP (faltam ${toNext} XP)`;
-                    }
+                    xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpNeeded} XP`;
                 }
 
                 // Overall Performance
-                const overall = Math.round(((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100) * 100) / 100;
+                const overall = Math.round((data.overallCorrect || 0) / Math.max(1, (data.overallTotal || 0)) * 100);
                 const overallValue = document.getElementById('overallPerformanceValue');
                 const overallFill = document.getElementById('overallPerformanceFill');
-                if (overallValue) overallValue.textContent = `${isFinite(overall) ? overall.toFixed(2) : '0.00'}%`;
+                if (overallValue) overallValue.textContent = `${isFinite(overall) ? overall : 0}%`;
                 if (overallFill) overallFill.style.width = `${isFinite(overall) ? overall : 0}%`;
 
                 // Matemática
                 if (data.mathTotal > 0) {
-                    const mathPct = Math.round(((data.mathCorrect || 0) / data.mathTotal * 100) * 100) / 100;
+                    const mathPct = Math.round((data.mathCorrect || 0) / data.mathTotal * 100);
                     const mathValue = document.getElementById('mathPerformanceValue');
                     const mathFill = document.getElementById('mathPerformanceFill');
-                    if (mathValue) mathValue.textContent = `${mathPct.toFixed(2)}%`;
+                    if (mathValue) mathValue.textContent = `${mathPct}%`;
                     if (mathFill) mathFill.style.width = `${mathPct}%`;
                 }
 
                 // Português
                 if (data.portTotal > 0) {
-                    const portPct = Math.round(((data.portCorrect || 0) / data.portTotal * 100) * 100) / 100;
+                    const portPct = Math.round((data.portCorrect || 0) / data.portTotal * 100);
                     const portValue = document.getElementById('portuguesePerformanceValue');
                     const portFill = document.getElementById('portuguesePerformanceFill');
-                    if (portValue) portValue.textContent = `${portPct.toFixed(2)}%`;
+                    if (portValue) portValue.textContent = `${portPct}%`;
                     if (portFill) portFill.style.width = `${portPct}%`;
                 }
 
                 // Detailed Statistics
-                const avgSeconds = data.totalQuestions > 0 
-                    ? Math.round(((data.totalMinutes || 0) * 60 / data.totalQuestions) * 100) / 100
-                    : null;
                 const statElements = {
                     statQuizzesCompleted: data.quizzesCompleted || 0,
                     statTotalQuestions: data.totalQuestions || 0,
                     statCorrectAnswers: data.overallCorrect || 0,
-                    statTotalTime: `${(Math.round((data.totalMinutes || 0) * 100) / 100).toFixed(2)}min`,
-                    statAvgTime: avgSeconds !== null ? `${avgSeconds.toFixed(2)}s` : '--',
+                    statTotalTime: `${data.totalMinutes || 0}min`,
+                    statAvgTime: data.totalQuestions > 0 
+                        ? `${Math.round((data.totalMinutes * 60) / data.totalQuestions)}s` 
+                        : '--',
                     statBestStreak: data.bestStreak || 0,
                     statCurrentStreak: data.currentStreak || 0,
                     statTotalScore: data.totalScore || 0
                 };
-
-                // Última sessão (se existir)
-                const lastAcc = typeof data.lastQuizScore === 'number' ? Math.round(data.lastQuizScore * 100) / 100 : null;
-                const lastTime = typeof data.lastQuizTime === 'number' ? Math.round(data.lastQuizTime * 100) / 100 : null;
-                const elLastAcc = document.getElementById('statLastAccuracy');
-                const elLastTime = document.getElementById('statLastTime');
-                if (elLastAcc) elLastAcc.textContent = lastAcc !== null ? `${lastAcc.toFixed(2)}%` : '--';
-                if (elLastTime) elLastTime.textContent = lastTime !== null ? `${lastTime.toFixed(2)}min` : '--';
 
                 for (const [id, value] of Object.entries(statElements)) {
                     const element = document.getElementById(id);
