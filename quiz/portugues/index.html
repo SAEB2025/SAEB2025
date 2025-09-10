@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Quiz Português - SAEB 2025 📝</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
 
         header { position: fixed; top: 0; width: 100%; background: rgba(10,10,10,0.9); backdrop-filter: blur(16px); border-bottom: 2px solid var(--neon-pink); z-index: 1000; }
         .header-content { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-        .logo { font-family: 'Oswald', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; cursor: pointer; }
+        .logo { font-family: 'Oswald', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; background: var(--gradient-main); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; cursor: pointer; }
         .quiz-info { display: flex; align-items: center; gap: 1rem; color: var(--text-secondary); font-size: clamp(0.9rem,2vw,1rem); }
         .question-counter { background: var(--gradient-secondary); color: #000; padding: 0.4rem 1rem; border-radius: 999px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .score { color: var(--neon-cyan); font-weight: 900; }
@@ -101,7 +101,7 @@
         .results-card { background: var(--card-bg); border: 3px solid var(--neon-purple); border-radius: 24px; padding: clamp(2rem,6vw,3rem); position: relative; overflow: hidden; box-shadow: 0 0 45px rgba(176,0,255,.3); }
         .results-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(var(--neon-purple) 0deg, var(--neon-pink) 90deg, var(--neon-cyan) 180deg, var(--neon-yellow) 270deg, var(--neon-purple) 360deg); opacity: .06; animation: rotate 8s linear infinite; }
         @keyframes rotate { from { transform: rotate(0) } to { transform: rotate(360deg) } }
-        .results-title { font-family: 'Oswald', sans-serif; font-size: clamp(2rem,6vw,3.2rem); font-weight: 900; text-transform: uppercase; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; }
+        .results-title { font-family: 'Oswald', sans-serif; font-size: clamp(2rem,6vw,3.2rem); font-weight: 900; text-transform: uppercase; background: var(--gradient-main); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; }
         .score-display { font-family: 'Oswald', sans-serif; font-size: clamp(3rem, 8vw, 5rem); color: var(--neon-cyan); text-shadow: 0 0 28px var(--neon-cyan); margin: 1.5rem 0; }
         .performance-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1.2rem; margin: 2rem 0; }
         .stat-item { background: var(--darker-bg); border: 2px solid var(--neon-pink); border-radius: 16px; padding: 1.4rem; }
@@ -271,7 +271,7 @@
             saveStats(stats);
         }
 
-        function goToLobby() { window.location.href = '/index.html#lobby'; }
+        function goToLobby() { window.location.href = '../../index.html#lobby'; }
 
         function initQuiz() {
             selectedQuestions = getRandomQuestions(questions, 10);

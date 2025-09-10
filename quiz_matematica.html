@@ -1849,14 +1849,15 @@
             // Calcular e mostrar XP ganho com sistema de patentes
             const xpGained = score * 50;
             const stats = loadStats();
-            const totalXP = stats.totalScore || 0;
-            const patentInfo = calculateRank(totalXP);
+            const previousTotalXP = stats.totalScore || 0;
+            const newTotalXP = previousTotalXP + xpGained;
+            const patentInfo = calculateRank(newTotalXP);
             
             document.getElementById('xpGainedDisplay').innerHTML = `
                 <div style="font-size: 2rem; color: var(--neon-yellow); margin: 0.5rem 0;">+${xpGained} XP</div>
                 <div style="font-size: 1.2rem; color: ${patentInfo.color}; margin: 0.5rem 0;">${patentInfo.icon} Patente: ${patentInfo.name}</div>
                 <div style="font-size: 1rem; color: var(--text-secondary);">
-                    XP Total: ${totalXP} | Próxima: ${getNextRankXP(totalXP)} XP
+                    XP Total: ${newTotalXP} | Próxima: ${getNextRankXP(newTotalXP)} XP
                 </div>
             `;
             document.getElementById('xpGainedStat').textContent = `${xpGained} XP`;
@@ -1864,17 +1865,19 @@
             // Animar XP ganho
             setTimeout(() => {
                 const xpDisplay = document.getElementById('xpGainedDisplay');
-                xpDisplay.style.animation = 'pulse 1s ease-in-out infinite';
-                
-                // Se subiu de patente, mostrar notificação
-                if (stats.rankUp) {
+                if (xpDisplay) {
+                    xpDisplay.style.animation = 'pulse 1s ease-in-out infinite';
+                }
+                // Recarregar stats para refletir atualização feita abaixo
+                const latestStats = (function(){ try { return JSON.parse(localStorage.getItem('saebStats') || '{}'); } catch(e){ return {}; } })();
+                if (latestStats && latestStats.rankUp && typeof latestStats.ranking === 'string') {
                     setTimeout(() => {
-                        alert(`🎉 PARABÉNS! Você subiu para a patente ${ranking}!`);
+                        alert(`🎉 PARABÉNS! Você subiu para a patente ${latestStats.ranking}!`);
                     }, 1000);
                 }
             }, 500);
             
-            // Persistir resultados
+            // Persistir resultados E atualizar XP/Patente antes de ler rankUp/ranking novamente
             updateStatsAfterQuiz(score, 10, finalTime);
 
             // Limpar progresso concluído
