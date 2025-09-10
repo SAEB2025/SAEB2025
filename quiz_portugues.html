@@ -29,6 +29,8 @@
             --gradient-secondary: linear-gradient(45deg, #FF6B35, #FF1493);
             --correct-green: #00FF00;
             --error-red: #FF3333;
+            /* Altura dinâmica do header para evitar sobreposição */
+            --header-height: 120px;
         }
 
         body {
@@ -200,8 +202,8 @@
 
         /* MAIN CONTAINER */
         .quiz-container {
-            margin-top: 120px;
-            min-height: calc(100vh - 120px);
+            margin-top: calc(var(--header-height, 120px) + 8px);
+            min-height: calc(100vh - var(--header-height, 120px));
             position: relative;
             z-index: 10;
         }
@@ -213,7 +215,7 @@
             padding: 2rem;
             display: flex;
             flex-direction: column;
-            min-height: calc(100vh - 160px);
+            min-height: auto;
         }
 
         .question-card {
@@ -273,7 +275,7 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.2rem;
         }
 
         .alternative {
@@ -373,8 +375,8 @@
             display: flex;
             justify-content: center;
             gap: 1rem;
-            margin-top: auto;
-            padding-top: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
         }
 
         .action-btn {
@@ -839,12 +841,12 @@
             }
 
             .quiz-container {
-                margin-top: 140px;
+                margin-top: calc(var(--header-height, 140px) + 8px);
             }
 
             .question-container {
                 padding: 1rem;
-                min-height: calc(100vh - 150px);
+                min-height: auto;
             }
             
             .question-card {
@@ -936,11 +938,11 @@
             }
             
             .quiz-container {
-                margin-top: 160px;
+                margin-top: calc(var(--header-height, 160px) + 8px);
             }
 
             .question-container {
-                min-height: calc(100vh - 170px);
+                min-height: auto;
                 padding: 0.5rem;
             }
             
@@ -998,11 +1000,11 @@
             }
             
             .quiz-container {
-                margin-top: 100px;
+                margin-top: calc(var(--header-height, 100px) + 8px);
             }
             
             .question-container {
-                min-height: calc(100vh - 110px);
+                min-height: auto;
             }
             
             .question-card {
@@ -1716,6 +1718,14 @@
             }
         }
 
+        // Ajustar altura do header de forma dinâmica para evitar sobreposição
+        function updateHeaderHeight() {
+            const header = document.querySelector('header');
+            if (!header) return;
+            const height = Math.ceil(header.getBoundingClientRect().height);
+            document.documentElement.style.setProperty('--header-height', height + 'px');
+        }
+
         // Embaralhar array (Fisher-Yates)
         function shuffleArray(array) {
             const newArray = [...array];
@@ -2060,11 +2070,20 @@
             saveProgress();
         });
 
+        // Ajustar header assim que o DOM estiver pronto
+        window.addEventListener('DOMContentLoaded', function(){
+            updateHeaderHeight();
+        });
+
         // Inicializar quando a página carregar
         window.addEventListener('load', function() {
             // Carregar dados do jogador (XP e patente)
             loadPlayerData();
             updateXPDisplay();
+            // Corrige layout inicial baseado na altura real do header
+            updateHeaderHeight();
+            window.addEventListener('resize', updateHeaderHeight);
+            window.addEventListener('orientationchange', updateHeaderHeight);
             
             // Pré-carregar imagens dos personagens
             preloadImages();
