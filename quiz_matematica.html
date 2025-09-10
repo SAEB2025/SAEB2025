@@ -237,6 +237,7 @@
             background: var(--gradient-main);
             opacity: 0.05;
             border-radius: 20px;
+            z-index: 0; /* Garante que o fundo fique atrás do conteúdo */
         }
 
         .question-number {
@@ -262,6 +263,10 @@
             font-weight: 400;
             position: relative;
             z-index: 2;
+            display: block; /* Evita colapsar em alguns navegadores móveis */
+            visibility: visible; /* Força visibilidade do enunciado */
+            white-space: pre-wrap; /* Mantém quebras se houver */
+            word-break: break-word; /* Evita overflow de termos longos */
         }
 
         .question-text strong {
@@ -1631,8 +1636,14 @@
             document.getElementById('scoreDisplay').textContent = `ACERTOS: ${score}`;
             document.getElementById('questionNumber').textContent = `QUESTÃO ${currentQuestionIndex + 1}`;
             
-            // Mostrar texto da questão
-            document.getElementById('questionText').textContent = question.question;
+            // Mostrar texto da questão (com fallback de visibilidade)
+            const questionTextEl = document.getElementById('questionText');
+            questionTextEl.textContent = question.question || 'Pergunta indisponível';
+            // Fallback para navegadores que eventualmente ocultam o texto
+            if (!questionTextEl.textContent || questionTextEl.textContent.trim() === '') {
+                questionTextEl.innerText = question.question || 'Pergunta indisponível';
+            }
+            questionTextEl.style.visibility = 'visible';
             
             // Criar índices embaralhados para as alternativas
             const shuffledIndices = shuffleArray([0, 1, 2, 3, 4]);
@@ -1866,10 +1877,10 @@
                 const xpDisplay = document.getElementById('xpGainedDisplay');
                 xpDisplay.style.animation = 'pulse 1s ease-in-out infinite';
                 
-                // Se subiu de patente, mostrar notificação
-                if (stats.rankUp) {
+                // Se subiu de patente, mostrar notificação (usa dado existente, se houver)
+                if (stats.rankUp && stats.ranking) {
                     setTimeout(() => {
-                        alert(`🎉 PARABÉNS! Você subiu para a patente ${ranking}!`);
+                        alert(`🎉 PARABÉNS! Você subiu para a patente ${stats.ranking}!`);
                     }, 1000);
                 }
             }, 500);
